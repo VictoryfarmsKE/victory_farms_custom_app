@@ -9,8 +9,8 @@ from victory_farms_custom_app import __version__ as version
 setup(
 	name="victory_farms_custom_app",
 	version=version,
-	description="Victory Farms Custom App",
-	author="Sloufy",
+	description="Custom Inventory Report",
+	author="Solufy",
 	author_email="contact@solufy.in",
 	packages=find_packages(),
 	zip_safe=False,

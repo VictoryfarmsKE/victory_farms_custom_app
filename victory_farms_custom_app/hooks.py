@@ -2,8 +2,8 @@ from . import __version__ as app_version
 
 app_name = "victory_farms_custom_app"
 app_title = "Victory Farms Custom App"
-app_publisher = "Sloufy"
-app_description = "Victory Farms Custom App"
+app_publisher = "Solufy"
+app_description = "Custom Inventory Report"
 app_email = "contact@solufy.in"
 app_license = "MIT"
 

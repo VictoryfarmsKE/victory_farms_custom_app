@@ -1,6 +1,6 @@
 ## Victory Farms Custom App
 
-Victory Farms Custom App
+Custom Inventory Report
 
 #### License
 
