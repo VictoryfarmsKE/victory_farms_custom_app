@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include victory_farms_custom_app *.css
+recursive-include victory_farms_custom_app *.csv
+recursive-include victory_farms_custom_app *.html
+recursive-include victory_farms_custom_app *.ico
+recursive-include victory_farms_custom_app *.js
+recursive-include victory_farms_custom_app *.json
+recursive-include victory_farms_custom_app *.md
+recursive-include victory_farms_custom_app *.png
+recursive-include victory_farms_custom_app *.py
+recursive-include victory_farms_custom_app *.svg
+recursive-include victory_farms_custom_app *.txt
+recursive-exclude victory_farms_custom_app *.pyc
