@@ -1,0 +1,50 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SCHD.#####",
+ "creation": "2024-01-01 10:12:35.382013",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "spoilage_item",
+  "warehouse",
+  "qty"
+ ],
+ "fields": [
+  {
+   "fieldname": "spoilage_item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Spoilage Item ",
+   "options": "Item"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Qty"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-01-29 15:26:15.912483",
+ "modified_by": "Administrator",
+ "module": "Victory Farms Custom App",
+ "name": "Spoilage Child",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
