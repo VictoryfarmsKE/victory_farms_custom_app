@@ -1,0 +1,13 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Stock Ledger Entry",
+  "enabled": 1,
+  "modified": "2024-02-26 16:35:03.645664",
+  "module": "Victory Farms Custom App",
+  "name": "Stock Ledger Entry Client Script",
+  "script": "frappe.ui.form.on('Stock Ledger Entry', {\n\trefresh(frm) {\n\t  frappe.db.get_doc('Item',frm.doc.item_code)\n    .then(doc => {\n        frm.set_value(\"custom_item_group\",doc.item_group)\n    })\n\t}\n})",
+  "view": "Form"
+ }
+]

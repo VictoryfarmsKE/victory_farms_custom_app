@@ -125,7 +125,11 @@ app_license = "MIT"
 #		"on_trash": "method"
 #	}
 # }
-
+doc_events = {
+	"Stock Entry": {
+		"on_update": "victory_farms_custom_app.public.py.stock_entry.stock_entry",
+	}
+}
 # Scheduled Tasks
 # ---------------
 
@@ -215,3 +219,16 @@ app_license = "MIT"
 # auth_hooks = [
 #	"victory_farms_custom_app.auth.validate"
 # ]
+fixtures = [{
+    "doctype": "Custom Field",
+        "filters": {
+            "module": ["in", ["Victory Farms Custom App"]]
+            }
+    },
+    {
+    "doctype": "Client Script",
+        "filters": {
+            "module": ["in", ["Victory Farms Custom App"]]
+            }
+    }
+]
