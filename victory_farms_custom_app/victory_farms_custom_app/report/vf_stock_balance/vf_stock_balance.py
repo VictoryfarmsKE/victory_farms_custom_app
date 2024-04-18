@@ -5,7 +5,7 @@ from frappe import _
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from itertools import filterfalse
-# from iteration_utilities import unique_everseen
+from erpnext.stock.utils import get_stock_balance 
 
 def execute(filters=None):
     columns, data = [], []
@@ -142,7 +142,7 @@ def get_data(filters, columns):
             "spoilage_stock": spoilage_stock,
             "expected_closing_stock": (total_opening_stock + received_qty) - (abs(total_quantity_sold) + 0.0),
             "system_stock": total_opening_stock,
-            "difference": (total_opening_stock + received_qty) - (abs(total_quantity_sold) + 0.0) - total_opening_stock,
+            "difference": (total_opening_stock + received_qty) - (abs(total_quantity_sold) + 0.0) - total_opening_stock
             # "item_group": item_grp
         }
         result.append(data)
@@ -160,18 +160,38 @@ def get_data(filters, columns):
 
     return unique_result
 def get_opening_stock(item_code, warehouse, end_date):
-    opening_stock = frappe.db.sql("""
-        SELECT COALESCE(SUM(item.qty), 0)
-        FROM `tabStock Reconciliation` AS sr
-        JOIN `tabStock Reconciliation Item` AS item ON sr.name = item.parent
-        WHERE item.item_code = %s AND item.warehouse = %s AND sr.posting_date <= %s
-            -- AND sr.purpose = 'Opening Stock'
-    """, (item_code, warehouse, end_date))[0][0]
-    return opening_stock or 0.0
+    blnc_qty = get_stock_balance( item_code=item_code, warehouse=warehouse, posting_date=end_date)
+
+    # capacity_data = frappe.db.get_all(
+    #     "Putaway Rule",
+    #     fields=["item_code", "warehouse", "stock_capacity", "company"],
+    #     filters=filters,
+    #     # limit_start=start,
+    #     # limit_page_length="11",
+    # )
+
+    # for entry in capacity_data:
+    #     balance_qty = get_stock_balance(entry.item_code, entry.warehouse, nowdate()) or 0
+    #     entry.update(
+    #         {
+    #             "actual_qty": balance_qty,
+    #             "percent_occupied": flt((flt(balance_qty) / flt(entry.stock_capacity)) * 100, 0),
+    #         }
+    #     )
+    # opening_stock = frappe.db.sql("""
+    #     SELECT COALESCE(SUM(item.qty), 0)
+    #     FROM `tabStock Ledger Entry` AS sr
+    #     JOIN `tabStock Reconciliation Item` AS item ON sr.name = item.parent
+    #     WHERE item.item_code = %s AND item.warehouse = %s AND sr.posting_date <= %s
+    #         -- AND sr.purpose = 'Opening Stock'
+    # """, (item_code, warehouse, end_date))[0][0]
+    return blnc_qty or 0.0
 
 
 
 def get_received_qty(item_code, warehouse, posting_date):
+    # #Now Date Received Stock
+    # received_qty = get_stock_balance(item_code=item_code, warehouse=warehouse, posting_date=posting_date)
     # Use a parameterized query to avoid SQL injection
     received_qty = frappe.db.sql("""
         SELECT COALESCE(SUM(item.qty), 0)
@@ -191,6 +211,8 @@ def get_received_qty(item_code, warehouse, posting_date):
 
     # Extract the first element of each tuple and then sum
     return sum(entry[0] for entry in received_qty) or 0.0
+    # return received_qty or 0.0
+
 
 
 
@@ -210,9 +232,9 @@ def get_spoilage_stock(item_code, warehouse, posting_date):
         SELECT COALESCE(SUM(item.qty), 0)
         FROM `tabStock Entry` AS se
         JOIN `tabItem Summery` AS item ON se.name = item.parent
-        WHERE item.item = %s 
+        WHERE item.item = %s
             AND se.stock_entry_type = 'Repack Spoilage'
-            AND se.posting_date = %s
+            AND se.posting_date = %s 
     """, (item_code, posting_date))
     # Extract the first element of each tuple and then sum
     return sum(entry[0] for entry in spoilage_st) or 0.0
