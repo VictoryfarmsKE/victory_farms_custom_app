@@ -187,7 +187,7 @@ def get_received_qty(item_code, warehouse, posting_date):
     received_qty = frappe.db.sql("""
         SELECT COALESCE(SUM(CASE WHEN sle.actual_qty > 0 THEN sle.actual_qty ELSE 0 END), 0)
         FROM `tabStock Ledger Entry` AS sle
-        WHERE sle.item_code = %s AND sle.warehouse = %s AND sle.posting_date = %s
+        WHERE sle.item_code = %s AND sle.warehouse = %s AND sle.posting_date = %s AND sle.voucher_type != "Stock Reconciliation"
     """, (item_code, warehouse, posting_date))[0][0]
 
     return abs(received_qty)
@@ -199,7 +199,7 @@ def get_quantity_sold(item_code, warehouse, posting_date):
     quantity_sold = frappe.db.sql("""
         SELECT COALESCE(SUM(CASE WHEN sle.actual_qty < 0 THEN sle.actual_qty ELSE 0 END), 0)
         FROM `tabStock Ledger Entry` AS sle
-        WHERE sle.item_code = %s AND sle.warehouse = %s AND sle.posting_date = %s
+        WHERE sle.item_code = %s AND sle.warehouse = %s AND sle.posting_date = %s AND sle.voucher_type != "Stock Reconciliation"
     """, (item_code, warehouse, posting_date))[0][0]
 
     return abs(quantity_sold)
@@ -217,25 +217,46 @@ def get_spoilage_stock(item_code, warehouse, posting_date):
     # Extract the first element of each tuple and then sum
     return sum(entry[0] for entry in spoilage_st) or 0.0
 
+
 def get_system_stock(item_code, warehouse, posting_date):
-    system_stock = frappe.db.sql("""
-        SELECT COALESCE(SUM(item.qty), 0)
-        FROM `tabStock Reconciliation` AS sr
-        JOIN `tabStock Reconciliation Item` AS item ON sr.name = item.parent
-        WHERE item.item_code = %s AND item.warehouse = %s AND sr.posting_date = %s
-            -- AND sr.purpose = 'Stock Reconciliation'
+    result = frappe.db.sql("""
+        SELECT COALESCE(sle.qty_after_transaction, 0)
+        FROM `tabStock Ledger Entry` AS sle
+        WHERE sle.posting_date = %s
+        AND sle.item_code = %s
+        AND sle.posting_time = (
+            SELECT MAX(sle_inner.posting_time)
+            FROM `tabStock Ledger Entry` AS sle_inner
+            WHERE sle_inner.posting_date = %s 
+            AND sle_inner.item_code = %s
+        )
+        ORDER BY sle.creation DESC
+        LIMIT 1
+    """, (posting_date, item_code, posting_date, item_code))
+    
+    system_stock = result[0][0] if result else 0
+    return system_stock
+
+
+# def get_system_stock(item_code, warehouse, posting_date):
+#     system_stock = frappe.db.sql("""
+#         SELECT COALESCE(SUM(item.qty), 0)
+#         FROM `tabStock Reconciliation` AS sr
+#         JOIN `tabStock Reconciliation Item` AS item ON sr.name = item.parent
+#         WHERE item.item_code = %s AND item.warehouse = %s AND sr.posting_date = %s
+#             -- AND sr.purpose = 'Stock Reconciliation'
         
-        UNION ALL
+#         UNION ALL
 
-        SELECT COALESCE(SUM(item.qty), 0)
-        FROM `tabStock Entry` AS se
-        JOIN `tabStock Entry Detail` AS item ON se.name = item.parent
-        WHERE item.item_code = %s AND item.t_warehouse = %s AND se.posting_date = %s
-            -- AND se.stock_entry_type = 'Material Transfer'
-    """, (item_code, warehouse, posting_date, item_code, warehouse,posting_date))
+#         SELECT COALESCE(SUM(item.qty), 0)
+#         FROM `tabStock Entry` AS se
+#         JOIN `tabStock Entry Detail` AS item ON se.name = item.parent
+#         WHERE item.item_code = %s AND item.t_warehouse = %s AND se.posting_date = %s
+#             -- AND se.stock_entry_type = 'Material Transfer'
+#     """, (item_code, warehouse, posting_date, item_code, warehouse,posting_date))
 
-    # Extract the first element of each tuple and then sum
-    return sum(entry[0] for entry in system_stock) or 0.0
-    return system_stock or 0.0
+#     # Extract the first element of each tuple and then sum
+#     return sum(entry[0] for entry in system_stock) or 0.0
+#     return system_stock or 0.0
 
 
