@@ -100,7 +100,6 @@ def get_columns():
         # }
     ]
 
-
 def get_data(filters, columns):
     query_filters = {}
 
@@ -116,52 +115,46 @@ def get_data(filters, columns):
             query_filters["posting_date"] = ["between", [filters["from_date"], filters["to_date"]]]
 
     # Fetch data from the Stock Ledger Entry table based on filters
-
     query = frappe.get_all(
         "Stock Ledger Entry",
         filters=query_filters,
-        fields=["posting_date", "name"]
+        fields=["posting_date", "item_code", "warehouse", "name"]
     )
 
     result = []
 
+    # Batch fetch opening stocks for all item codes
+    item_codes = set(entry["item_code"] for entry in query)
+    opening_stocks = {item_code: get_opening_stock(filters["from_date"], item_code) for item_code in item_codes}
+
     # Process the query results
     for qr in query:
         ledger_entry = frappe.get_doc("Stock Ledger Entry", qr.name)
-        end_date = ledger_entry.posting_date + relativedelta(days=-1)
-        total_opening_stock = get_opening_stock(end_date,ledger_entry.item_code)
         received_qty = get_received_qty(ledger_entry.item_code, ledger_entry.warehouse, ledger_entry.posting_date)
         total_quantity_sold = get_quantity_sold(ledger_entry.item_code, ledger_entry.warehouse, ledger_entry.posting_date)
         spoilage_stock = get_spoilage_stock(ledger_entry.item_code, ledger_entry.warehouse, ledger_entry.posting_date)
-        system_stock = get_system_stock(ledger_entry.item_code, ledger_entry.warehouse, ledger_entry.posting_date)
-        # item_grp = itm_group
+        system_stock = opening_stocks.get(ledger_entry.item_code, 0)  # Use pre-fetched opening stock
+        end_date = ledger_entry.posting_date + relativedelta(days=-1)
+        opening_stock = get_opening_stock(end_date, ledger_entry.item_code)
 
         data = {
             "posting_date": ledger_entry.posting_date,
             "item_code": ledger_entry.item_code,
             "warehouse": ledger_entry.warehouse,
-            "total_opening_stock": total_opening_stock,
+            "total_opening_stock": opening_stock,
             "received_qty": received_qty,
             "total_quantity_sold": total_quantity_sold,
             "spoilage_stock": spoilage_stock,
-            "expected_closing_stock": (total_opening_stock + received_qty) - (abs(total_quantity_sold) + 0.0),
+            "expected_closing_stock": (opening_stock + received_qty) - (abs(total_quantity_sold) + 0.0),
             "system_stock": system_stock,
-            "difference": ((total_opening_stock + received_qty) - (abs(total_quantity_sold) + 0.0) - system_stock)
+            "difference": ((opening_stock + received_qty) - (abs(total_quantity_sold) + 0.0) - system_stock)
         }
         result.append(data)
-
-    # Remove duplicates METHOD 1
     unique_result = list({tuple(sorted(d.items())): d for d in result}.values())
-    # Remove duplicates METHOD 2
-    # unique_result = []
-    # seen = set()
-    # for d in result:
-    #     t = tuple(sorted(d.items()))
-    #     if t not in seen:
-    #         seen.add(t)
-    #         unique_result.append(d)
+        
 
     return unique_result
+
 def get_opening_stock(end_date, item_code):
     # Modified SQL query to retrieve the qty_after_transaction value for the given end_date and max posting_time
     result = frappe.db.sql("""
@@ -237,26 +230,5 @@ def get_system_stock(item_code, warehouse, posting_date):
     system_stock = result[0][0] if result else 0
     return system_stock
 
-
-# def get_system_stock(item_code, warehouse, posting_date):
-#     system_stock = frappe.db.sql("""
-#         SELECT COALESCE(SUM(item.qty), 0)
-#         FROM `tabStock Reconciliation` AS sr
-#         JOIN `tabStock Reconciliation Item` AS item ON sr.name = item.parent
-#         WHERE item.item_code = %s AND item.warehouse = %s AND sr.posting_date = %s
-#             -- AND sr.purpose = 'Stock Reconciliation'
-        
-#         UNION ALL
-
-#         SELECT COALESCE(SUM(item.qty), 0)
-#         FROM `tabStock Entry` AS se
-#         JOIN `tabStock Entry Detail` AS item ON se.name = item.parent
-#         WHERE item.item_code = %s AND item.t_warehouse = %s AND se.posting_date = %s
-#             -- AND se.stock_entry_type = 'Material Transfer'
-#     """, (item_code, warehouse, posting_date, item_code, warehouse,posting_date))
-
-#     # Extract the first element of each tuple and then sum
-#     return sum(entry[0] for entry in system_stock) or 0.0
-#     return system_stock or 0.0
 
 
