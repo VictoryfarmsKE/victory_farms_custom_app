@@ -15,13 +15,13 @@ frappe.query_reports["VF Stock Balance"] = {
             "fieldname": "from_date",
             "label": __("Start Date"),
             "fieldtype": "Date",
-            "default": frappe.defaults.get_user_default("year_start_date")
+            "default": frappe.datetime.get_today()
         },
         {
             "fieldname": "to_date",
             "label": __("End Date"),
             "fieldtype": "Date",
-            "default": frappe.defaults.get_user_default("year_end_date")
+            "default": frappe.datetime.get_today()
         },
         {
             "fieldname": "item_code",
