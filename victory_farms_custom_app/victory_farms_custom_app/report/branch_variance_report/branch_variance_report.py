@@ -79,14 +79,14 @@ def get_columns():
         },
         {
             'fieldname': 'system_stock',
-            'label': _('System Stock'),
+            'label': _('Current Stock'),
             'fieldtype': 'Data',
             'width': 120,
             'align': 'right'
         },
         {
             'fieldname': 'difference',
-            'label': _('Difference'),
+            'label': _('Variance'),
             'fieldtype': 'Data',
             'width': 100,
             'align': 'right'
@@ -109,16 +109,14 @@ def get_data(filters, columns):
     from_date = str(filters.get("from_date"))
     to_date = str(filters.get("to_date"))
     where_cnd = ''
-    spoilage_where_cnd = ''
     if filters.get("item_code"):
-        where_cnd = " and sle.item_code ='%s' " % filters["item_code"]
-        spoilage_where_cnd = " and sed.item_code ='%s' " % filters["item_code"]
+        where_cnd += " and sle.item_code ='%s' " % filters["item_code"]
+    if filters.get("custom_item_group"):
+        where_cnd += " and sle.custom_item_group ='%s' " % filters["custom_item_group"]
     if filters.get("warehouse"):
         where_cnd += " and sle.warehouse ='%s' " % filters["warehouse"]
-        spoilage_where_cnd += " and sed.s_warehouse ='%s' " % filters["warehouse"]
     if filters.get("company"):
         where_cnd += " and sle.company ='%s' " % filters["company"]
-        spoilage_where_cnd += " and sle.company ='%s' " % filters["company"]
 
     vf_stock_balance_dict = {
             "posting_date": '',

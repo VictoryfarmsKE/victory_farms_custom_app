@@ -12,11 +12,11 @@
  "modified": "2024-04-16 14:34:38.804907",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
- "name": "VF Stock Balance",
+ "name": "Branch Variance Report",
  "owner": "Administrator",
  "prepared_report": 0,
  "ref_doctype": "Stock Entry",
- "report_name": "VF Stock Balance",
+ "report_name": "Branch Variance Report",
  "report_type": "Script Report",
  "roles": [
   {
