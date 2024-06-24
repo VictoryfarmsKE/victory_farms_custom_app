@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["VF Stock Balance"] = {
+frappe.query_reports["Branch Variance Report"] = {
     "filters": [
         {
             "fieldname": "company",
@@ -34,7 +34,13 @@ frappe.query_reports["VF Stock Balance"] = {
             "label": __("Warehouse"),
             "fieldtype": "Link",
             "options": "Warehouse"
-        }
+        },
+        {
+            "fieldname": "custom_item_group",
+            "label": __("Item Group"),
+            "fieldtype": "Link",
+            "options": "Item Group"
+        },
     ],
     "formatter": function (value, row, column, data, default_formatter) {
         value = default_formatter(value, row, column, data);
