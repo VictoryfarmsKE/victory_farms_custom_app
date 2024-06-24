@@ -183,11 +183,17 @@ def get_data(filters, columns):
     """ % where_cnd, (from_date, to_date)))
     query_voucher_sp_results = list(frappe.db.sql("""
     SELECT
-        name
+        se.name
     FROM
         `tabStock Entry` AS se
+    INNER JOIN
+        `tabWarehouse` AS wh ON wh.name = se.destination_warehouse
     WHERE
-        stock_entry_type = 'Repack - Spoilage'
+        se.workflow_state = 'Submitted' and
+        se.outgoing_stock_entry is NULL and
+        se.stock_entry_type = 'Material Transfer' and
+        wh.warehouse_type = 'Spoilage' and
+        se.add_to_transit=1;
     """))
     voucher_spoilage_list = [query_voucher_sp_res[0] for query_voucher_sp_res in query_voucher_sp_results]
 
@@ -217,18 +223,21 @@ def get_data(filters, columns):
         sle.actual_qty,
         sle.qty_after_transaction,
         sle.posting_datetime,
-        sle.creation
+        sle.creation,
+        se.name
     FROM
         `tabStock Ledger Entry` AS sle
         INNER JOIN `tabStock Entry` AS se ON se.name = sle.voucher_no
-        INNER JOIN `tabStock Entry Detail` AS sed ON sed.parent = se.name and
-                                    sed.s_warehouse=sle.warehouse and
-                                    sed.item_code=sle.item_code
+        INNER JOIN `tabWarehouse` AS wh ON wh.name = se.destination_warehouse
     WHERE
+        se.workflow_state = 'Submitted' and
+        se.outgoing_stock_entry is NULL and
+        se.stock_entry_type = 'Material Transfer' and
+        wh.warehouse_type = 'Spoilage' and
+        se.add_to_transit=1 and
         sle.is_cancelled!='1' and
-        se.stock_entry_type = 'Repack - Spoilage' and
-        sed.s_warehouse is not NULL and
         sle.docstatus = '1' and
+        sle.actual_qty < 0 and
         sle.posting_date >= %%s and
         sle.posting_date <= %%s
         %s
@@ -250,7 +259,6 @@ def get_data(filters, columns):
                                                                                     x['warehouse'],
                                                                                     x['posting_datetime'],
                                                                                     x['creation']))
-
 
     last_closing_item_wh_stock_date = prev_item_wh_key = current_item_wh_key = ''
     dummy_key = 'Pdummy_item_not_check-Wdummy_wh_not_check'
