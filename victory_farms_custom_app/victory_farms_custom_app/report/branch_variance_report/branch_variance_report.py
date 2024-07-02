@@ -26,7 +26,7 @@ def get_columns():
 	return [
 		{
 			"fieldname": "warehouse",
-			"label": _("Warehouse / Item Code"),
+			"label": _("Warehouse"),
 			"fieldtype": "Data",
 			# "options": "Warehouse",
 			"width": 200,
@@ -43,8 +43,7 @@ def get_columns():
 			"fieldname": "item_code",
 			"fieldtype": "Link",
 			"options": "Item",
-			"width": 120,
-			"hidden": 1
+			"width": 120
 		},
 		{
 			"fieldname": "total_opening_stock",
@@ -121,19 +120,22 @@ def get_data(filters, columns=[]):
 	from_date = str(filters.get("from_date"))
 	to_date = str(filters.get("to_date"))
 	where_cnd = ""
+	condition = ""
 	if filters.get("item_code"):
 		where_cnd += " and sle.item_code ='%s' " % filters["item_code"]
 	if filters.get("custom_item_group"):
 		where_cnd += " and sle.custom_item_group ='%s' " % filters["custom_item_group"]
 	if filters.get("warehouse"):
-		where_cnd += " and sle.warehouse ='%s' " % filters["warehouse"]
+		lft, rgt = frappe.db.get_value("Warehouse", filters.get("warehouse"), ["lft", "rgt"])
+		where_cnd += f" and wh.lft >= {lft} and wh.rgt <= {rgt}"
+		condition = f"and lft >= {lft} and rgt <= {rgt}"
 	if filters.get("company"):
 		where_cnd += " and sle.company ='%s' " % filters["company"]
 
 	warehouse_data = frappe.db.sql(
 		f"""
 		SELECT name, parent_warehouse from `tabWarehouse` where company = '{filters.get("company")}' order by lft
-	""",
+	""",	
 		as_dict=1,
 	)
 
@@ -168,6 +170,7 @@ def get_data(filters, columns=[]):
 		sle.warehouse
 	FROM
 		`tabStock Ledger Entry` AS sle
+	JOIN `tabWarehouse` as wh on wh.name = sle.warehouse
 	WHERE
 		sle.is_cancelled!='1' and
 		sle.docstatus = '1'
@@ -206,6 +209,7 @@ def get_data(filters, columns=[]):
 		sle.voucher_no
 	FROM
 		`tabStock Ledger Entry` AS sle
+	JOIN `tabWarehouse` as wh on wh.name = sle.warehouse
 	WHERE
 		sle.is_cancelled!='1' and
 		sle.docstatus = '1' and
@@ -417,6 +421,7 @@ def get_data(filters, columns=[]):
 		sle.creation
 	FROM
 		`tabStock Ledger Entry` AS sle
+	JOIN `tabWarehouse` as wh on wh.name = sle.warehouse
 	Join
 		(
 		select
@@ -426,6 +431,7 @@ def get_data(filters, columns=[]):
 			max(sle_sub.creation) as creation
 		from
 			`tabStock Ledger Entry` AS sle_sub
+		JOIN `tabWarehouse` as wh on wh.name = sle_sub.warehouse
 		where
 			sle_sub.is_cancelled!='1' and
 			sle_sub.docstatus = '1' and
@@ -617,20 +623,29 @@ def get_data(filters, columns=[]):
 
 			for entry in warehouse_wise_data[warehouse]:
 				entry["indent"] = indent + 1
-				entry["warehouse"] = entry["item_code"]
+				entry["warehouse"] = None
+				# entry["warehouse"] = entry["item_code"]
 				final_list.append(entry)
 		else:
-			final_list.append({
-				"warehouse": warehouse,
-				"indent": indent,
-				"received_qty": parent_data[warehouse]["received_qty"] if parent_data.get(warehouse) else 0,
-				"total_quantity_sold": parent_data[warehouse]["total_quantity_sold"] if parent_data.get(warehouse) else 0,
-				"total_opening_stock": parent_data[warehouse]["total_opening_stock"] if parent_data.get(warehouse) else 0,
-				"spoilage_stock": parent_data[warehouse]["spoilage_stock"] if parent_data.get(warehouse) else 0,
-				"expected_closing_stock": parent_data[warehouse]["expected_closing_stock"] if parent_data.get(warehouse) else 0,
-				"system_stock": parent_data[warehouse]["system_stock"] if parent_data.get(warehouse) else 0,
-				"difference": parent_data[warehouse]["difference"] if parent_data.get(warehouse) else 0
-			})
+			if parent_data.get(warehouse) and any(
+				parent_data[warehouse].get(key) != 0 for key in [
+					"received_qty", "total_quantity_sold", "total_opening_stock",
+					"spoilage_stock", "expected_closing_stock", "system_stock", "difference"
+				]
+			):
+				# Append the warehouse data to the final list
+				final_list.append({
+					"warehouse": warehouse,
+					"indent": indent,
+					"received_qty": parent_data[warehouse].get("received_qty", 0),
+					"total_quantity_sold": parent_data[warehouse].get("total_quantity_sold", 0),
+					"total_opening_stock": parent_data[warehouse].get("total_opening_stock", 0),
+					"spoilage_stock": parent_data[warehouse].get("spoilage_stock", 0),
+					"expected_closing_stock": parent_data[warehouse].get("expected_closing_stock", 0),
+					"system_stock": parent_data[warehouse].get("system_stock", 0),
+					"difference": parent_data[warehouse].get("difference", 0)
+				})
+
 
 	return final_list
 
