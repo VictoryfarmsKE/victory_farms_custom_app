@@ -294,7 +294,7 @@ def get_data(filters, columns=[]):
 		sle.posting_date <= %%s
 		%s
 	"""
-			% spoilage_cnd,
+			% where_cnd,
 			(from_date, to_date),
 		)
 	)

@@ -51,7 +51,8 @@ frappe.query_reports["Branch Variance Report"] = {
             value = "<span style='color:red'>" + value + "</span>";
         }
         return value;
-    }
+    },
+    "initial_depth": 2
 };
 
 
