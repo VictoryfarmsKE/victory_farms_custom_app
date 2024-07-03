@@ -120,17 +120,19 @@ def get_data(filters, columns=[]):
 	from_date = str(filters.get("from_date"))
 	to_date = str(filters.get("to_date"))
 	where_cnd = ""
-	condition = ""
+	spoilage_cnd = ""
 	if filters.get("item_code"):
 		where_cnd += " and sle.item_code ='%s' " % filters["item_code"]
+		spoilage_cnd += " and sle.item_code ='%s' " % filters["item_code"]
 	if filters.get("custom_item_group"):
 		where_cnd += " and sle.custom_item_group ='%s' " % filters["custom_item_group"]
+		spoilage_cnd += " and sle.custom_item_group ='%s' " % filters["custom_item_group"]
 	if filters.get("warehouse"):
 		lft, rgt = frappe.db.get_value("Warehouse", filters.get("warehouse"), ["lft", "rgt"])
 		where_cnd += f" and wh.lft >= {lft} and wh.rgt <= {rgt}"
-		condition = f"and lft >= {lft} and rgt <= {rgt}"
 	if filters.get("company"):
 		where_cnd += " and sle.company ='%s' " % filters["company"]
+		spoilage_cnd += " and sle.company ='%s' " % filters["company"]
 
 	warehouse_data = frappe.db.sql(
 		f"""
@@ -292,7 +294,7 @@ def get_data(filters, columns=[]):
 		sle.posting_date <= %%s
 		%s
 	"""
-			% where_cnd,
+			% spoilage_cnd,
 			(from_date, to_date),
 		)
 	)
