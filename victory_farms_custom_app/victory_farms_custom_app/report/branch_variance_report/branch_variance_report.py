@@ -67,6 +67,13 @@ def get_columns():
 			"align": "right",
 		},
 		{
+			"fieldname": "loss_qty",
+			"label": _("Return Qty"),
+			"fieldtype": "Float",
+			"width": 100,
+			"align": "right",
+		},
+		{
 			"fieldname": "spoilage_stock",
 			"label": _("Spoilage Stock"),
 			"fieldtype": "Float",
@@ -157,6 +164,7 @@ def get_data(filters, columns=[]):
 		"warehouse": "",
 		"total_opening_stock": 0.0,
 		"received_qty": 0.0,
+		"loss_qty": 0.0,
 		"total_quantity_sold": 0.0,
 		"spoilage_stock": 0.0,
 		"expected_closing_stock": 0.0,
@@ -208,7 +216,8 @@ def get_data(filters, columns=[]):
 		sle.qty_after_transaction,
 		sle.posting_datetime,
 		sle.creation,
-		sle.voucher_no
+		sle.voucher_no,
+		wh.warehouse_type
 	FROM
 		`tabStock Ledger Entry` AS sle
 	JOIN `tabWarehouse` as wh on wh.name = sle.warehouse
@@ -255,7 +264,8 @@ def get_data(filters, columns=[]):
 				"warehouse": qr_bal_res[1],
 				"posting_date": qr_bal_res[2],
 				"voucher_type": qr_bal_res[3],
-				"actual_qty": qr_bal_res[4],
+				"actual_qty": qr_bal_res[4] if (qr_bal_res[9] != "LC") else 0,
+				"loss_qty": qr_bal_res[4] if (qr_bal_res[9] == "LC") else 0,
 				"spoilage_qty": 0,
 				"qty_after_transaction": qr_bal_res[5],
 				"posting_datetime": qr_bal_res[6],
@@ -294,7 +304,7 @@ def get_data(filters, columns=[]):
 		sle.posting_date <= %%s
 		%s
 	"""
-			% where_cnd,
+			% spoilage_cnd,
 			(from_date, to_date),
 		)
 	)
@@ -306,6 +316,7 @@ def get_data(filters, columns=[]):
 				"posting_date": query_spoilage_res[2],
 				"voucher_type": query_spoilage_res[3],
 				"actual_qty": 0,
+				"loss_qty": 0,
 				"spoilage_qty": abs(query_spoilage_res[4] or 0),
 				"qty_after_transaction": query_spoilage_res[5],
 				"posting_datetime": query_spoilage_res[6],
@@ -332,6 +343,7 @@ def get_data(filters, columns=[]):
 			"posting_date": False,
 			"voucher_type": False,
 			"actual_qty": 0,
+			"loss_qty": 0,
 			"spoilage_qty": 0,
 			"qty_after_transaction": 0,
 			"posting_datetime": False,
@@ -346,6 +358,7 @@ def get_data(filters, columns=[]):
 		posting_date = str(qr_balance_res["posting_date"]) or ""
 		voucher_type = qr_balance_res["voucher_type"] or ""
 		actual_qty = qr_balance_res["actual_qty"] or 0
+		loss_qty = qr_balance_res["loss_qty"] or 0
 		qty_after_transaction = qr_balance_res["qty_after_transaction"] or 0
 
 		current_item_wh_key = "P%s-W%s" % (item_code, warehouse)
@@ -362,12 +375,13 @@ def get_data(filters, columns=[]):
 			)
 			last_stock_product_key = "%s-D%s" % (prev_item_wh_key, to_date)
 			prev_system_stock = result_data[prev_stock_product_key]["system_stock"]
-			result_data[last_stock_product_key].update(
-				{
-					"total_opening_stock": prev_system_stock,
-					"system_stock": prev_system_stock,
-				}
-			)
+			if result_data.get(last_stock_product_key):
+				result_data[last_stock_product_key].update(
+					{
+						"total_opening_stock": prev_system_stock,
+						"system_stock": prev_system_stock,
+					}
+				)
 
 		if dummy_key == current_item_wh_key:
 			continue
@@ -404,6 +418,8 @@ def get_data(filters, columns=[]):
 			result_data[stock_product_key][
 				actual_qty > 0 and "received_qty" or "total_quantity_sold"
 			] += abs(actual_qty)
+			if loss_qty < 0:
+				result_data[stock_product_key]["loss_qty"] += abs(loss_qty)
 		result_data[stock_product_key]["spoilage_stock"] += (
 			qr_balance_res["spoilage_qty"] or 0
 		)
@@ -500,6 +516,7 @@ def get_data(filters, columns=[]):
 			result_data[item_wh_key]["total_opening_stock"]
 			+ result_data[item_wh_key]["received_qty"]
 			- result_data[item_wh_key]["total_quantity_sold"]
+			- result_data[item_wh_key]["loss_qty"]
 			- result_data[item_wh_key]["spoilage_stock"],
 			3,
 		)
@@ -533,6 +550,7 @@ def get_data(filters, columns=[]):
 			warehouse_total[warehouse]["total_opening_stock"] += row['total_opening_stock']
 			warehouse_total[warehouse]["received_qty"] += row['received_qty']
 			warehouse_total[warehouse]["total_quantity_sold"] += row['total_quantity_sold']
+			warehouse_total[warehouse]["loss_qty"] += row['loss_qty']
 			warehouse_total[warehouse]["spoilage_stock"] += row['spoilage_stock']
 			warehouse_total[warehouse]["expected_closing_stock"] += row['expected_closing_stock']
 			warehouse_total[warehouse]["system_stock"] += row['system_stock']
@@ -544,6 +562,7 @@ def get_data(filters, columns=[]):
 				"total_opening_stock": row['total_opening_stock'],
 				"received_qty": row['received_qty'],
 				"total_quantity_sold": row['total_quantity_sold'],
+				"loss_qty": row['loss_qty'],
 				"spoilage_stock": row['spoilage_stock'],
 				"expected_closing_stock": row['expected_closing_stock'],
 				"system_stock": row['system_stock'],
@@ -575,6 +594,7 @@ def get_data(filters, columns=[]):
 			"total_opening_stock": 0,
 			"received_qty": 0,
 			"total_quantity_sold": 0,
+			"loss_qty": 0,
 			"spoilage_stock": 0,
 			"expected_closing_stock": 0,
 			"system_stock": 0,
@@ -585,6 +605,7 @@ def get_data(filters, columns=[]):
 				parent_data[key]["total_opening_stock"] += warehouse_total[row]["total_opening_stock"]
 				parent_data[key]["received_qty"] += warehouse_total[row]["received_qty"]
 				parent_data[key]["total_quantity_sold"] += warehouse_total[row]["total_quantity_sold"]
+				parent_data[key]["loss_qty"] += warehouse_total[row]["loss_qty"]
 				parent_data[key]["spoilage_stock"] += warehouse_total[row]["spoilage_stock"]
 				parent_data[key]["expected_closing_stock"] += warehouse_total[row]["expected_closing_stock"]
 				parent_data[key]["difference"] += warehouse_total[row]["difference"]
@@ -593,6 +614,7 @@ def get_data(filters, columns=[]):
 				parent_data[key]["total_opening_stock"] += parent_data[row]["total_opening_stock"]
 				parent_data[key]["received_qty"] += parent_data[row]["received_qty"]
 				parent_data[key]["total_quantity_sold"] += parent_data[row]["total_quantity_sold"]
+				parent_data[key]["loss_qty"] += parent_data[row]["loss_qty"]
 				parent_data[key]["spoilage_stock"] += parent_data[row]["spoilage_stock"]
 				parent_data[key]["expected_closing_stock"] += parent_data[row]["expected_closing_stock"]
 				parent_data[key]["difference"] += parent_data[row]["difference"]
@@ -616,6 +638,7 @@ def get_data(filters, columns=[]):
 				"indent": indent,
 				"received_qty": flt(warehouse_data.get("received_qty", 0), 2),
 				"total_quantity_sold": flt(warehouse_data.get("total_quantity_sold", 0), 2),
+				"loss_qty": flt(warehouse_data.get("loss_qty", 0), 2),
 				"total_opening_stock": flt(warehouse_data.get("total_opening_stock", 0), 2),
 				"spoilage_stock": flt(warehouse_data.get("spoilage_stock", 0), 2),
 				"expected_closing_stock": flt(warehouse_data.get("expected_closing_stock", 0), 2),
@@ -631,7 +654,7 @@ def get_data(filters, columns=[]):
 		else:
 			if parent_data.get(warehouse) and any(
 				parent_data[warehouse].get(key) != 0 for key in [
-					"received_qty", "total_quantity_sold", "total_opening_stock",
+					"received_qty", "total_quantity_sold", "loss_qty", "total_opening_stock",
 					"spoilage_stock", "expected_closing_stock", "system_stock", "difference"
 				]
 			):
@@ -641,6 +664,7 @@ def get_data(filters, columns=[]):
 					"indent": indent,
 					"received_qty": parent_data[warehouse].get("received_qty", 0),
 					"total_quantity_sold": parent_data[warehouse].get("total_quantity_sold", 0),
+					"loss_qty": parent_data[warehouse].get("loss_qty", 0),
 					"total_opening_stock": parent_data[warehouse].get("total_opening_stock", 0),
 					"spoilage_stock": parent_data[warehouse].get("spoilage_stock", 0),
 					"expected_closing_stock": parent_data[warehouse].get("expected_closing_stock", 0),
