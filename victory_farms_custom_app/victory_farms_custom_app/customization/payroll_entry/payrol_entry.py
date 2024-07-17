@@ -1,0 +1,26 @@
+from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_filter_condition, get_joining_relieving_condition, get_emp_list, remove_payrolled_employees, get_salary_structure
+
+class CustomPayrollEntry(PayrollEntry):
+	def get_emp_list(self):
+		"""
+		Returns list of active employees based on selected criteria
+		and for which salary structure exists
+		"""
+		self.check_mandatory()
+		filters = self.make_filters()
+		cond = get_filter_condition(filters)
+		cond += get_joining_relieving_condition(self.start_date, self.end_date)
+
+		if self.custom_salary_structure:
+			sal_struct = [self.custom_salary_structure]
+		else:
+			sal_struct = get_salary_structure(
+				self.company, self.currency, self.salary_slip_based_on_timesheet, self.payroll_frequency
+			)
+		if sal_struct:
+			cond += "and t2.salary_structure IN %(sal_struct)s "
+			cond += "and t2.payroll_payable_account = %(payroll_payable_account)s "
+			cond += "and %(from_date)s >= t2.from_date"
+			emp_list = get_emp_list(sal_struct, cond, self.end_date, self.payroll_payable_account)
+			emp_list = remove_payrolled_employees(emp_list, self.start_date, self.end_date)
+			return emp_list

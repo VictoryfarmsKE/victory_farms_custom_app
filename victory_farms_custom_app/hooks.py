@@ -110,9 +110,9 @@ app_license = "MIT"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-#	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	"Payroll Entry": "victory_farms_custom_app.victory_farms_custom_app.customization.payroll_entry.payrol_entry.CustomPayrollEntry"
+}
 
 # Document Events
 # ---------------
