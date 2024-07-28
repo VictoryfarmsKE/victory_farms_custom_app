@@ -1,3 +1,4 @@
+import frappe
 from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_filter_condition, get_joining_relieving_condition, get_emp_list, remove_payrolled_employees, get_salary_structure
 
 class CustomPayrollEntry(PayrollEntry):
@@ -22,5 +23,21 @@ class CustomPayrollEntry(PayrollEntry):
 			cond += "and t2.payroll_payable_account = %(payroll_payable_account)s "
 			cond += "and %(from_date)s >= t2.from_date"
 			emp_list = get_emp_list(sal_struct, cond, self.end_date, self.payroll_payable_account)
+			emp_list = remove_wrong_ssa_applied(emp_list, self.start_date, self.end_date)
 			emp_list = remove_payrolled_employees(emp_list, self.start_date, self.end_date)
 			return emp_list
+		
+def remove_wrong_ssa_applied(emp_list, start_date, end_date):
+	new_emp_list = []
+	for employee_details in emp_list:
+		if not frappe.db.exists(
+			"Salary Structure Assignment",
+			{
+				"employee": employee_details.employee,
+				"from_date": ["between", [start_date, end_date]],
+				"docstatus": 1,
+			},
+		):
+			new_emp_list.append(employee_details)
+
+	return new_emp_list
