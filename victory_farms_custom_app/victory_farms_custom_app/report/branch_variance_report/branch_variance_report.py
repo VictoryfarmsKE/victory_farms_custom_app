@@ -242,7 +242,7 @@ def get_data(filters, columns=[]):
 	INNER JOIN
 		`tabWarehouse` AS wh ON wh.name = se.destination_warehouse
 	WHERE
-		se.workflow_state = 'Submitted' and
+		se.docstatus = 1 and
 		se.outgoing_stock_entry is NULL and
 		se.stock_entry_type = 'Material Transfer' and
 		wh.warehouse_type = 'Spoilage' and
@@ -292,7 +292,7 @@ def get_data(filters, columns=[]):
 		INNER JOIN `tabStock Entry` AS se ON se.name = sle.voucher_no
 		INNER JOIN `tabWarehouse` AS wh ON wh.name = se.destination_warehouse
 	WHERE
-		se.workflow_state = 'Submitted' and
+		se.docstatus = 1 and
 		se.outgoing_stock_entry is NULL and
 		se.stock_entry_type = 'Material Transfer' and
 		wh.warehouse_type = 'Spoilage' and
