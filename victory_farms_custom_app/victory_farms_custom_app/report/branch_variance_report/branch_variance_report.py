@@ -538,33 +538,28 @@ def get_data(filters, columns=[]):
 
 	warehouse_wise_data = {}
 	warehouse_total = {}
-	# for row in final_data:
-	# 	warehouse = row['warehouse']
-	# 	total_opening_stock = row['total_opening_stock']
-	# 	warehouse_wise_data.setdefault(warehouse, []).append(row)
-	# 	warehouse_total[warehouse] = warehouse_total.get(warehouse, 0) + total_opening_stock
 
 	for row in final_data:
 		warehouse = row['warehouse']
 		if warehouse in warehouse_wise_data:
-			warehouse_total[warehouse]["total_opening_stock"] += row['total_opening_stock']
+			warehouse_total[warehouse]["total_opening_stock"] += row['total_opening_stock'] if filters.get("from_date") == row["posting_date"] else 0
 			warehouse_total[warehouse]["received_qty"] += row['received_qty']
 			warehouse_total[warehouse]["total_quantity_sold"] += row['total_quantity_sold']
 			warehouse_total[warehouse]["loss_qty"] += row['loss_qty']
 			warehouse_total[warehouse]["spoilage_stock"] += row['spoilage_stock']
-			warehouse_total[warehouse]["expected_closing_stock"] += row['expected_closing_stock']
+			warehouse_total[warehouse]["expected_closing_stock"] += row['expected_closing_stock'] if filters.get("to_date") == row["posting_date"] else 0
 			warehouse_total[warehouse]["system_stock"] += row['system_stock']
 			warehouse_total[warehouse]["difference"] += row['difference']
 			
 			warehouse_wise_data[warehouse].append(row)
 		else:
 			warehouse_total[warehouse] = {
-				"total_opening_stock": row['total_opening_stock'],
+				"total_opening_stock": row['total_opening_stock'] if filters.get("from_date") == row["posting_date"] else 0 ,
 				"received_qty": row['received_qty'],
 				"total_quantity_sold": row['total_quantity_sold'],
 				"loss_qty": row['loss_qty'],
 				"spoilage_stock": row['spoilage_stock'],
-				"expected_closing_stock": row['expected_closing_stock'],
+				"expected_closing_stock": row['expected_closing_stock'] if filters.get("to_date") == row["posting_date"] else 0,
 				"system_stock": row['system_stock'],
 				"difference": row['difference']
 			}
