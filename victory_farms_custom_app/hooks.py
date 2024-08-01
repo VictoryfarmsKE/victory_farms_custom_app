@@ -111,7 +111,8 @@ app_license = "MIT"
 # Override standard doctype classes
 
 override_doctype_class = {
-	"Payroll Entry": "victory_farms_custom_app.victory_farms_custom_app.customization.payroll_entry.payrol_entry.CustomPayrollEntry"
+	"Payroll Entry": "victory_farms_custom_app.victory_farms_custom_app.customization.payroll_entry.payrol_entry.CustomPayrollEntry",
+    "Salary Slip": "victory_farms_custom_app.victory_farms_custom_app.customization.salary_slip.salary_slip.CustomSalarySlip"
 }
 
 # Document Events
@@ -128,7 +129,10 @@ override_doctype_class = {
 doc_events = {
 	"Stock Entry": {
 		"on_update": "victory_farms_custom_app.public.py.stock_entry.stock_entry",
-	}
+	},
+    "Leave Application": {
+        "on_submit" : "victory_farms_custom_app.victory_farms_custom_app.customization.leave_application.leave_application.on_submit"
+    }
 }
 # Scheduled Tasks
 # ---------------
