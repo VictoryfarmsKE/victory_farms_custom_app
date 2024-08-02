@@ -11,7 +11,7 @@ def create_additional_salary(self):
     if not salary_component:
         return
     
-    gross_pay = frappe.db.get_value("Employee", self.employee, "ctc")
+    gross_pay, currency = frappe.db.get_value("Employee", self.employee, ["ctc", "salary_scurrency"])
 
     daily_pay = gross_pay / 30
 
@@ -31,6 +31,7 @@ def create_additional_salary(self):
         ads_doc = frappe.new_doc("Additional Salary")
         ads_doc.employee = self.employee
         ads_doc.salary_component = salary_component
+        ads_doc.currency = currency
         ads_doc.payroll_date = row
         ads_doc.amount = flt(leave_days * daily_pay, self.precision)
         ads_doc.ref_doctype = "Leave Application"
