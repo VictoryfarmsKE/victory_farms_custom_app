@@ -236,3 +236,5 @@ fixtures = [{
             }
     }
 ]
+
+after_migrate = "victory_farms_custom_app.migrate.after_migrate"

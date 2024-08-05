@@ -1,0 +1,12 @@
+{
+    "Payroll Settings": [
+        {
+            "dt": "Payroll Settings",
+            "fieldname": "custom_commercial_holiday_component",
+            "fieldtype": "Link",
+            "insert_after": "Salary Component",
+            "label": "Commercial Holiday Component",
+            "module": "Victory Farms Custom App"
+        }
+    ]
+}
