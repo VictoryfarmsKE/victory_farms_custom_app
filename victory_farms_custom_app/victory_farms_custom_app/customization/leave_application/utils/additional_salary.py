@@ -11,7 +11,7 @@ def create_additional_salary(self):
     if not salary_component:
         return
     
-    gross_pay, currency = frappe.db.get_value("Employee", self.employee, ["ctc", "salary_scurrency"])
+    gross_pay, currency = frappe.db.get_value("Employee", self.employee, ["ctc", "salary_currency"])
 
     daily_pay = gross_pay / 30
 
@@ -27,7 +27,7 @@ def create_additional_salary(self):
         date_range.update({month_last_day : [self.from_date, month_last_day], next_month_last_date : [next_month_start_date, self.to_date]})
 
     for row in date_range:
-        leave_days = date_diff(date_range[row][1], date_range[row][0]) if date_range[row][1] != date_range[row][0] else 1
+        leave_days = (date_diff(date_range[row][1], date_range[row][0]) + 1 )if date_range[row][1] != date_range[row][0] else 1
         ads_doc = frappe.new_doc("Additional Salary")
         ads_doc.employee = self.employee
         ads_doc.salary_component = salary_component
