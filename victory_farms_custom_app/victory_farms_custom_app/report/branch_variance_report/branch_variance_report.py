@@ -182,8 +182,8 @@ def get_data(filters, columns=[]):
 		`tabStock Ledger Entry` AS sle
 	JOIN `tabWarehouse` as wh on wh.name = sle.warehouse
 	WHERE
-		sle.is_cancelled!='1' and
-		sle.docstatus = '1'
+		sle.is_cancelled!=1 and
+		sle.docstatus = 1
 		%s
 	Group by
 		sle.item_code,
@@ -222,8 +222,8 @@ def get_data(filters, columns=[]):
 		`tabStock Ledger Entry` AS sle
 	JOIN `tabWarehouse` as wh on wh.name = sle.warehouse
 	WHERE
-		sle.is_cancelled!='1' and
-		sle.docstatus = '1' and
+		sle.is_cancelled!=1 and
+		sle.docstatus = 1 and
 		sle.posting_date >= %%s and
 		sle.posting_date <= %%s
 		%s
@@ -296,9 +296,9 @@ def get_data(filters, columns=[]):
 		se.outgoing_stock_entry is NULL and
 		se.stock_entry_type = 'Material Transfer' and
 		wh.warehouse_type = 'Spoilage' and
-		se.add_to_transit=1 and
-		sle.is_cancelled!='1' and
-		sle.docstatus = '1' and
+		se.add_to_transit= 1 and
+		sle.is_cancelled!= 1 and
+		sle.docstatus = 1 and 
 		sle.actual_qty < 0 and
 		sle.posting_date >= %%s and
 		sle.posting_date <= %%s
@@ -451,8 +451,8 @@ def get_data(filters, columns=[]):
 			`tabStock Ledger Entry` AS sle_sub
 		JOIN `tabWarehouse` as wh on wh.name = sle_sub.warehouse
 		where
-			sle_sub.is_cancelled!='1' and
-			sle_sub.docstatus = '1' and
+			sle_sub.is_cancelled!=1 and
+			sle_sub.docstatus = 1 and
 			sle_sub.posting_date < %%s
 			%s
 		group by
@@ -464,8 +464,8 @@ def get_data(filters, columns=[]):
 		msle.warehouse = sle.warehouse and
 		msle.posting_datetime = sle.posting_datetime and
 		msle.creation = sle.creation and
-		sle.is_cancelled!='1' and
-		sle.docstatus = '1' and
+		sle.is_cancelled!=1 and
+		sle.docstatus = 1 and
 		sle.posting_date < %%s
 		%s
 	"""
@@ -475,7 +475,10 @@ def get_data(filters, columns=[]):
 	)
 
 	query_last_results_dict_list = []
+	opening_dict = {}
 	for qr_lst_res in query_last_results:
+		opening_dict.setdefault(qr_lst_res[1], 0)
+		opening_dict[qr_lst_res[1]] += qr_lst_res[2]
 		query_last_results_dict_list.append(
 			{
 				"item_code": qr_lst_res[0],
@@ -513,11 +516,11 @@ def get_data(filters, columns=[]):
 
 	for item_wh_key, balance_values in result_data.items():
 		expected_closing_stock = round(
-			result_data[item_wh_key]["total_opening_stock"]
-			+ result_data[item_wh_key]["received_qty"]
-			- result_data[item_wh_key]["total_quantity_sold"]
-			- result_data[item_wh_key]["loss_qty"]
-			- result_data[item_wh_key]["spoilage_stock"],
+			result_data[item_wh_key]["total_opening_stock"] # balance
+			+ result_data[item_wh_key]["received_qty"] # in qty
+			- result_data[item_wh_key]["total_quantity_sold"] # out qty
+			- result_data[item_wh_key]["loss_qty"] # return qty
+			- result_data[item_wh_key]["spoilage_stock"], # spoilage
 			3,
 		)
 		result_data[item_wh_key]["expected_closing_stock"] = expected_closing_stock
@@ -542,7 +545,7 @@ def get_data(filters, columns=[]):
 	for row in final_data:
 		warehouse = row['warehouse']
 		if warehouse in warehouse_wise_data:
-			warehouse_total[warehouse]["total_opening_stock"] += row['total_opening_stock'] if filters.get("from_date") == row["posting_date"] else 0
+			# warehouse_total[warehouse]["total_opening_stock"] += opening_dict.get(warehouse) or 0
 			warehouse_total[warehouse]["received_qty"] += row['received_qty']
 			warehouse_total[warehouse]["total_quantity_sold"] += row['total_quantity_sold']
 			warehouse_total[warehouse]["loss_qty"] += row['loss_qty']
@@ -554,7 +557,7 @@ def get_data(filters, columns=[]):
 			warehouse_wise_data[warehouse].append(row)
 		else:
 			warehouse_total[warehouse] = {
-				"total_opening_stock": row['total_opening_stock'] if filters.get("from_date") == row["posting_date"] else 0 ,
+				"total_opening_stock": opening_dict.get(warehouse) or 0,
 				"received_qty": row['received_qty'],
 				"total_quantity_sold": row['total_quantity_sold'],
 				"loss_qty": row['loss_qty'],
@@ -657,14 +660,14 @@ def get_data(filters, columns=[]):
 				final_list.append({
 					"warehouse": warehouse,
 					"indent": indent,
-					"received_qty": parent_data[warehouse].get("received_qty", 0),
-					"total_quantity_sold": parent_data[warehouse].get("total_quantity_sold", 0),
-					"loss_qty": parent_data[warehouse].get("loss_qty", 0),
-					"total_opening_stock": parent_data[warehouse].get("total_opening_stock", 0),
-					"spoilage_stock": parent_data[warehouse].get("spoilage_stock", 0),
-					"expected_closing_stock": parent_data[warehouse].get("expected_closing_stock", 0),
-					"system_stock": parent_data[warehouse].get("system_stock", 0),
-					"difference": parent_data[warehouse].get("difference", 0)
+					"received_qty": flt(parent_data[warehouse].get("received_qty", 0), 2),
+					"total_quantity_sold": flt(parent_data[warehouse].get("total_quantity_sold", 0), 2),
+					"loss_qty": flt(parent_data[warehouse].get("loss_qty", 0), 2),
+					"total_opening_stock": flt(parent_data[warehouse].get("total_opening_stock", 0), 2),
+					"spoilage_stock": flt(parent_data[warehouse].get("spoilage_stock", 0), 2),
+					"expected_closing_stock": flt(parent_data[warehouse].get("expected_closing_stock", 0), 2),
+					"system_stock": flt(parent_data[warehouse].get("system_stock", 0), 2),
+					"difference": flt(parent_data[warehouse].get("difference", 0), 2)
 				})
 
 
