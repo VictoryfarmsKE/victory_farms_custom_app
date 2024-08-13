@@ -43,7 +43,7 @@ def get_columns():
 			"fieldname": "item_code",
 			"fieldtype": "Link",
 			"options": "Item",
-			"width": 120
+			"width": 120,
 		},
 		{
 			"fieldname": "total_opening_stock",
@@ -147,9 +147,13 @@ def get_data(filters, columns=[]):
 		spoilage_cnd += " and sle.item_code ='%s' " % filters["item_code"]
 	if filters.get("custom_item_group"):
 		where_cnd += " and sle.custom_item_group ='%s' " % filters["custom_item_group"]
-		spoilage_cnd += " and sle.custom_item_group ='%s' " % filters["custom_item_group"]
+		spoilage_cnd += (
+			" and sle.custom_item_group ='%s' " % filters["custom_item_group"]
+		)
 	if filters.get("warehouse"):
-		lft, rgt = frappe.db.get_value("Warehouse", filters.get("warehouse"), ["lft", "rgt"])
+		lft, rgt = frappe.db.get_value(
+			"Warehouse", filters.get("warehouse"), ["lft", "rgt"]
+		)
 		where_cnd += f" and wh.lft >= {lft} and wh.rgt <= {rgt}"
 	if filters.get("warehouse_type"):
 		where_cnd += " and wh.warehouse_type ='%s' " % filters["warehouse_type"]
@@ -160,19 +164,24 @@ def get_data(filters, columns=[]):
 	warehouse_data = frappe.db.sql(
 		f"""
 		SELECT name, parent_warehouse, custom_is_region as is_region, custom_is_sub_region as is_sub_region from `tabWarehouse` where company = '{filters.get("company")}' order by lft
-	""",	
+	""",
 		as_dict=1,
 	)
 
 	parent_children_map = {}
 	region_data = {}
 	for d in warehouse_data:
-		region_data[d.name] = {"is_region": d.is_region, "is_sub_region": d.is_sub_region}
+		region_data[d.name] = {
+			"is_region": d.is_region,
+			"is_sub_region": d.is_sub_region,
+		}
 		parent_children_map.setdefault(d.parent_warehouse or None, []).append(d)
 
 	filtered_warehouse = []
 
-	parent_children_map1 = add_to_list(parent_children_map, filtered_warehouse, region_data, None, None, None, 0)
+	parent_children_map1 = add_to_list(
+		parent_children_map, filtered_warehouse, region_data, None, None, None, 0
+	)
 
 	vf_stock_balance_dict = {
 		"posting_date": "",
@@ -533,9 +542,15 @@ def get_data(filters, columns=[]):
 
 	for item_wh_key, balance_values in result_data.items():
 		expected_closing_stock = round(
-			(result_data[item_wh_key]["total_opening_stock"] 
-			+ result_data[item_wh_key]["received_qty"])
-			- (result_data[item_wh_key]["total_quantity_sold"] + result_data[item_wh_key]["loss_qty"] + result_data[item_wh_key]["spoilage_stock"]),
+			(
+				result_data[item_wh_key]["total_opening_stock"]
+				+ result_data[item_wh_key]["received_qty"]
+			)
+			- (
+				result_data[item_wh_key]["total_quantity_sold"]
+				+ result_data[item_wh_key]["loss_qty"]
+				+ result_data[item_wh_key]["spoilage_stock"]
+			),
 			3,
 		)
 		result_data[item_wh_key]["expected_closing_stock"] = expected_closing_stock
@@ -558,28 +573,48 @@ def get_data(filters, columns=[]):
 	warehouse_total = {}
 
 	for row in final_data:
-		warehouse = row['warehouse']
+		warehouse = row["warehouse"]
 		if warehouse in warehouse_wise_data:
 			# warehouse_total[warehouse]["total_opening_stock"] += opening_dict.get(warehouse) or 0
-			warehouse_total[warehouse]["received_qty"] += row['received_qty']
-			warehouse_total[warehouse]["total_quantity_sold"] += row['total_quantity_sold']
-			warehouse_total[warehouse]["loss_qty"] += row['loss_qty']
-			warehouse_total[warehouse]["spoilage_stock"] += row['spoilage_stock']
-			warehouse_total[warehouse]["expected_closing_stock"] += row['expected_closing_stock'] if filters.get("to_date") == row["posting_date"] else 0
-			warehouse_total[warehouse]["system_stock"] += row['system_stock'] if filters.get("to_date") == row["posting_date"] else 0
-			warehouse_total[warehouse]["difference"] += row['difference']
-			
+			warehouse_total[warehouse]["received_qty"] += flt(row["received_qty", 3])
+			warehouse_total[warehouse]["total_quantity_sold"] += flt(
+				row["total_quantity_sold"], 3
+			)
+			warehouse_total[warehouse]["loss_qty"] += flt(row["loss_qty", 3])
+			warehouse_total[warehouse]["spoilage_stock"] += flt(
+				row["spoilage_stock"], 3
+			)
+			warehouse_total[warehouse]["expected_closing_stock"] += (
+				flt(row["expected_closing_stock"], 3)
+				if filters.get("to_date") == row["posting_date"]
+				else 0
+			)
+			warehouse_total[warehouse]["system_stock"] += (
+				flt(row["system_stock"], 3)
+				if filters.get("to_date") == row["posting_date"]
+				else 0
+			)
+			warehouse_total[warehouse]["difference"] += flt(row["difference"], 3)
+
 			warehouse_wise_data[warehouse].append(row)
 		else:
 			warehouse_total[warehouse] = {
 				"total_opening_stock": opening_dict.get(warehouse) or 0,
-				"received_qty": row['received_qty'],
-				"total_quantity_sold": row['total_quantity_sold'],
-				"loss_qty": row['loss_qty'],
-				"spoilage_stock": row['spoilage_stock'],
-				"expected_closing_stock": row['expected_closing_stock'] if filters.get("to_date") == row["posting_date"] else 0,
-				"system_stock": row['system_stock'] if filters.get("to_date") == row["posting_date"] else 0,
-				"difference": row['difference']
+				"received_qty": flt(row["received_qty"], 3),
+				"total_quantity_sold": flt(row["total_quantity_sold"], 3),
+				"loss_qty": flt(row["loss_qty"], 3),
+				"spoilage_stock": flt(row["spoilage_stock"], 3),
+				"expected_closing_stock": (
+					flt(row["expected_closing_stock"], 3)
+					if filters.get("to_date") == row["posting_date"]
+					else 0
+				),
+				"system_stock": (
+					flt(row["system_stock"], 3)
+					if filters.get("to_date") == row["posting_date"]
+					else 0
+				),
+				"difference": flt(row["difference"], 3),
 			}
 			warehouse_wise_data[warehouse] = [row]
 
@@ -590,12 +625,12 @@ def get_data(filters, columns=[]):
 		for value in parent_children_map1[row]:
 			if row == None:
 				lst.append(value)
-				if parent_children_map1.get(value['name']):
-					get_parent(parent_children_map1, lst, value['name'])
+				if parent_children_map1.get(value["name"]):
+					get_parent(parent_children_map1, lst, value["name"])
 			if parent_dict.get(value["parent_warehouse"]):
-				parent_dict[value["parent_warehouse"]].append(value['name'])
+				parent_dict[value["parent_warehouse"]].append(value["name"])
 			else:
-				parent_dict[value["parent_warehouse"]] = [value['name']]
+				parent_dict[value["parent_warehouse"]] = [value["name"]]
 
 	parent_data = {}
 	from collections import OrderedDict
@@ -611,25 +646,39 @@ def get_data(filters, columns=[]):
 			"spoilage_stock": 0,
 			"expected_closing_stock": 0,
 			"system_stock": 0,
-			"difference": 0
+			"difference": 0,
 		}
 		for row in value:
 			if warehouse_total.get(row):
-				parent_data[key]["total_opening_stock"] += warehouse_total[row]["total_opening_stock"]
+				parent_data[key]["total_opening_stock"] += warehouse_total[row][
+					"total_opening_stock"
+				]
 				parent_data[key]["received_qty"] += warehouse_total[row]["received_qty"]
-				parent_data[key]["total_quantity_sold"] += warehouse_total[row]["total_quantity_sold"]
+				parent_data[key]["total_quantity_sold"] += warehouse_total[row][
+					"total_quantity_sold"
+				]
 				parent_data[key]["loss_qty"] += warehouse_total[row]["loss_qty"]
-				parent_data[key]["spoilage_stock"] += warehouse_total[row]["spoilage_stock"]
-				parent_data[key]["expected_closing_stock"] += warehouse_total[row]["expected_closing_stock"]
+				parent_data[key]["spoilage_stock"] += warehouse_total[row][
+					"spoilage_stock"
+				]
+				parent_data[key]["expected_closing_stock"] += warehouse_total[row][
+					"expected_closing_stock"
+				]
 				parent_data[key]["difference"] += warehouse_total[row]["difference"]
-			
+
 			elif parent_data.get(row):
-				parent_data[key]["total_opening_stock"] += parent_data[row]["total_opening_stock"]
+				parent_data[key]["total_opening_stock"] += parent_data[row][
+					"total_opening_stock"
+				]
 				parent_data[key]["received_qty"] += parent_data[row]["received_qty"]
-				parent_data[key]["total_quantity_sold"] += parent_data[row]["total_quantity_sold"]
+				parent_data[key]["total_quantity_sold"] += parent_data[row][
+					"total_quantity_sold"
+				]
 				parent_data[key]["loss_qty"] += parent_data[row]["loss_qty"]
 				parent_data[key]["spoilage_stock"] += parent_data[row]["spoilage_stock"]
-				parent_data[key]["expected_closing_stock"] += parent_data[row]["expected_closing_stock"]
+				parent_data[key]["expected_closing_stock"] += parent_data[row][
+					"expected_closing_stock"
+				]
 				parent_data[key]["difference"] += parent_data[row]["difference"]
 
 	# for row in parent_children_map1[None]:
@@ -637,7 +686,7 @@ def get_data(filters, columns=[]):
 	# 	if parent_children_map1.get(row['name']):
 	# 		get_parent(parent_children_map1, lst, row['name'])
 
-	final_list= []
+	final_list = []
 	for row in lst:
 		warehouse = row.name
 		indent = row.indent
@@ -645,21 +694,29 @@ def get_data(filters, columns=[]):
 		# Check if warehouse exists in warehouse_wise_data
 		if warehouse in warehouse_wise_data:
 			warehouse_data = warehouse_total.get(warehouse, {})
-			
-			final_list.append({
-				"warehouse": warehouse,
-				"indent": indent,
-				"received_qty": flt(warehouse_data.get("received_qty", 0), 2),
-				"total_quantity_sold": flt(warehouse_data.get("total_quantity_sold", 0), 2),
-				"loss_qty": flt(warehouse_data.get("loss_qty", 0), 2),
-				"total_opening_stock": flt(warehouse_data.get("total_opening_stock", 0), 2),
-				"spoilage_stock": flt(warehouse_data.get("spoilage_stock", 0), 2),
-				"expected_closing_stock": flt(warehouse_data.get("expected_closing_stock", 0), 2),
-				"system_stock": flt(warehouse_data.get("system_stock", 0), 2),
-				"difference": flt(warehouse_data.get("difference", 0), 2),
-				"region": row.region,
-				"sub_region": row.sub_region
-			})
+
+			final_list.append(
+				{
+					"warehouse": warehouse,
+					"indent": indent,
+					"received_qty": flt(warehouse_data.get("received_qty", 0), 2),
+					"total_quantity_sold": flt(
+						warehouse_data.get("total_quantity_sold", 0), 2
+					),
+					"loss_qty": flt(warehouse_data.get("loss_qty", 0), 2),
+					"total_opening_stock": flt(
+						warehouse_data.get("total_opening_stock", 0), 2
+					),
+					"spoilage_stock": flt(warehouse_data.get("spoilage_stock", 0), 2),
+					"expected_closing_stock": flt(
+						warehouse_data.get("expected_closing_stock", 0), 2
+					),
+					"system_stock": flt(warehouse_data.get("system_stock", 0), 2),
+					"difference": flt(warehouse_data.get("difference", 0), 2),
+					"region": row.region,
+					"sub_region": row.sub_region,
+				}
+			)
 
 			for entry in warehouse_wise_data[warehouse]:
 				entry["indent"] = indent + 1
@@ -669,41 +726,89 @@ def get_data(filters, columns=[]):
 				final_list.append(entry)
 		else:
 			if parent_data.get(warehouse) and any(
-				parent_data[warehouse].get(key) != 0 for key in [
-					"received_qty", "total_quantity_sold", "loss_qty", "total_opening_stock",
-					"spoilage_stock", "expected_closing_stock", "system_stock", "difference"
+				parent_data[warehouse].get(key) != 0
+				for key in [
+					"received_qty",
+					"total_quantity_sold",
+					"loss_qty",
+					"total_opening_stock",
+					"spoilage_stock",
+					"expected_closing_stock",
+					"system_stock",
+					"difference",
 				]
 			):
 				# Append the warehouse data to the final list
-				final_list.append({
-					"warehouse": warehouse,
-					"indent": indent,
-					"received_qty": flt(parent_data[warehouse].get("received_qty", 0), 2),
-					"total_quantity_sold": flt(parent_data[warehouse].get("total_quantity_sold", 0), 2),
-					"loss_qty": flt(parent_data[warehouse].get("loss_qty", 0), 2),
-					"total_opening_stock": flt(parent_data[warehouse].get("total_opening_stock", 0), 2),
-					"spoilage_stock": flt(parent_data[warehouse].get("spoilage_stock", 0), 2),
-					"expected_closing_stock": flt(parent_data[warehouse].get("expected_closing_stock", 0), 2),
-					"system_stock": flt(parent_data[warehouse].get("system_stock", 0), 2),
-					"difference": flt(parent_data[warehouse].get("difference", 0), 2),
-					"region": row.region,
-					"sub_region": row.sub_region
-				})
-
+				final_list.append(
+					{
+						"warehouse": warehouse,
+						"indent": indent,
+						"received_qty": flt(
+							parent_data[warehouse].get("received_qty", 0), 2
+						),
+						"total_quantity_sold": flt(
+							parent_data[warehouse].get("total_quantity_sold", 0), 2
+						),
+						"loss_qty": flt(parent_data[warehouse].get("loss_qty", 0), 2),
+						"total_opening_stock": flt(
+							parent_data[warehouse].get("total_opening_stock", 0), 2
+						),
+						"spoilage_stock": flt(
+							parent_data[warehouse].get("spoilage_stock", 0), 2
+						),
+						"expected_closing_stock": flt(
+							parent_data[warehouse].get("expected_closing_stock", 0), 2
+						),
+						"system_stock": flt(
+							parent_data[warehouse].get("system_stock", 0), 2
+						),
+						"difference": flt(
+							parent_data[warehouse].get("difference", 0), 2
+						),
+						"region": row.region,
+						"sub_region": row.sub_region,
+					}
+				)
 
 	return final_list
 
 
-def add_to_list(parent_children_map, filtered_warehouse, region_data = {}, parent=None, region = None, sub_region = None, level=0):
+def add_to_list(
+	parent_children_map,
+	filtered_warehouse,
+	region_data={},
+	parent=None,
+	region=None,
+	sub_region=None,
+	level=0,
+):
 	children = parent_children_map.get(parent) or []
-	is_region = True if region_data and region_data.get(parent) and region_data[parent].get("is_region") else False
-	is_sub_region = True if region_data.get(parent) and region_data[parent].get("is_sub_region") else False
+	is_region = (
+		True
+		if region_data
+		and region_data.get(parent)
+		and region_data[parent].get("is_region")
+		else False
+	)
+	is_sub_region = (
+		True
+		if region_data.get(parent) and region_data[parent].get("is_sub_region")
+		else False
+	)
 	for child in children:
 		child.indent = level
 		child.region = parent if is_region else region
 		child.sub_region = parent if is_sub_region else sub_region
 		filtered_warehouse.append(child)
-		add_to_list(parent_children_map, filtered_warehouse, region_data, child.name, child.region, child.sub_region, level + 1)
+		add_to_list(
+			parent_children_map,
+			filtered_warehouse,
+			region_data,
+			child.name,
+			child.region,
+			child.sub_region,
+			level + 1,
+		)
 
 	return parent_children_map
 
@@ -712,4 +817,4 @@ def get_parent(data, lst, warehouse):
 	if data.get(warehouse):
 		for row in data.get(warehouse):
 			lst.append(row)
-			get_parent(data, lst, row['name'])
+			get_parent(data, lst, row["name"])
