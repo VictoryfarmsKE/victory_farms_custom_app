@@ -6,6 +6,7 @@
             "fieldtype": "Link",
             "insert_after": "Salary Component",
             "label": "Commercial Holiday Component",
+            "options": "Salary Component", 
             "module": "Victory Farms Custom App"
         }
     ]

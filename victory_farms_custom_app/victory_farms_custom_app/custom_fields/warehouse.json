@@ -1,0 +1,20 @@
+{
+    "Warehouse": [
+        {
+            "dt": "Warehouse",
+            "fieldname": "custom_is_region",
+            "fieldtype": "Check",
+            "insert_after": "company",
+            "label": "Is Region",
+            "module": "Victory Farms Custom App"
+        },
+        {
+            "dt": "Warehouse",
+            "fieldname": "custom_is_sub_region",
+            "fieldtype": "Check",
+            "insert_after": "custom_is_region",
+            "label": "Is Sub Region",
+            "module": "Victory Farms Custom App"
+        }
+    ]
+}

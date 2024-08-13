@@ -101,6 +101,20 @@ def get_columns():
 			"width": 100,
 			"align": "right",
 		},
+		{
+			"fieldname": "region",
+			"label": _("Region"),
+			"fieldtype": "Data",
+			"width": 100,
+			"align": "right",
+		},
+		{
+			"fieldname": "sub_region",
+			"label": _("Sub Region"),
+			"fieldtype": "Data",
+			"width": 100,
+			"align": "right",
+		},
 		# {
 		#     'fieldname': 'item_group',
 		#     'label': _('Item Group'),
@@ -143,20 +157,20 @@ def get_data(filters, columns=[]):
 
 	warehouse_data = frappe.db.sql(
 		f"""
-		SELECT name, parent_warehouse from `tabWarehouse` where company = '{filters.get("company")}' order by lft
+		SELECT name, parent_warehouse, custom_is_region as is_region, custom_is_sub_region as is_sub_region from `tabWarehouse` where company = '{filters.get("company")}' order by lft
 	""",	
 		as_dict=1,
 	)
 
 	parent_children_map = {}
-	accounts_by_name = {}
+	region_data = {}
 	for d in warehouse_data:
-		accounts_by_name[d.name] = d
+		region_data[d.name] = {"is_region": d.is_region, "is_sub_region": d.is_sub_region}
 		parent_children_map.setdefault(d.parent_warehouse or None, []).append(d)
 
-	filtered_accounts = []
+	filtered_warehouse = []
 
-	parent_children_map1 = add_to_list(parent_children_map, filtered_accounts, None, 0)
+	parent_children_map1 = add_to_list(parent_children_map, filtered_warehouse, region_data, None, None, None, 0)
 
 	vf_stock_balance_dict = {
 		"posting_date": "",
@@ -641,12 +655,16 @@ def get_data(filters, columns=[]):
 				"spoilage_stock": flt(warehouse_data.get("spoilage_stock", 0), 2),
 				"expected_closing_stock": flt(warehouse_data.get("expected_closing_stock", 0), 2),
 				"system_stock": flt(warehouse_data.get("system_stock", 0), 2),
-				"difference": flt(warehouse_data.get("difference", 0), 2)
+				"difference": flt(warehouse_data.get("difference", 0), 2),
+				"region": row.region,
+				"sub_region": row.sub_region
 			})
 
 			for entry in warehouse_wise_data[warehouse]:
 				entry["indent"] = indent + 1
 				entry["warehouse"] = None
+				entry["region"] = row.region
+				entry["sub_region"] = row.sub_region
 				# entry["warehouse"] = entry["item_code"]
 				final_list.append(entry)
 		else:
@@ -667,20 +685,25 @@ def get_data(filters, columns=[]):
 					"spoilage_stock": flt(parent_data[warehouse].get("spoilage_stock", 0), 2),
 					"expected_closing_stock": flt(parent_data[warehouse].get("expected_closing_stock", 0), 2),
 					"system_stock": flt(parent_data[warehouse].get("system_stock", 0), 2),
-					"difference": flt(parent_data[warehouse].get("difference", 0), 2)
+					"difference": flt(parent_data[warehouse].get("difference", 0), 2),
+					"region": row.region,
+					"sub_region": row.sub_region
 				})
 
 
 	return final_list
 
 
-def add_to_list(parent_children_map, filtered_accounts, parent=None, level=0):
+def add_to_list(parent_children_map, filtered_warehouse, region_data = {}, parent=None, region = None, sub_region = None, level=0):
 	children = parent_children_map.get(parent) or []
-
+	is_region = True if region_data and region_data.get(parent) and region_data[parent].get("is_region") else False
+	is_sub_region = True if region_data.get(parent) and region_data[parent].get("is_sub_region") else False
 	for child in children:
 		child.indent = level
-		filtered_accounts.append(child)
-		add_to_list(parent_children_map, filtered_accounts, child.name, level + 1)
+		child.region = parent if is_region else region
+		child.sub_region = parent if is_sub_region else sub_region
+		filtered_warehouse.append(child)
+		add_to_list(parent_children_map, filtered_warehouse, region_data, child.name, child.region, child.sub_region, level + 1)
 
 	return parent_children_map
 
