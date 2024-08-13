@@ -30,17 +30,24 @@ frappe.query_reports["Branch Variance Report"] = {
             "options": "Item"
         },
         {
+            "fieldname": "custom_item_group",
+            "label": __("Item Group"),
+            "fieldtype": "Link",
+            "options": "Item Group"
+        },
+        {
             "fieldname": "warehouse",
             "label": __("Warehouse"),
             "fieldtype": "Link",
             "options": "Warehouse"
         },
         {
-            "fieldname": "custom_item_group",
-            "label": __("Item Group"),
+            "fieldname": "warehouse_type",
+            "label": __("Warehouse Type"),
             "fieldtype": "Link",
-            "options": "Item Group"
+            "options": "Warehouse Type"
         },
+        
     ],
     "formatter": function (value, row, column, data, default_formatter) {
         value = default_formatter(value, row, column, data);

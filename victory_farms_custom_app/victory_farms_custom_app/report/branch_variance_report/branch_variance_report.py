@@ -151,6 +151,8 @@ def get_data(filters, columns=[]):
 	if filters.get("warehouse"):
 		lft, rgt = frappe.db.get_value("Warehouse", filters.get("warehouse"), ["lft", "rgt"])
 		where_cnd += f" and wh.lft >= {lft} and wh.rgt <= {rgt}"
+	if filters.get("warehouse_type"):
+		where_cnd += " and wh.warehouse_type ='%s' " % filters["warehouse_type"]
 	if filters.get("company"):
 		where_cnd += " and sle.company ='%s' " % filters["company"]
 		spoilage_cnd += " and sle.company ='%s' " % filters["company"]
@@ -304,12 +306,13 @@ def get_data(filters, columns=[]):
 	FROM
 		`tabStock Ledger Entry` AS sle
 		INNER JOIN `tabStock Entry` AS se ON se.name = sle.voucher_no
+		INNER JOIN `tabWarehouse` AS swh ON swh.name = se.destination_warehouse
 		INNER JOIN `tabWarehouse` AS wh ON wh.name = se.destination_warehouse
 	WHERE
 		se.docstatus = 1 and
 		se.outgoing_stock_entry is NULL and
 		se.stock_entry_type = 'Material Transfer' and
-		wh.warehouse_type = 'Spoilage' and
+		swh.warehouse_type = 'Spoilage' and
 		se.add_to_transit= 1 and
 		sle.is_cancelled!= 1 and
 		sle.docstatus = 1 and 
@@ -318,7 +321,7 @@ def get_data(filters, columns=[]):
 		sle.posting_date <= %%s
 		%s
 	"""
-			% spoilage_cnd,
+			% where_cnd,
 			(from_date, to_date),
 		)
 	)
@@ -663,7 +666,6 @@ def get_data(filters, columns=[]):
 				entry["warehouse"] = None
 				entry["region"] = row.region
 				entry["sub_region"] = row.sub_region
-				# entry["warehouse"] = entry["item_code"]
 				final_list.append(entry)
 		else:
 			if parent_data.get(warehouse) and any(
