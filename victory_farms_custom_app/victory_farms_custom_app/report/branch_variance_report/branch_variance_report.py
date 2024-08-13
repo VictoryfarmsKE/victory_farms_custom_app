@@ -565,7 +565,7 @@ def get_data(filters, columns=[]):
 			warehouse_total[warehouse]["loss_qty"] += row['loss_qty']
 			warehouse_total[warehouse]["spoilage_stock"] += row['spoilage_stock']
 			warehouse_total[warehouse]["expected_closing_stock"] += row['expected_closing_stock'] if filters.get("to_date") == row["posting_date"] else 0
-			warehouse_total[warehouse]["system_stock"] += row['system_stock']
+			warehouse_total[warehouse]["system_stock"] += row['system_stock'] if filters.get("to_date") == row["posting_date"] else 0
 			warehouse_total[warehouse]["difference"] += row['difference']
 			
 			warehouse_wise_data[warehouse].append(row)
@@ -577,7 +577,7 @@ def get_data(filters, columns=[]):
 				"loss_qty": row['loss_qty'],
 				"spoilage_stock": row['spoilage_stock'],
 				"expected_closing_stock": row['expected_closing_stock'] if filters.get("to_date") == row["posting_date"] else 0,
-				"system_stock": row['system_stock'],
+				"system_stock": row['system_stock'] if filters.get("to_date") == row["posting_date"] else 0,
 				"difference": row['difference']
 			}
 			warehouse_wise_data[warehouse] = [row]
