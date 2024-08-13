@@ -530,11 +530,9 @@ def get_data(filters, columns=[]):
 
 	for item_wh_key, balance_values in result_data.items():
 		expected_closing_stock = round(
-			result_data[item_wh_key]["total_opening_stock"] # balance
-			+ result_data[item_wh_key]["received_qty"] # in qty
-			- result_data[item_wh_key]["total_quantity_sold"] # out qty
-			- result_data[item_wh_key]["loss_qty"] # return qty
-			- result_data[item_wh_key]["spoilage_stock"], # spoilage
+			(result_data[item_wh_key]["total_opening_stock"] 
+			+ result_data[item_wh_key]["received_qty"])
+			- (result_data[item_wh_key]["total_quantity_sold"] + result_data[item_wh_key]["loss_qty"] + result_data[item_wh_key]["spoilage_stock"]),
 			3,
 		)
 		result_data[item_wh_key]["expected_closing_stock"] = expected_closing_stock
