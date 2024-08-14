@@ -576,11 +576,11 @@ def get_data(filters, columns=[]):
 		warehouse = row["warehouse"]
 		if warehouse in warehouse_wise_data:
 			# warehouse_total[warehouse]["total_opening_stock"] += opening_dict.get(warehouse) or 0
-			warehouse_total[warehouse]["received_qty"] += flt(row["received_qty", 3])
+			warehouse_total[warehouse]["received_qty"] += flt(row["received_qty"], 3)
 			warehouse_total[warehouse]["total_quantity_sold"] += flt(
 				row["total_quantity_sold"], 3
 			)
-			warehouse_total[warehouse]["loss_qty"] += flt(row["loss_qty", 3])
+			warehouse_total[warehouse]["loss_qty"] += flt(row["loss_qty"], 3)
 			warehouse_total[warehouse]["spoilage_stock"] += flt(
 				row["spoilage_stock"], 3
 			)
