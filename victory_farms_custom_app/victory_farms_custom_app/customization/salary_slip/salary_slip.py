@@ -141,3 +141,14 @@ class CustomSalarySlip(SalarySlip):
 
 		if component_data.get("salary_component") and frappe.db.get_value("Salary Component", component_data.get("salary_component"), "custom_is_negative_component"):
 			component_row.amount *= -1
+
+def before_validate(self, method):
+	update_to_date(self)
+
+def update_to_date(self):
+	relieving_date = frappe.db.get_value("Employee", self.employee, "relieving_date")
+
+	if not relieving_date or frappe.utils.getdate(self.posting_date) < relieving_date:
+		return
+	
+	self.end_date = relieving_date

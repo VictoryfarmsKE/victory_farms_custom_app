@@ -709,7 +709,16 @@ def get_data(filters, columns=[]):
 					),
 					"spoilage_stock": flt(warehouse_data.get("spoilage_stock", 0), 2),
 					"expected_closing_stock": flt(
-						warehouse_data.get("expected_closing_stock", 0), 2
+						(
+							warehouse_data.get("total_opening_stock")
+							+ warehouse_data.get("received_qty")
+						)
+						- (
+							warehouse_data.get("total_quantity_sold")
+							+ warehouse_data.get("loss_qty")
+							+ warehouse_data.get("spoilage_stock")
+						),
+						3,
 					),
 					"system_stock": flt(warehouse_data.get("system_stock", 0), 2),
 					"difference": flt(warehouse_data.get("difference", 0), 2),
@@ -757,7 +766,16 @@ def get_data(filters, columns=[]):
 							parent_data[warehouse].get("spoilage_stock", 0), 2
 						),
 						"expected_closing_stock": flt(
-							parent_data[warehouse].get("expected_closing_stock", 0), 2
+							(
+								parent_data[warehouse].get("total_opening_stock")
+								+ parent_data[warehouse].get("received_qty")
+							)
+							- (
+								parent_data[warehouse].get("total_quantity_sold")
+								+ parent_data[warehouse].get("loss_qty")
+								+ parent_data[warehouse].get("spoilage_stock")
+							),
+							3,
 						),
 						"system_stock": flt(
 							parent_data[warehouse].get("system_stock", 0), 2
