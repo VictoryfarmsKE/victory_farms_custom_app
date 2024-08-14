@@ -316,7 +316,7 @@ def get_data(filters, columns=[]):
 		`tabStock Ledger Entry` AS sle
 		INNER JOIN `tabStock Entry` AS se ON se.name = sle.voucher_no
 		INNER JOIN `tabWarehouse` AS swh ON swh.name = se.destination_warehouse
-		INNER JOIN `tabWarehouse` AS wh ON wh.name = se.destination_warehouse
+		INNER JOIN `tabWarehouse` AS wh ON wh.name = sle.warehouse
 	WHERE
 		se.docstatus = 1 and
 		se.outgoing_stock_entry is NULL and
