@@ -1,5 +1,5 @@
 import frappe
-from frappe.utils import flt
+from frappe.utils import flt, fmt_money
 from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip
 
 class CustomSalarySlip(SalarySlip):
@@ -152,3 +152,25 @@ def update_to_date(self):
 		return
 	
 	self.end_date = relieving_date
+
+def validate(self, method):
+	udpate_foreign_currency(self)
+
+def udpate_foreign_currency(self):
+	if not self.payroll_entry:
+		return
+
+	exchange_rate = frappe.db.get_value("Payroll Entry", self.payroll_entry, "exchange_rate")
+
+	if exchange_rate <= 1:
+		return
+	
+	foreign_currency = frappe.db.get_value("Employee", self.employee, "salary_currency")
+
+	for row in self.earnings + self.deductions:
+		row.custom_foreign_amount = fmt_money(flt(row.default_amount / exchange_rate, 3), 2, foreign_currency)
+
+	self.custom_foreign_gross_pay = fmt_money(flt(self.gross_pay / exchange_rate, 2), 2, foreign_currency)
+	self.custom_foreign_total_deduction = fmt_money(flt(self.total_deduction / exchange_rate, 2), 2, foreign_currency)
+	self.custom_foreign_net_pay = fmt_money(flt(self.net_pay / exchange_rate, 2), 2, foreign_currency)
+	self.custom_foreign_rounded_total = fmt_money(flt(self.rounded_total / exchange_rate, 0), 2, foreign_currency)

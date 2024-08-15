@@ -1,0 +1,40 @@
+{
+ "Salary Slip": [
+  {
+   "dt": "Salary Slip",
+   "fieldname": "custom_foreign_gross_pay",
+   "fieldtype": "Data",
+   "insert_after": "base_gross_pay",
+   "label": "Foreign Gross Pay",
+   "module": "Victory Farms Custom App",
+   "read_only": 1
+  },
+  {
+   "dt": "Salary Slip",
+   "fieldname": "custom_foreign_total_deduction",
+   "fieldtype": "Data",
+   "insert_after": "base_total_deduction",
+   "label": "Foreign Total Deduction",
+   "module": "Victory Farms Custom App",
+   "read_only": 1
+  },
+  {
+   "dt": "Salary Slip",
+   "fieldname": "custom_foreign_net_pay",
+   "fieldtype": "Data",
+   "insert_after": "base_net_pay",
+   "label": "Foreign Net Pay",
+   "module": "Victory Farms Custom App",
+   "read_only": 1
+  },
+  {
+   "dt": "Salary Slip",
+   "fieldname": "custom_foreign_rounded_total",
+   "fieldtype": "Data",
+   "insert_after": "base_rounded_total",
+   "label": "Foreign Rounded Total",
+   "module": "Victory Farms Custom App",
+   "read_only": 1
+  }
+ ]
+}

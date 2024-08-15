@@ -1,0 +1,13 @@
+{
+ "Salary Detail": [
+  {
+   "dt": "Salary Detail",
+   "fieldname": "custom_foreign_amount",
+   "fieldtype": "Data",
+   "insert_after": "additional_amount",
+   "label": "Foreign Amount",
+   "module": "Victory Farms Custom App",
+   "read_only": 1
+  }
+ ]
+}

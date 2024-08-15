@@ -134,7 +134,8 @@ doc_events = {
         "on_submit" : "victory_farms_custom_app.victory_farms_custom_app.customization.leave_application.leave_application.on_submit"
     },
     "Salary Slip": {
-        "before_validate": "victory_farms_custom_app.victory_farms_custom_app.customization.salary_slip.salary_slip.before_validate"
+        "before_validate": "victory_farms_custom_app.victory_farms_custom_app.customization.salary_slip.salary_slip.before_validate",
+        "validate": "victory_farms_custom_app.victory_farms_custom_app.customization.salary_slip.salary_slip.validate"
     }
 }
 # Scheduled Tasks
