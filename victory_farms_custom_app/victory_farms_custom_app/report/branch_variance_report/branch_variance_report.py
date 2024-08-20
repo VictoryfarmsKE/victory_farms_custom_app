@@ -156,7 +156,17 @@ def get_data(filters, columns=[]):
 		)
 		where_cnd += f" and wh.lft >= {lft} and wh.rgt <= {rgt}"
 	if filters.get("warehouse_type"):
-		where_cnd += " and wh.warehouse_type ='%s' " % filters["warehouse_type"]
+		wt_data = frappe.db.get_all("Warehouse", {"warehouse_type": filters["warehouse_type"]}, ["lft", "rgt"])
+		cond = "(select name from `tabWarehouse` where "
+		for idx, row in enumerate(wt_data):
+			if idx != 0:
+				cond += f" OR (lft >= {row.lft} and rgt <= {row.rgt})"
+			else:
+				cond += f"(lft >= {row.lft} and rgt <= {row.rgt})"
+		cond += ")"
+		if wt_data:
+			where_cnd += f" and wh.name in {cond}"
+		# where_cnd += " and wh.warehouse_type ='%s' " % filters["warehouse_type"]
 	if filters.get("company"):
 		where_cnd += " and sle.company ='%s' " % filters["company"]
 		spoilage_cnd += " and sle.company ='%s' " % filters["company"]
