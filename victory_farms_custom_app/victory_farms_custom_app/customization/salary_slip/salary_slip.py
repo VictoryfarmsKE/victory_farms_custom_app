@@ -92,8 +92,8 @@ class CustomSalarySlip(SalarySlip):
 
 
 
-		if salary_structure_assignment.get("base"):
-			salary_structure_assignment.base = salary_structure_assignment.base * self.exchange_rate if self.exchange_rate else 1
+		# if salary_structure_assignment.get("base"):
+		# 	salary_structure_assignment.base = salary_structure_assignment.base * self.exchange_rate if self.exchange_rate else 1
 
 		data.update(salary_structure_assignment)
 		data.update(self.as_dict())
