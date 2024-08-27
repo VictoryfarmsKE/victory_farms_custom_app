@@ -1,5 +1,6 @@
 import frappe
-from frappe.utils import flt, fmt_money
+from frappe import _
+from frappe.utils import flt, fmt_money, getdate, formatdate, cint
 from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip
 
 class CustomSalarySlip(SalarySlip):
@@ -57,6 +58,71 @@ class CustomSalarySlip(SalarySlip):
 						default_amount=default_amount,
 						remove_if_zero_valued=remove_if_zero_valued,
 					)
+	
+	def get_data_for_eval(self):
+		"""Returns data for evaluating formula"""
+		data = frappe._dict()
+		employee = frappe.get_doc("Employee", self.employee).as_dict()
+
+		start_date = getdate(self.start_date)
+		date_to_validate = employee.date_of_joining if employee.date_of_joining > start_date else start_date
+
+		salary_structure_assignment = frappe.get_value(
+			"Salary Structure Assignment",
+			{
+				"employee": self.employee,
+				"salary_structure": self.salary_structure,
+				"from_date": ("<=", date_to_validate),
+				"docstatus": 1,
+			},
+			"*",
+			order_by="from_date desc",
+			as_dict=True,
+		)
+
+		if not salary_structure_assignment:
+			frappe.throw(
+				_(
+					"Please assign a Salary Structure for Employee {0} " "applicable from or before {1} first"
+				).format(
+					frappe.bold(self.employee_name),
+					frappe.bold(formatdate(date_to_validate)),
+				)
+			)
+
+
+
+		if salary_structure_assignment.get("base"):
+			salary_structure_assignment.base = salary_structure_assignment.base * self.exchange_rate if self.exchange_rate else 1
+
+		data.update(salary_structure_assignment)
+		data.update(self.as_dict())
+		data.update(employee)
+
+		# set values for components
+		salary_components = frappe.get_all("Salary Component", fields=["salary_component_abbr"])
+		for sc in salary_components:
+			data.setdefault(sc.salary_component_abbr, 0)
+
+		# shallow copy of data to store default amounts (without payment days) for tax calculation
+		default_data = data.copy()
+
+		convertable_components = frappe.db.get_all("Salary Component", {"custom_is_in_employee_currency": 1}, pluck = "salary_component_abbr")
+
+		for key in ("earnings", "deductions"):
+			i = 0
+			for d in self.get(key):
+				i += 1
+				if d.abbr in convertable_components:
+					if d.default_amount:
+						d.default_amount *= self.exchange_rate
+					if d.amount:
+						d.amount *= self.exchange_rate
+				default_data[d.abbr] = d.default_amount or 0
+				data[d.abbr] = d.amount or 0
+			self.flags.ignore_conversion = True
+
+		return data, default_data
 
 	def update_component_row(
 		self,
@@ -168,7 +234,8 @@ def udpate_foreign_currency(self):
 	foreign_currency = frappe.db.get_value("Employee", self.employee, "salary_currency")
 
 	for row in self.earnings + self.deductions:
-		row.custom_foreign_amount = fmt_money(flt(row.default_amount / exchange_rate, 3), 2, foreign_currency)
+		amount = row.default_amount or row.amount or row.additional_amount
+		row.custom_foreign_amount = fmt_money(flt(amount / exchange_rate, 3), 2, foreign_currency)
 
 	self.custom_foreign_gross_pay = fmt_money(flt(self.gross_pay / exchange_rate, 2), 2, foreign_currency)
 	self.custom_foreign_total_deduction = fmt_money(flt(self.total_deduction / exchange_rate, 2), 2, foreign_currency)
