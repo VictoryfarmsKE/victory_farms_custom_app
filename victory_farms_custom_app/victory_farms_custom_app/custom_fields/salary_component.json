@@ -5,7 +5,7 @@
             "fieldname": "custom_is_in_employee_currency",
             "fieldtype": "Check",
             "insert_after": "custom_is_negative_component",
-            "label": "Is In Company Currency",
+            "label": "Is In Employee Currency",
             "module": "Victory Farms Custom App"
         }
     ]
