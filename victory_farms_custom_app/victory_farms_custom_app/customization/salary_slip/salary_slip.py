@@ -2,6 +2,9 @@ import frappe
 from frappe import _
 from frappe.utils import flt, fmt_money, getdate, formatdate, cint
 from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip
+from hrms.payroll.doctype.payroll_period.payroll_period import (
+	get_period_factor,
+)
 
 class CustomSalarySlip(SalarySlip):
 	def add_structure_components(self, component_type):
@@ -92,8 +95,10 @@ class CustomSalarySlip(SalarySlip):
 
 
 
-		# if salary_structure_assignment.get("base"):
-		# 	salary_structure_assignment.base = salary_structure_assignment.base * self.exchange_rate if self.exchange_rate else 1
+		if salary_structure_assignment.get("base"):
+			custom_exchange_rate = salary_structure_assignment.custom_exchange_rate or 1
+			foreign_base = flt(salary_structure_assignment.base / custom_exchange_rate, 2) if custom_exchange_rate else 1
+			salary_structure_assignment.base = foreign_base * self.exchange_rate if self.exchange_rate else 1
 
 		data.update(salary_structure_assignment)
 		data.update(self.as_dict())
@@ -110,19 +115,42 @@ class CustomSalarySlip(SalarySlip):
 		convertable_components = frappe.db.get_all("Salary Component", {"custom_is_in_employee_currency": 1}, pluck = "salary_component_abbr")
 
 		for key in ("earnings", "deductions"):
-			i = 0
 			for d in self.get(key):
-				i += 1
-				if d.abbr in convertable_components:
+				if d.abbr in convertable_components and frappe.flags.allow_conversions == True:
 					if d.default_amount:
 						d.default_amount *= self.exchange_rate
 					if d.amount:
 						d.amount *= self.exchange_rate
 				default_data[d.abbr] = d.default_amount or 0
 				data[d.abbr] = d.amount or 0
+			frappe.flags.allow_conversions = False
 			self.flags.ignore_conversion = True
 
 		return data, default_data
+
+	def calculate_net_pay(self):
+		if self.salary_structure:
+			self.calculate_component_amounts("earnings")
+
+		# get remaining numbers of sub-period (period for which one salary is processed)
+		if self.payroll_period:
+			self.remaining_sub_periods = get_period_factor(
+				self.employee, self.start_date, self.end_date, self.payroll_frequency, self.payroll_period
+			)[1]
+
+		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1)
+		self.base_gross_pay = flt(
+			flt(self.gross_pay) * flt(self.exchange_rate), self.precision("base_gross_pay")
+		)
+
+		if self.salary_structure:
+			frappe.flags.allow_conversions = True
+			self.calculate_component_amounts("deductions")
+
+		self.set_loan_repayment()
+		self.set_precision_for_component_amounts()
+		self.set_net_pay()
+		self.compute_income_tax_breakup()
 
 	def update_component_row(
 		self,

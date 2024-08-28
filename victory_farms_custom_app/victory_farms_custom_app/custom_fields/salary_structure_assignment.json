@@ -1,0 +1,20 @@
+{
+    "Salary Structure Assignment": [
+        {
+            "dt": "Salary Structure Assignment",
+            "fieldname": "custom_foreign_base",
+            "fieldtype": "Currency",
+            "insert_after": "section_break_7",
+            "label": "Foreign Base",
+            "module": "Victory Farms Custom App"
+        },
+        {
+            "dt": "Salary Structure Assignment",
+            "fieldname": "custom_exchange_rate",
+            "fieldtype": "Float",
+            "insert_after": "custom_foreign_base",
+            "label": "Exchange Rate",
+            "module": "Victory Farms Custom App"
+        }
+    ]
+}
