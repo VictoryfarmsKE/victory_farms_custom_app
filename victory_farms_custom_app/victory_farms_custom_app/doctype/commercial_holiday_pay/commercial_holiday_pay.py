@@ -56,9 +56,16 @@ def create_additional_salary(self):
 	if not self.number_of_days:
 		return
 	
+	payroll_date = get_last_day(self.to_date or self.posting_date)
+	
+	relieving_date = frappe.db.get_value("Employee", self.employee, "relieving_date")
+	
+	if relieving_date and payroll_date > relieving_date:
+		payroll_date = relieving_date
+
 	ads_doc = frappe.new_doc("Additional Salary")
 	ads_doc.employee = self.employee
-	ads_doc.payroll_date = get_last_day(self.to_date or self.posting_date)
+	ads_doc.payroll_date = payroll_date
 	ads_doc.currecy = self.currency
 	ads_doc.amount = self.commercial_amount
 	ads_doc.override_salary_structure_amount = 1
