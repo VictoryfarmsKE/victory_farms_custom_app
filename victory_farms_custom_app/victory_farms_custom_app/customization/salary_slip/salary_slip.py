@@ -255,7 +255,7 @@ def udpate_foreign_currency(self):
 	foreign_currency = frappe.db.get_value("Employee", self.employee, "salary_currency")
 
 	for row in self.earnings + self.deductions:
-		amount = row.default_amount or row.amount or row.additional_amount
+		amount = row.amount or row.default_amount or row.additional_amount
 		row.custom_foreign_amount = fmt_money(flt(amount / exchange_rate, 3), 2, foreign_currency)
 
 	self.custom_foreign_gross_pay = fmt_money(flt(self.gross_pay / exchange_rate, 2), 2, foreign_currency)
