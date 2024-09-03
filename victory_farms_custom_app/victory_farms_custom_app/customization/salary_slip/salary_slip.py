@@ -1,10 +1,11 @@
 import frappe
 from frappe import _
 from frappe.utils import flt, fmt_money, getdate, formatdate, cint
-from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip
+from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip, get_salary_component_data
 from hrms.payroll.doctype.payroll_period.payroll_period import (
 	get_period_factor,
 )
+from hrms.payroll.doctype.additional_salary.additional_salary import get_additional_salaries
 
 class CustomSalarySlip(SalarySlip):
 	def add_structure_components(self, component_type):
@@ -237,6 +238,21 @@ class CustomSalarySlip(SalarySlip):
 
 		if component_data.get("salary_component") and frappe.db.get_value("Salary Component", component_data.get("salary_component"), "custom_is_negative_component"):
 			component_row.amount *= -1
+
+	def add_additional_salary_components(self, component_type):
+		additional_salaries = get_additional_salaries(
+			self.employee, self.start_date, self.end_date, component_type
+		)
+
+		for additional_salary in additional_salaries:
+			additional_salary.amount *= self.exchange_rate
+			self.update_component_row(
+				get_salary_component_data(additional_salary.component),
+				additional_salary.amount,
+				component_type,
+				additional_salary,
+				is_recurring=additional_salary.is_recurring,
+			)
 
 def before_validate(self, method):
 	update_to_date(self)
