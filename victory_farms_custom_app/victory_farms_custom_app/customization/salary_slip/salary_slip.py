@@ -121,6 +121,8 @@ class CustomSalarySlip(SalarySlip):
 						d.default_amount *= self.exchange_rate
 					if d.amount:
 						d.amount *= self.exchange_rate
+					if d.additional_amount:
+						d.additional_amount *= self.exchange_rate
 				default_data[d.abbr] = d.default_amount or 0
 				data[d.abbr] = d.amount or 0
 			frappe.flags.allow_conversions = False
