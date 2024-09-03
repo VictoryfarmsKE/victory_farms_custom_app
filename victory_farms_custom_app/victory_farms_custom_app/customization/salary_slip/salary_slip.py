@@ -117,7 +117,7 @@ class CustomSalarySlip(SalarySlip):
 
 		for key in ("earnings", "deductions"):
 			for d in self.get(key):
-				if d.abbr in convertable_components and d.salary_component not in self.converted_components:
+				if self.get("converted_components") is not None and d.abbr in convertable_components and d.salary_component not in self.converted_components:
 					if d.default_amount:
 						d.default_amount *= self.exchange_rate
 					if d.amount:
@@ -244,7 +244,7 @@ class CustomSalarySlip(SalarySlip):
 		)
 
 		for additional_salary in additional_salaries:
-			if additional_salary.component not in self.converted_components:
+			if self.get("converted_components") is not None and additional_salary.component not in self.converted_components:
 				additional_salary.amount *= self.exchange_rate
 				self.converted_components.append(additional_salary.component)
 			self.update_component_row(
