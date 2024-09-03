@@ -113,8 +113,6 @@ class CustomSalarySlip(SalarySlip):
 		# shallow copy of data to store default amounts (without payment days) for tax calculation
 		default_data = data.copy()
 
-		convertable_components = frappe.db.get_all("Salary Component", {"custom_is_in_employee_currency": 1}, pluck = "salary_component_abbr")
-
 		for key in ("earnings", "deductions"):
 			for d in self.get(key):
 				# if self.get("converted_components") is not None and d.abbr in convertable_components and d.salary_component not in self.converted_components:
@@ -219,8 +217,11 @@ class CustomSalarySlip(SalarySlip):
 			self.employee, self.start_date, self.end_date, component_type
 		)
 
+		convertable_components = frappe.db.get_all("Salary Component", {"custom_is_in_employee_currency": 1}, pluck = "name")
+
 		for additional_salary in additional_salaries:
-			additional_salary.amount *= self.exchange_rate
+			if additional_salary.component in convertable_components:
+				additional_salary.amount *= self.exchange_rate
 			self.update_component_row(
 				get_salary_component_data(additional_salary.component),
 				additional_salary.amount,
