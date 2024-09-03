@@ -117,42 +117,18 @@ class CustomSalarySlip(SalarySlip):
 
 		for key in ("earnings", "deductions"):
 			for d in self.get(key):
-				if self.get("converted_components") is not None and d.abbr in convertable_components and d.salary_component not in self.converted_components:
-					if d.default_amount:
-						d.default_amount *= self.exchange_rate
-					if d.amount:
-						d.amount *= self.exchange_rate
-					if d.additional_amount:
-						d.additional_amount *= self.exchange_rate
-					self.converted_components.append(d.salary_component)
+				# if self.get("converted_components") is not None and d.abbr in convertable_components and d.salary_component not in self.converted_components:
+				# 	if d.default_amount:
+				# 		d.default_amount *= self.exchange_rate
+				# 	if d.amount:
+				# 		d.amount *= self.exchange_rate
+				# 	if d.additional_amount:
+				# 		d.additional_amount *= self.exchange_rate
+				# 	self.converted_components.append(d.salary_component)
 				default_data[d.abbr] = d.default_amount or 0
 				data[d.abbr] = d.amount or 0
 
 		return data, default_data
-
-	def calculate_net_pay(self):
-		if self.salary_structure:
-			self.calculate_component_amounts("earnings")
-
-		# get remaining numbers of sub-period (period for which one salary is processed)
-		if self.payroll_period:
-			self.remaining_sub_periods = get_period_factor(
-				self.employee, self.start_date, self.end_date, self.payroll_frequency, self.payroll_period
-			)[1]
-
-		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1)
-		self.base_gross_pay = flt(
-			flt(self.gross_pay) * flt(self.exchange_rate), self.precision("base_gross_pay")
-		)
-
-		if self.salary_structure:
-			self.converted_components = []
-			self.calculate_component_amounts("deductions")
-
-		self.set_loan_repayment()
-		self.set_precision_for_component_amounts()
-		self.set_net_pay()
-		self.compute_income_tax_breakup()
 
 	def update_component_row(
 		self,
@@ -244,9 +220,7 @@ class CustomSalarySlip(SalarySlip):
 		)
 
 		for additional_salary in additional_salaries:
-			if self.get("converted_components") is not None and additional_salary.component not in self.converted_components:
-				additional_salary.amount *= self.exchange_rate
-				self.converted_components.append(additional_salary.component)
+			additional_salary.amount *= self.exchange_rate
 			self.update_component_row(
 				get_salary_component_data(additional_salary.component),
 				additional_salary.amount,
