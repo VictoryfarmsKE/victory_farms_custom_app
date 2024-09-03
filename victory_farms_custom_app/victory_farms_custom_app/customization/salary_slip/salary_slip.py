@@ -117,17 +117,16 @@ class CustomSalarySlip(SalarySlip):
 
 		for key in ("earnings", "deductions"):
 			for d in self.get(key):
-				if d.abbr in convertable_components and frappe.flags.allow_conversions == True:
+				if d.abbr in convertable_components and d.salary_component not in self.converted_components:
 					if d.default_amount:
 						d.default_amount *= self.exchange_rate
 					if d.amount:
 						d.amount *= self.exchange_rate
 					if d.additional_amount:
 						d.additional_amount *= self.exchange_rate
+					self.converted_components.append(d.salary_component)
 				default_data[d.abbr] = d.default_amount or 0
 				data[d.abbr] = d.amount or 0
-			frappe.flags.allow_conversions = False
-			self.flags.ignore_conversion = True
 
 		return data, default_data
 
@@ -147,7 +146,7 @@ class CustomSalarySlip(SalarySlip):
 		)
 
 		if self.salary_structure:
-			frappe.flags.allow_conversions = True
+			self.converted_components = []
 			self.calculate_component_amounts("deductions")
 
 		self.set_loan_repayment()
@@ -245,7 +244,9 @@ class CustomSalarySlip(SalarySlip):
 		)
 
 		for additional_salary in additional_salaries:
-			additional_salary.amount *= self.exchange_rate
+			if additional_salary.component not in self.converted_components:
+				additional_salary.amount *= self.exchange_rate
+				self.converted_components.append(additional_salary.component)
 			self.update_component_row(
 				get_salary_component_data(additional_salary.component),
 				additional_salary.amount,
