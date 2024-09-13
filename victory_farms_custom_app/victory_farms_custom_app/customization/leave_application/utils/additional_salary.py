@@ -28,14 +28,19 @@ def create_additional_salary(self):
 
     for row in date_range:
         leave_days = (date_diff(date_range[row][1], date_range[row][0]) + 1 )if date_range[row][1] != date_range[row][0] else 1
-        ads_doc = frappe.new_doc("Additional Salary")
-        ads_doc.employee = self.employee
-        ads_doc.salary_component = salary_component
-        ads_doc.currency = currency
-        ads_doc.payroll_date = row
-        ads_doc.amount = flt(leave_days * daily_pay, self.precision)
-        ads_doc.ref_doctype = "Leave Application"
-        ads_doc.ref_docname = self.name
+
+        if add_doc_name := frappe.db.get_value("Additional Salary", {"docstatus": 0, "employee": self.employee, "salary_component": salary_component, "payroll_date": row}):
+            ads_doc = frappe.get_doc("Additional Salary", add_doc_name)
+            ads_doc.amount += flt(leave_days * daily_pay, self.precision)
+        else:
+            ads_doc = frappe.new_doc("Additional Salary")
+            ads_doc.employee = self.employee
+            ads_doc.salary_component = salary_component
+            ads_doc.currency = currency
+            ads_doc.payroll_date = row
+            ads_doc.amount = flt(leave_days * daily_pay, self.precision)
+        # ads_doc.ref_doctype = "Leave Application"
+        # ads_doc.ref_docname = self.name
 
         ads_doc.save()
     # ads_doc.submit()
