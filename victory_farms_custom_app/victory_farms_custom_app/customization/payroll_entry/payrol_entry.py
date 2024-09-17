@@ -1,4 +1,5 @@
 import frappe
+from frappe.utils import add_days
 from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_filter_condition, get_joining_relieving_condition, get_emp_list, remove_payrolled_employees, get_salary_structure
 
 class CustomPayrollEntry(PayrollEntry):
@@ -28,6 +29,7 @@ class CustomPayrollEntry(PayrollEntry):
 			return emp_list
 		
 def remove_wrong_ssa_applied(emp_list, start_date, end_date):
+	start_date = add_days(start_date, 1)
 	new_emp_list = []
 	for employee_details in emp_list:
 		if not frappe.db.exists(
