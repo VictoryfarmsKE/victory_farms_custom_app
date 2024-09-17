@@ -13,7 +13,7 @@ class CustomPayrollEntry(PayrollEntry):
 		cond = get_filter_condition(filters)
 		cond += get_joining_relieving_condition(self.start_date, self.end_date)
 
-		if values := frappe.db.get_all("Salary Structure Multiselect", {"parent": self.name}, pluck = ["salary_structure"]):
+		if values := frappe.db.get_all("Salary Structure Multiselect", {"parent": self.name}, pluck = "salary_structure"):
 			sal_struct = values
 		else:
 			sal_struct = get_salary_structure(
