@@ -33,7 +33,7 @@ doctype_js = {
     "Additional Salary" : "victory_farms_custom_app/customization/additional_salary/additional_salary.js",
     "Leave Encashment" : "victory_farms_custom_app/customization/leave_encashment/leave_encashment.js",
     "Salary Structure Assignment": "victory_farms_custom_app/customization/salary_structure_assignment/salary_structure_assignment.js",
-    "Stock Entry Detail": "victory_farms_custom_app/customization/stock_entry_detail/stock_entry_detail.js"
+    "Stock Entry": "victory_farms_custom_app/customization/stock_entry_detail/stock_entry_detail.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
