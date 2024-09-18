@@ -10,6 +10,15 @@
    "read_only": 1
   },
   {
+    "dt": "Salary Slip",
+    "fieldname": "custom_overdrawn_salary",
+    "fieldtype": "Check",
+    "insert_after": "status",
+    "label": "Overdrawn Salary",
+    "module": "Victory Farms Custom App",
+    "read_only": 1
+   },
+  {
    "dt": "Salary Slip",
    "fieldname": "custom_foreign_total_deduction",
    "fieldtype": "Data",

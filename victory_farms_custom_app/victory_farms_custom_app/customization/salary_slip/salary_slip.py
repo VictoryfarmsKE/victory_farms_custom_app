@@ -242,6 +242,10 @@ def update_to_date(self):
 	self.end_date = relieving_date
 
 def validate(self, method):
+	if self.gross_pay < 0:
+		self.custom_overdrawn_salary = 1
+	else:
+		self.custom_overdrawn_salary = 0
 	udpate_foreign_currency(self)
 
 def udpate_foreign_currency(self):
