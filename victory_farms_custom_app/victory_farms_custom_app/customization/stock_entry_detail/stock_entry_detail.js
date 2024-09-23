@@ -8,7 +8,8 @@ frappe.ui.form.on('Stock Entry Detail', {
 				if (data.error == '') {
 					$.each(frm.doc.items || [], function (i, v) {
 						if (cdt == v.name) {
-							frappe.model.set_value(v.doctype, v.name, "qty", data.data)
+							var amount = parseFloat(data.data)
+							frappe.model.set_value(v.doctype, v.name, "qty", amount)
 						}
 
 					})
