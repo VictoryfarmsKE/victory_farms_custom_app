@@ -146,23 +146,14 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-#	"all": [
-#		"victory_farms_custom_app.tasks.all"
-#	],
-#	"daily": [
-#		"victory_farms_custom_app.tasks.daily"
-#	],
-#	"hourly": [
-#		"victory_farms_custom_app.tasks.hourly"
-#	],
-#	"weekly": [
-#		"victory_farms_custom_app.tasks.weekly"
-#	],
-#	"monthly": [
-#		"victory_farms_custom_app.tasks.monthly"
-#	],
-# }
+scheduler_events = {
+    "cron": {
+        "59 23 28-31 * *": [
+            "victory_farms_custom_app.victory_farms_custom_app.customization.leave_type.leave_type.auto_create_leave_allocation"
+        ]
+    }
+}
+
 
 # Testing
 # -------

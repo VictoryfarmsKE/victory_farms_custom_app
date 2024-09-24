@@ -1,0 +1,39 @@
+{
+    "Leave Type": [
+        {
+            "depends_on": "eval: doc.custom_create_auto_allocation == 1;",
+            "dt": "Leave Type",
+            "fieldname": "custom_based_on_employee_grade",
+            "fieldtype": "Check",
+            "insert_after": "custom_create_auto_allocation",
+            "label": "Based on Employee Grade",
+            "module": "Victory Farms Custom App"
+        },
+        {
+            "dt": "Leave Type",
+            "fieldname": "custom_create_auto_allocation",
+            "fieldtype": "Check",
+            "insert_after": "earned_leave_frequency",
+            "label": "Create Auto Allocation",
+            "module": "Victory Farms Custom App"
+        },
+        {
+            "dt": "Leave Type",
+            "fieldname": "custom_leave_grade",
+            "fieldtype": "Table MultiSelect",
+            "insert_after": "custom_employee_grade",
+            "label": "Leave Grade",
+            "module": "Victory Farms Custom App",
+            "options": "Leave Grade"
+        },
+        {
+            "depends_on": "eval: doc.custom_based_on_employee_grade == 1;",
+            "dt": "Leave Type",
+            "fieldname": "custom_employee_grade",
+            "fieldtype": "Section Break",
+            "insert_after": "rounding",
+            "label": "Employee Grade",
+            "module": "Victory Farms Custom App"
+        }
+    ]
+}
