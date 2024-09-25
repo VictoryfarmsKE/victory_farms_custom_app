@@ -33,7 +33,8 @@ doctype_js = {
     "Additional Salary" : "victory_farms_custom_app/customization/additional_salary/additional_salary.js",
     "Leave Encashment" : "victory_farms_custom_app/customization/leave_encashment/leave_encashment.js",
     "Salary Structure Assignment": "victory_farms_custom_app/customization/salary_structure_assignment/salary_structure_assignment.js",
-    "Stock Entry": "victory_farms_custom_app/customization/stock_entry_detail/stock_entry_detail.js"
+    "Stock Entry": "victory_farms_custom_app/customization/stock_entry_detail/stock_entry_detail.js",
+    "Leave Type": "victory_farms_custom_app/customization/leave_type/leave_type.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -148,7 +149,7 @@ doc_events = {
 
 scheduler_events = {
     "cron": {
-        "59 23 28-31 * *": [
+        "0 0 28-31 * *": [
             "victory_farms_custom_app.victory_farms_custom_app.customization.leave_type.leave_type.auto_create_leave_allocation"
         ]
     }
