@@ -22,15 +22,16 @@ def create_leave_allocation(leave_type, is_earned_leave = 0):
     to_date = get_year_ending(today())
 
     for employee in employee_data:
+        employee_from_date = from_date
         allocated_leaves = flt(lt_data.max_leaves_allowed / 12, 2) if is_earned_leave else lt_data.max_leaves_allowed
         if not is_earned_leave and from_date < employee.date_of_joining < to_date:
             condition_value = month_diff(to_date, employee.date_of_joining) if get_first_day(employee.date_of_joining) == employee.date_of_joining else (month_diff(to_date, employee.date_of_joining) - 1)
             allocated_leaves = flt(allocated_leaves * condition_value / 12, 2)
-            from_date = employee.date_of_joining
+            employee_from_date = employee.date_of_joining
         leave_all_doc = frappe.new_doc("Leave Allocation")
         leave_all_doc.employee = employee.name
         leave_all_doc.leave_type = leave_type
-        leave_all_doc.from_date = from_date
+        leave_all_doc.from_date = employee_from_date
         leave_all_doc.to_date = to_date
         leave_all_doc.carry_forward = 1 if is_earned_leave else 0
         leave_all_doc.new_leaves_allocated = allocated_leaves
