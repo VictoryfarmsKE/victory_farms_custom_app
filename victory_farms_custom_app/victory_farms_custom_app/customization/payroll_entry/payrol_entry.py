@@ -23,6 +23,7 @@ class CustomPayrollEntry(PayrollEntry):
 			cond += "and t2.salary_structure IN %(sal_struct)s "
 			cond += "and t2.payroll_payable_account = %(payroll_payable_account)s "
 			cond += "and %(from_date)s >= t2.from_date"
+			cond += f"and t1.salary_currency = '{self.currency}'"
 			emp_list = get_emp_list(sal_struct, cond, self.end_date, self.payroll_payable_account)
 			emp_list = remove_wrong_ssa_applied(emp_list, self.start_date, self.end_date)
 			emp_list = remove_payrolled_employees(emp_list, self.start_date, self.end_date)
