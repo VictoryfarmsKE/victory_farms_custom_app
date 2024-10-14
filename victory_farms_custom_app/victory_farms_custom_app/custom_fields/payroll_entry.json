@@ -1,0 +1,13 @@
+{
+    "Payroll Entry": [
+        {
+            "dt": "Payroll Entry",
+            "fieldname": "salary_currency",
+            "fieldtype": "Link",
+            "options": "Currency",
+            "insert_after": "number_of_employees",
+            "label": "Employee Salary Currency",
+            "module": "Victory Farms Custom App"
+        }
+    ]
+}
