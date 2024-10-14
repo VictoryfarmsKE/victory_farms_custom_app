@@ -7,7 +7,7 @@ from frappe.utils import get_first_day, today
 
 class StoreDeduction(Document):
 	def on_submit(self):
-		salary_component = frappe.db.get_value("Salaty Componet")
+		salary_component = frappe.db.get_value("Salary Component", {"is_for_store_deduction": 1})
 		
 		payroll_date = get_first_day(self.posting_date)
 
@@ -19,7 +19,7 @@ class StoreDeduction(Document):
 		
 		else:
 			ads_doc = frappe.new_doc("Additional Salary")
-			ads_doc.salary_component = "test"
+			ads_doc.salary_component = salary_component
 			ads_doc.employee = self.employee
 			ads_doc.payroll_date = payroll_date
 			ads_doc.currency = frappe.db.get_value("Employee", self.employee, "salary_currency")

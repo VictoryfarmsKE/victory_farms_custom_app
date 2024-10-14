@@ -7,6 +7,14 @@
             "insert_after": "custom_is_negative_component",
             "label": "Is In Employee Currency",
             "module": "Victory Farms Custom App"
+        },
+        {
+            "dt": "Salary Component",
+            "fieldname": "is_for_store_deduction",
+            "fieldtype": "Check",
+            "insert_after": "custom_is_in_employee_currency",
+            "label": "Is for Store Deduction",
+            "module": "Victory Farms Custom App"
         }
     ]
 }
