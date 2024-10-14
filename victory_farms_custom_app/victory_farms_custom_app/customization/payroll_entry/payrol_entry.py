@@ -25,7 +25,6 @@ class CustomPayrollEntry(PayrollEntry):
 			cond += "and %(from_date)s >= t2.from_date"
 			if self.salary_currency:
 				cond += f" and t1.salary_currency = '{self.salary_currency}'"
-			frappe.throw(f"{cond}")
 			emp_list = get_emp_list(sal_struct, cond, self.end_date, self.payroll_payable_account)
 			emp_list = remove_wrong_ssa_applied(emp_list, self.start_date, self.end_date)
 			emp_list = remove_payrolled_employees(emp_list, self.start_date, self.end_date)
