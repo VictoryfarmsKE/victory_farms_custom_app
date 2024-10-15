@@ -70,10 +70,10 @@ def create_additional_salary(self):
 	ads_doc.amount = self.commercial_amount
 	ads_doc.override_salary_structure_amount = 1
 
-	ads_doc.salary_component = frappe.db.get_single_value("Payroll Settings", "custom_commercial_holiday_component")
+	ads_doc.salary_component = self.salary_component
 
 	if not ads_doc.salary_component:
-		frappe.throw(_("Salary Component is not defined in Payroll Setting"))
+		frappe.throw(_("Salary Component is Mandatory"))
 	
 	ads_doc.ref_doctype = self.doctype
 	ads_doc.ref_docname = self.name
