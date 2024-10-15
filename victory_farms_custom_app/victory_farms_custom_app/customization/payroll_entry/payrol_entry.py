@@ -22,7 +22,7 @@ class CustomPayrollEntry(PayrollEntry):
 			)
 
 		if erpnext.get_company_currency(self.company) != self.currency:
-			cond += "and t2.salary_currency = %(salary_currency)s "
+			cond += "and t1.salary_currency = %(salary_currency)s "
 			cond += "and t2.payroll_payable_account = %(payroll_payable_account)s "
 			cond += "and %(from_date)s >= t2.from_date"
 			emp_list = get_other_currency_emp(cond, self.currency, self.end_date, self.payroll_payable_account)
