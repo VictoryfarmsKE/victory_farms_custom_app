@@ -14,6 +14,12 @@ class StoreDeduction(Document):
 
 		total_range = month_diff(payroll_date, curr_month_last_date)
 
+		if total_range > 1:
+			total_range -= 1
+
+		if total_range > 5:
+			total_range = 5
+
 		for i in range(total_range):
 			if ads_name:= frappe.db.get_value("Additional Salary", {"docstatus": 0, "from_date": payroll_date, "salary_component": salary_component, "employee": self.employee}):
 				ads_doc = frappe.get_doc("Additional Salary", ads_name)
