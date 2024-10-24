@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import get_first_day, today, get_last_day, month_diff, add_days
+from frappe.utils import today, get_last_day, month_diff, add_days, is_last_day_of_the_month
 
 class StoreDeduction(Document):
 	def on_submit(self):
@@ -15,12 +15,12 @@ class StoreDeduction(Document):
 		total_range = month_diff(curr_month_last_date, payroll_date)
 
 		divide_cost = total_range > 1
-		total_range = min(total_range - 1, 5) if total_range > 1 else total_range
+		total_range = min(total_range - 1, self.period_of_payment) if total_range > 1 else total_range
 
 		for i in range(total_range):
 			item_cost = self.item_cost
 			if divide_cost:
-				item_cost /= 5
+				item_cost /= self.period_of_payment
 			if ads_name:= frappe.db.get_value("Additional Salary", {"docstatus": 0, "payroll_date": payroll_date, "salary_component": salary_component, "employee": self.employee}):
 				ads_doc = frappe.get_doc("Additional Salary", ads_name)
 				ads_doc.amount += item_cost
@@ -45,17 +45,23 @@ class StoreDeduction(Document):
 
 
 def create_remaining_payments():
+	if not is_last_day_of_the_month(today()):
+		return
+
 	ads_list = frappe.db.get_all("Store Deduction", {"remaining_payments": [">", 0], "docstatus": 1}, pluck = "name")
-	payroll_date = get_first_day(today())
+	salary_component = frappe.db.get_value("Salary Component", {"is_for_store_deduction": 1})
 	for row in ads_list:
 		sd_doc = frappe.get_doc("Store Deduction", row)
+		item_cost = sd_doc.item_cost
+		if sd_doc.period_of_payment > 1:
+			item_cost /= sd_doc.period_of_payment
 		ads_doc = frappe.new_doc("Additional Salary")
-		ads_doc.salary_component = "test"
+		ads_doc.salary_component = salary_component
 		ads_doc.employee = sd_doc.employee
-		ads_doc.payroll_date = payroll_date
+		ads_doc.payroll_date = today()
 		ads_doc.currency = frappe.db.get_value("Employee", sd_doc.employee, "salary_currency")
-		ads_doc.amount = sd_doc.item_cost
+		ads_doc.amount = item_cost
 		ads_doc.overwrite_salary_structure_amount = 1
 		ads_doc.save()
 
-		sd_doc.db_set("remaining_payments", sd_doc.period_of_payment - 1)
+		sd_doc.db_set("remaining_payments", sd_doc.remaining_payments - 1)
