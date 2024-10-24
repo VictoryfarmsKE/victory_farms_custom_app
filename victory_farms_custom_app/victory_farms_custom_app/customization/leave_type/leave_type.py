@@ -1,8 +1,8 @@
 import frappe
-from frappe.utils import today, add_days, flt, get_year_ending, is_last_day_of_the_month, month_diff, get_year_start, get_first_day
+from frappe.utils import today, add_days, flt, get_year_ending, month_diff, get_year_start, get_first_day, get_last_day
 
 def auto_create_leave_allocation():
-    if is_last_day_of_the_month(today()):
+    if get_last_day(today()) == today():
         leave_type_list = frappe.db.get_all("Leave Type", {"custom_create_auto_allocation": 1, "is_earned_leave": 1}, pluck = "name")
 
         for row in leave_type_list:
