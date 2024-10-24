@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import today, get_last_day, month_diff, add_days, is_last_day_of_the_month
+from frappe.utils import today, get_last_day, month_diff, add_days
 
 class StoreDeduction(Document):
 	def on_submit(self):
@@ -45,7 +45,7 @@ class StoreDeduction(Document):
 
 
 def create_remaining_payments():
-	if not is_last_day_of_the_month(today()):
+	if get_last_day(today()) != today():
 		return
 
 	ads_list = frappe.db.get_all("Store Deduction", {"remaining_payments": [">", 0], "docstatus": 1}, pluck = "name")
