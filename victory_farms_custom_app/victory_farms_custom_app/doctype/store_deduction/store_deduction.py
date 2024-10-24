@@ -3,31 +3,36 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import get_first_day, today
+from frappe.utils import get_first_day, today, get_last_day, month_diff, add_days
 
 class StoreDeduction(Document):
 	def on_submit(self):
 		salary_component = frappe.db.get_value("Salary Component", {"is_for_store_deduction": 1})
 		
-		payroll_date = get_first_day(self.posting_date)
+		payroll_date = get_last_day(self.posting_date)
+		curr_month_last_date = get_last_day(today())
 
-		if ads_name:= frappe.db.get_value("Additional salary", {"docstatus": 0, "from_date": payroll_date, "salary_component": salary_component, "employee": self.employee}):
-			ads_doc = frappe.get_doc("Additional Salary", ads_name)
-			ads_doc.amount += self.item_cost
-			ads_doc.save()
-			self.db_set("remaining_payments", self.remaining_payments - 1)
-		
-		else:
-			ads_doc = frappe.new_doc("Additional Salary")
-			ads_doc.salary_component = salary_component
-			ads_doc.employee = self.employee
-			ads_doc.payroll_date = payroll_date
-			ads_doc.currency = frappe.db.get_value("Employee", self.employee, "salary_currency")
-			ads_doc.amount = self.item_cost
-			ads_doc.overwrite_salary_structure_amount = 1
-			ads_doc.save()
+		total_range = month_diff(payroll_date, curr_month_last_date)
 
-			self.db_set("remaining_payments", self.period_of_payment - 1)
+		for i in range(total_range):
+			if ads_name:= frappe.db.get_value("Additional Salary", {"docstatus": 0, "from_date": payroll_date, "salary_component": salary_component, "employee": self.employee}):
+				ads_doc = frappe.get_doc("Additional Salary", ads_name)
+				ads_doc.amount += self.item_cost
+				ads_doc.save()
+				self.db_set("remaining_payments", self.remaining_payments - 1)
+			
+			else:
+				ads_doc = frappe.new_doc("Additional Salary")
+				ads_doc.salary_component = salary_component
+				ads_doc.employee = self.employee
+				ads_doc.payroll_date = payroll_date
+				ads_doc.currency = frappe.db.get_value("Employee", self.employee, "salary_currency")
+				ads_doc.amount = self.item_cost
+				ads_doc.overwrite_salary_structure_amount = 1
+				ads_doc.save()
+
+				self.db_set("remaining_payments", self.period_of_payment - 1)
+			payroll_date = get_last_day(add_days(payroll_date, days = 1))
 
 
 def create_remaining_payments():
