@@ -38,6 +38,8 @@ class StoreDeduction(Document):
 				ads_doc.save()
 
 				if i == 0:
+					if not self.period_of_payment:
+						self.period_of_payment = 5 if self.item_cost > 1000 else 1
 					self.db_set("remaining_payments", self.period_of_payment - 1)
 				else:
 					self.db_set("remaining_payments", self.remaining_payments - 1)
