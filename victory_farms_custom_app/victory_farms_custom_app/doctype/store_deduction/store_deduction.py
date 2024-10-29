@@ -25,7 +25,12 @@ class StoreDeduction(Document):
 				ads_doc = frappe.get_doc("Additional Salary", ads_name)
 				ads_doc.amount += item_cost
 				ads_doc.save()
-				self.db_set("remaining_payments", self.remaining_payments - 1)
+				if i == 0:
+					if not self.period_of_payment:
+						self.period_of_payment = 5 if self.item_cost > 1000 else 1
+					self.db_set("remaining_payments", self.period_of_payment - 1)
+				else:
+					self.db_set("remaining_payments", self.remaining_payments - 1)
 			
 			else:
 				ads_doc = frappe.new_doc("Additional Salary")
@@ -57,13 +62,20 @@ def create_remaining_payments():
 		item_cost = sd_doc.item_cost
 		if sd_doc.period_of_payment > 1:
 			item_cost /= sd_doc.period_of_payment
-		ads_doc = frappe.new_doc("Additional Salary")
-		ads_doc.salary_component = salary_component
-		ads_doc.employee = sd_doc.employee
-		ads_doc.payroll_date = today()
-		ads_doc.currency = frappe.db.get_value("Employee", sd_doc.employee, "salary_currency")
-		ads_doc.amount = item_cost
-		ads_doc.overwrite_salary_structure_amount = 1
-		ads_doc.save()
+
+		if ads_name:= frappe.db.get_value("Additional Salary", {"docstatus": 0, "payroll_date": today(), "salary_component": salary_component, "employee": sd_doc.employee}):
+			ads_doc = frappe.get_doc("Additional Salary", ads_name)
+			ads_doc.amount += item_cost
+			ads_doc.save()
+		
+		else:
+			ads_doc = frappe.new_doc("Additional Salary")
+			ads_doc.salary_component = salary_component
+			ads_doc.employee = sd_doc.employee
+			ads_doc.payroll_date = today()
+			ads_doc.currency = frappe.db.get_value("Employee", sd_doc.employee, "salary_currency")
+			ads_doc.amount = item_cost
+			ads_doc.overwrite_salary_structure_amount = 1
+			ads_doc.save()
 
 		sd_doc.db_set("remaining_payments", sd_doc.remaining_payments - 1)
