@@ -15,7 +15,8 @@
   "posting_date",
   "employee_name",
   "item_cost",
-  "amended_from"
+  "amended_from",
+  "additional_salary"
  ],
  "fields": [
   {
@@ -75,12 +76,19 @@
    "fieldtype": "Int",
    "label": "Remaining Payments",
    "read_only": 1
+  },
+  {
+   "fieldname": "additional_salary",
+   "fieldtype": "Link",
+   "label": "Additional Salary",
+   "options": "Additional Salary",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-15 00:06:09.211746",
+ "modified": "2024-10-31 17:16:18.414455",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Store Deduction",
