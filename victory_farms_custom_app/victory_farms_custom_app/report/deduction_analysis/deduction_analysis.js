@@ -12,6 +12,13 @@ frappe.query_reports["Deduction Analysis"] = {
 			reqd: 1,
 		},
 		{
+			fieldname: "salary_component",
+			label: __("Salary Component"),
+			fieldtype: "Link",
+			options: "Salary Component",
+			reqd: 1,
+		},
+		{
 			fieldname: "employment_type",
 			label: __("Employment Type"),
 			fieldtype: "Link",
