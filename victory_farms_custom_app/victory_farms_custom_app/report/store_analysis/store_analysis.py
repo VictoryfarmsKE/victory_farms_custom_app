@@ -84,7 +84,7 @@ def get_data(filters):
 
 	query = (
 		frappe.qb.from_(SD)
-		.select(SD.name, SD.posting_date.as_("date_of_issue"), SD.item, SD.period_of_payment, SD.item_cost.as_("deduction"), SD.employee, SD.employee_name, SD.remaining_payments, (SD.item_cost / SD.period_of_payment).as_("item_cost"), (SD.remaining_payments * (SD.item_cost / SD.period_of_payment)).as_("outstanding"))
+		.select(SD.name, SD.posting_date.as_("date_of_issue"), SD.item, SD.period_of_payment, SD.item_cost, SD.employee, SD.employee_name, SD.remaining_payments, ((SD.item_cost / SD.period_of_payment) * (SD.period_of_payment - SD.remaining_payments)).as_("deduction"), (SD.remaining_payments * (SD.item_cost / SD.period_of_payment)).as_("outstanding"))
 		.where(SD.docstatus == 1)
 	)
 

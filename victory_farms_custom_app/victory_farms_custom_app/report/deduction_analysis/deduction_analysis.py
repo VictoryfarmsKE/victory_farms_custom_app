@@ -70,9 +70,7 @@ def get_columns(filters):
 
 def get_data(filters):
 
-	# deduction_component = frappe.db.get_value("Salary Component", {"is_for_store_deduction": 1})
-
-	deduction_component = "test"
+	deduction_component = frappe.db.get_value("Salary Component", {"is_for_store_deduction": 1})
 
 	if not deduction_component:
 		return []
@@ -89,7 +87,7 @@ def get_data(filters):
 		.join(EMP).on(EMP.name == ASL.employee)
 		.select(ASL.employee, ASL.employee_name, ASL.amount, month(ASL.payroll_date).as_("month_number"))
 		.where((ASL.docstatus == 1)
-			& (ASL.salary_component == "test")
+			& (ASL.salary_component == deduction_component)
 			& (ASL.payroll_date >= filters.from_date)
 			& (ASL.payroll_date <= filters.to_date)
 			)
