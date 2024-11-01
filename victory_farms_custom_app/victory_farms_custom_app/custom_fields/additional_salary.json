@@ -1,0 +1,14 @@
+{
+ "Additional Salary": [
+  {
+   "dt": "Additional Salary",
+   "fieldname": "custom_store_deduction_details",
+   "fieldtype": "Table",
+   "insert_after": "ref_docname",
+   "label": "Store Deduction Details",
+   "module": "Victory Farms Custom App",
+   "options": "SD Details",
+   "read_only": 1
+  }
+ ]
+}
