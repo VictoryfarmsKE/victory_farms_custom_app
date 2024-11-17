@@ -1,4 +1,3 @@
-console.log("called")
 frappe.ui.form.on("Salary Structure Assignment", {
     custom_foreign_base: function(frm){
         if (frm.doc.custom_exchange_rate && frm.doc.custom_foreign_base){

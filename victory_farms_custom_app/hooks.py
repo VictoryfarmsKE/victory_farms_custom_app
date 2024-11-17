@@ -34,7 +34,9 @@ doctype_js = {
     "Leave Encashment" : "victory_farms_custom_app/customization/leave_encashment/leave_encashment.js",
     "Salary Structure Assignment": "victory_farms_custom_app/customization/salary_structure_assignment/salary_structure_assignment.js",
     "Stock Entry": "victory_farms_custom_app/customization/stock_entry_detail/stock_entry_detail.js",
-    "Leave Type": "victory_farms_custom_app/customization/leave_type/leave_type.js"
+    "Leave Type": "victory_farms_custom_app/customization/leave_type/leave_type.js",
+    "Holiday List": "victory_farms_custom_app/customization/holiday_list/holiday_list.js",
+    "Employee": "victory_farms_custom_app/customization/employee/employee.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
