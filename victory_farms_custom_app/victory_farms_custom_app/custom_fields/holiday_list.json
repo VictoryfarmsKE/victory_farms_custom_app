@@ -1,0 +1,12 @@
+{
+ "Holiday List": [
+  {
+   "dt": "Holiday List",
+   "fieldname": "custom_template_holiday_list",
+   "fieldtype": "Check",
+   "insert_after": "total_holidays",
+   "label": "Template Holiday List",
+   "module": "Victory Farms Custom App"
+  }
+ ]
+}

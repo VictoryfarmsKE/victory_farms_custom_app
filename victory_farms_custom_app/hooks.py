@@ -142,6 +142,9 @@ doc_events = {
     "Salary Slip": {
         "before_validate": "victory_farms_custom_app.victory_farms_custom_app.customization.salary_slip.salary_slip.before_validate",
         "validate": "victory_farms_custom_app.victory_farms_custom_app.customization.salary_slip.salary_slip.validate"
+    },
+    "Employee": {
+        "after_insert": "victory_farms_custom_app.victory_farms_custom_app.customization.employee.employee.after_insert"
     }
 }
 # Scheduled Tasks
@@ -152,6 +155,9 @@ scheduler_events = {
         "0 0 28-31 * *": [
             "victory_farms_custom_app.victory_farms_custom_app.customization.leave_type.leave_type.auto_create_leave_allocation",
             "victory_farms_custom_app.victory_farms_custom_app.doctype.store_deduction.store_deduction.create_remaining_payments"
+        ],
+        "0 2 1 1 *": [
+            "victory_farms_custom_app.victory_farms_custom_app.customization.employee.employee.create_holiday_list_for_new_year"
         ]
     }
 }
