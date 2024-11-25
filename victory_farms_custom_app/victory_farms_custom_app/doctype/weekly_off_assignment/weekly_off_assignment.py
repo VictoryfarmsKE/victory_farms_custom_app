@@ -9,8 +9,9 @@ from frappe.model.document import Document
 
 class WeeklyOffAssignment(Document):
 	def validate(self):
-		if self.weekly_off_date < frappe.utils.today():
-			frappe.throw(_("Past Dated entries are not allowed"))
+		pass
+		#if self.weekly_off_date < frappe.utils.today():
+			#frappe.throw(_("Past Dated entries are not allowed"))
 
 	def on_submit(self):
 		holiday_list = []
