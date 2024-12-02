@@ -231,15 +231,16 @@ class CustomSalarySlip(SalarySlip):
 			)
 
 def before_validate(self, method):
-	update_to_date(self)
+	update_from_to_date(self)
 
-def update_to_date(self):
-	relieving_date = frappe.db.get_value("Employee", self.employee, "relieving_date")
+def update_from_to_date(self):
+	employee_details = frappe.db.get_value("Employee", self.employee, ["date_of_joining", "relieving_date"], as_dict = 1)
 
-	if not relieving_date or frappe.utils.getdate(self.posting_date) < relieving_date:
-		return
-	
-	self.end_date = relieving_date
+	if employee_details.get("date_of_joining") and frappe.utils.getdate(self.start_date) < employee_details.date_of_joining:
+		self.start_date = employee_details.date_of_joining
+
+	if employee_details.get("relieving_date") and frappe.utils.getdate(self.end_date) > employee_details.relieving_date:
+		self.end_date = employee_details.relieving_date
 
 def validate(self, method):
 	if self.gross_pay < 0:
