@@ -33,3 +33,17 @@ class WeeklyOffAssignment(Document):
 			})
 			hd_doc.flags.ignore_permissions = True
 			hd_doc.save()
+	
+	def on_cancel(self):
+		holiday_list = []
+
+		for row in self.employee_details:
+			if row.holiday_list not in holiday_list:
+				holiday_list.append(row.holiday_list)
+
+		to_remove = []
+		for row in holiday_list:
+			to_remove.append(frappe.db.get_value("Holiday", {"parent": row, "holiday_date": self.weekly_off_date}))
+
+		for row in to_remove:
+			frappe.delete_doc("Holiday", row)
