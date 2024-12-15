@@ -2,18 +2,9 @@
     "Employee": [
         {
             "dt": "Employee",
-            "fieldname": "maximum_billable_hours",
-            "fieldtype": "Int",
-            "insert_after": "department",
-            "is_system_generated": 1,
-            "label": "Maximum Billable Hours",
-            "module": "Victory Farms Custom App"
-        },
-        {
-            "dt": "Employee",
             "fieldname": "employment_type",
             "fieldtype": "Link",
-            "insert_after": "maximum_billable_hours",
+            "insert_after": "department",
             "is_system_generated": 1,
             "label": "Employment Type",
             "module": "Victory Farms Custom App",
