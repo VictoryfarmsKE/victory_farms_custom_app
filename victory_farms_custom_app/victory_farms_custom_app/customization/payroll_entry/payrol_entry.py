@@ -1,7 +1,7 @@
 import frappe
 import erpnext
 from frappe.utils import add_days
-# from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_filter_condition, get_joining_relieving_condition, get_emp_list, remove_payrolled_employees, get_salary_structure
+from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_filter_condition, get_joining_relieving_condition, get_emp_list, remove_payrolled_employees, get_salary_structure
 
 class CustomPayrollEntry(PayrollEntry):
 	def get_emp_list(self):
