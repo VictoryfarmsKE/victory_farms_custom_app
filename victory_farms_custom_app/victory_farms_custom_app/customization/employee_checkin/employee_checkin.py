@@ -4,7 +4,8 @@ from frappe.utils import get_datetime, add_to_date
 
 
 def validate(self, method):
-	check_existing_logs(self)
+	pass
+	# check_existing_logs(self)
 
 
 def check_existing_logs(self):
