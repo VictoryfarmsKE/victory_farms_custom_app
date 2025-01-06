@@ -9,7 +9,7 @@ frappe.listview_settings["Employee Checkin"] = {
             if (checkins){
                 frappe.call({
                     method:
-                        "nl_attendance_timesheet.nl_attendance_timesheet.customization.attendance.attendance.create_additional_salary",
+                        "victory_farms_custom_app.victory_farms_custom_app.customization.employee_checkin.employee_checkin.create_missing_values",
                     args: {
                         selected_values: checkins
                     },

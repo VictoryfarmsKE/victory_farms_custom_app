@@ -78,6 +78,7 @@ def create_auto_in_out_log(self, shift_data, log_type):
 	new_checkin.custom_auto_created = 1
 	new_checkin.save()
 
+@frappe.whitelist()
 def create_missing_values(selected_values):
 	if not selected_values:
 		return
@@ -89,20 +90,23 @@ def create_missing_values(selected_values):
 	for row in selected_values:
 		curr_log = frappe.db.get_value("Employee Checkin", row, ["name", "employee", "shift", "time", "log_type"], as_dict= 1)
 
-		prev_log = frappe.db.get_value("Employee Checkin", {"name": ["!=", curr_log.name], "employee": curr_log.employee, "time": [">=", curr_log.time]}, ["name", "employee", "shift", "time", "log_type"], order_by="time desc", as_dict= 1)
+		prev_log = frappe.db.get_value("Employee Checkin", {"name": ["!=", curr_log.name], "employee": curr_log.employee, "time": ["<=", curr_log.time]}, ["name", "employee", "shift", "time", "log_type"], order_by="time desc", as_dict= 1)
 		if prev_log and curr_log.log_type == prev_log.log_type:
 			if not shift_data.get(prev_log.shift):
 				field_name = "end_time" if curr_log.log_type == "IN" else "start_time"
-				shift_data[prev_log.shift] = frappe.db.get_value("Shift", prev_log.shift, field_name)
-			date = curr_log.time.date()
-			time = curr_log.time.time()
-			new_date = datetime.combine(date,datetime.strptime(str(shift_data[prev_log.shift]), '%H:%M:%S').time())
+				shift_data[prev_log.shift] = frappe.db.get_value("Shift Type", prev_log.shift, field_name)
 			if curr_log.log_type == "IN":
+				date = prev_log.time.date()
+				time = prev_log.time.time()
+				new_date = datetime.combine(date,datetime.strptime(str(shift_data[prev_log.shift]), '%H:%M:%S').time())
 				if new_date.time() < time:
 					new_date += timedelta(days=1)
 				prev_log["new_time"] = new_date
 				create_logs(prev_log, "OUT")
 			else:
+				date = curr_log.time.date()
+				time = curr_log.time.time()
+				new_date = datetime.combine(date,datetime.strptime(str(shift_data[prev_log.shift]), '%H:%M:%S').time())
 				if new_date.time() > time:
 					new_date += timedelta(days= - 1)
 				prev_log["new_time"] = new_date
