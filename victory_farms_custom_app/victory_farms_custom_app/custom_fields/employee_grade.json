@@ -1,30 +1,12 @@
 {
-    "Employee Grade": [
-        {
-            "dt": "Employee Grade",
-            "fieldname": "custom_employee_category",
-            "fieldtype": "Link",
-            "options": "Employee Category",
-            "insert_after": "default_base_pay",
-            "label": "Employee Category",
-            "module": "Victory Farms Custom App"
-        },
-        {
-            "dt": "Employee Grade",
-            "fieldname": "custom_payout_frequency",
-            "fieldtype": "Select",
-            "label": "Payout Frequency",
-            "module": "Victory Farms Custom App",
-            "insert_after": "custom_employee_category",
-            "options": "Monthly\nQuarterly\nAnnually"
-        },
-        {
-            "dt": "Employee Grade",
-            "fieldname": "custom_allowed_salary_update",
-            "fieldtype": "Check",
-            "insert_after": "custom_payout_frequency",
-            "label": "Employee Category",
-            "module": "Victory Farms Custom App"
-        }
-    ]
+ "Employee Grade": [
+  {
+   "dt": "Employee Grade",
+   "fieldname": "custom__timesheet_approval_",
+   "fieldtype": "Check",
+   "insert_after": "default_base_pay",
+   "label": "Timesheet Approval Required",
+   "module": "Victory Farms Custom App"
+  }
+ ]
 }
