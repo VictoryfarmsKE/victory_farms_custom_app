@@ -1,4 +1,5 @@
 import frappe
+import json
 from datetime import datetime, timedelta
 from frappe.utils import get_datetime, add_to_date
 
@@ -76,3 +77,41 @@ def create_auto_in_out_log(self, shift_data, log_type):
 	new_checkin.employee = self.employee
 	new_checkin.custom_auto_created = 1
 	new_checkin.save()
+
+def create_missing_values(selected_values):
+	if not selected_values:
+		return
+	
+	if isinstance(selected_values, str):
+		selected_values = json.loads(selected_values)
+	
+	shift_data = frappe._dict()
+	for row in selected_values:
+		curr_log = frappe.db.get_value("Employee Checkin", row, ["name", "employee", "shift", "time", "log_type"], as_dict= 1)
+
+		prev_log = frappe.db.get_value("Employee Checkin", {"name": ["!=", curr_log.name], "employee": curr_log.employee, "time": [">=", curr_log.time]}, ["name", "employee", "shift", "time", "log_type"], order_by="time desc", as_dict= 1)
+		if prev_log and curr_log.log_type == prev_log.log_type:
+			if not shift_data.get(prev_log.shift):
+				field_name = "end_time" if curr_log.log_type == "IN" else "start_time"
+				shift_data[prev_log.shift] = frappe.db.get_value("Shift", prev_log.shift, field_name)
+			date = curr_log.time.date()
+			time = curr_log.time.time()
+			new_date = datetime.combine(date,datetime.strptime(str(shift_data[prev_log.shift]), '%H:%M:%S').time())
+			if curr_log.log_type == "IN":
+				if new_date.time() < time:
+					new_date += timedelta(days=1)
+				prev_log["new_time"] = new_date
+				create_logs(prev_log, "OUT")
+			else:
+				if new_date.time() > time:
+					new_date += timedelta(days= - 1)
+				prev_log["new_time"] = new_date
+				create_logs(prev_log, "IN")
+
+def create_logs(log, log_type):
+	ec_doc = frappe.new_doc("Employee Checkin")
+	ec_doc.employee = log.employee
+	ec_doc.log_type = log_type
+	ec_doc.time = log.new_time
+	ec_doc.shift = log.shift
+	ec_doc.save()

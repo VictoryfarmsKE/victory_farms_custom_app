@@ -38,7 +38,7 @@ doctype_js = {
     "Holiday List": "victory_farms_custom_app/customization/holiday_list/holiday_list.js",
     "Employee": "victory_farms_custom_app/customization/employee/employee.js"
 }
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {"Employee Checkin" : "victory_farms_custom_app/customization/employee_checkin/employee_checkin.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
