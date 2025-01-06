@@ -2,11 +2,54 @@
  "Employee Grade": [
   {
    "dt": "Employee Grade",
-   "fieldname": "custom__timesheet_approval_",
+   "fieldname": "custom_exclude_company_bonus",
    "fieldtype": "Check",
-   "insert_after": "default_base_pay",
-   "label": "Timesheet Approval Required",
+   "insert_after": "custom_allow_mark_attendance",
+   "label": "Exclude Company Bonus",
    "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee Grade",
+   "fieldname": "custom_column_break_kxqco",
+   "fieldtype": "Column Break",
+   "insert_after": "custom_allowed_salary_update",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee Grade",
+   "fieldname": "custom_allow_mark_attendance",
+   "fieldtype": "Check",
+   "insert_after": "custom_column_break_kxqco",
+   "label": "Allow Mark Attendance",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee Grade",
+   "fieldname": "custom_allowed_salary_update",
+   "fieldtype": "Check",
+   "insert_after": "custom_payout_frequency",
+   "is_system_generated": 1,
+   "label": "Employee Category",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee Grade",
+   "fieldname": "custom_payout_frequency",
+   "fieldtype": "Select",
+   "insert_after": "custom_employee_category",
+   "label": "Payout Frequency",
+   "module": "Victory Farms Custom App",
+   "options": "Monthly\nQuarterly\nAnnually"
+  },
+  {
+   "dt": "Employee Grade",
+   "fieldname": "custom_employee_category",
+   "fieldtype": "Link",
+   "insert_after": "default_base_pay",
+   "is_system_generated": 1,
+   "label": "Employee Category",
+   "module": "Victory Farms Custom App",
+   "options": "Employee Category"
   }
  ]
 }
