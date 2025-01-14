@@ -1,0 +1,21 @@
+{
+ "Appraisal": [
+  {
+   "doctype": "Appraisal",
+   "doctype_or_field": "DocField",
+   "field_name": "final_score",
+   "module": "Victory Farms Custom App",
+   "property": "description",
+   "property_type": "Text",
+   "value": "Weighted average of individual scorecard (10%) and department scorecard (20%)"
+  },
+  {
+   "doctype": "Appraisal",
+   "doctype_or_field": "DocType",
+   "module": "Victory Farms Custom App",
+   "property": "field_order",
+   "property_type": "Data",
+   "value": "[\"employee_details_tab\", \"naming_series\", \"employee\", \"employee_name\", \"department\", \"designation\", \"employee_image\", \"column_break0\", \"company\", \"status\", \"appraisal_cycle\", \"start_date\", \"end_date\", \"section_break_aeb0\", \"kra_tab\", \"appraisal_template\", \"rate_goals_manually\", \"section_break_kras\", \"appraisal_kra\", \"goal_score_percentage\", \"section_break_goals\", \"goals\", \"remarks\", \"total_section\", \"final_score\", \"total_score\", \"feedback_tab\", \"feedback_html\", \"section_break_20\", \"avg_feedback_score\", \"self_appraisal_tab\", \"section_break_23\", \"self_ratings\", \"self_score\", \"reflections_section\", \"reflections\", \"amended_from\"]"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "Appraisal Goal": [
+  {
+   "doctype": "Appraisal Goal",
+   "doctype_or_field": "DocField",
+   "field_name": "score",
+   "module": "Victory Farms Custom App",
+   "property": "label",
+   "property_type": "Data",
+   "value": "Score (1-5)"
+  }
+ ]
+}
