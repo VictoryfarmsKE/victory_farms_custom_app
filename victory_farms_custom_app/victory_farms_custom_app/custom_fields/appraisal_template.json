@@ -1,0 +1,19 @@
+{
+    "Appraisal Template": [
+        {
+            "dt": "Appraisal Template",
+            "fieldname": "custom_multiplier_template",
+            "fieldtype": "Check",
+            "insert_after": "custom_column_break_nwbwy",
+            "label": "Multiplier Template",
+            "module": "Victory Farms Custom App"
+        },
+        {
+            "dt": "Appraisal Template",
+            "fieldname": "custom_column_break_nwbwy",
+            "fieldtype": "Column Break",
+            "insert_after": "department_template",
+            "module": "Victory Farms Custom App"
+        }
+    ]
+}
