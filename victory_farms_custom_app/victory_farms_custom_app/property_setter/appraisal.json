@@ -3,7 +3,7 @@
   {
    "doctype": "Appraisal",
    "doctype_or_field": "DocField",
-   "field_name": "final_score",
+   "fieldname": "final_score",
    "module": "Victory Farms Custom App",
    "property": "description",
    "property_type": "Text",
