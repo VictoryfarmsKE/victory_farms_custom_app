@@ -36,4 +36,6 @@ def create_property_setter():
 		for field in PPS[row]:
 			if isinstance(field.get("value"), list):
 				field["value"] = json.dumps(field["value"])
+			if field.get("field_name"):
+				field["fieldname"] = field.get("field_name")
 			make_property_setter(field, is_system_generated=False)
