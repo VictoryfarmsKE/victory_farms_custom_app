@@ -150,6 +150,9 @@ doc_events = {
     },
     "Employee Checkin": {
         "validate": "victory_farms_custom_app.victory_farms_custom_app.customization.employee_checkin.employee_checkin.validate"
+    },
+    "Appraisal": {
+        "before_validate": "victory_farms_custom_app.victory_farms_custom_app.customization.appraisal.appraisal.before_validate"
     }
 }
 # Scheduled Tasks
