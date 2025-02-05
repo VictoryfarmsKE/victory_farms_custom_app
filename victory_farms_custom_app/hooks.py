@@ -119,7 +119,7 @@ doctype_list_js = {"Employee Checkin" : "victory_farms_custom_app/customization/
 # Override standard doctype classes
 
 override_doctype_class = {
-	"Payroll Entry": "victory_farms_custom_app.victory_farms_custom_app.customization.payroll_entry.payrol_entry.CustomPayrollEntry",
+	# "Payroll Entry": "victory_farms_custom_app.victory_farms_custom_app.customization.payroll_entry.payrol_entry.CustomPayrollEntry",
     "Salary Slip": "victory_farms_custom_app.victory_farms_custom_app.customization.salary_slip.salary_slip.CustomSalarySlip"
 }
 
