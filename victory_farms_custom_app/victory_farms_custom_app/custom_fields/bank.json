@@ -1,0 +1,20 @@
+{
+ "Bank": [
+  {
+   "dt": "Bank",
+   "fieldname": "branch_no",
+   "fieldtype": "Data",
+   "insert_after": "code",
+   "label": "Branch No",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Bank",
+   "fieldname": "code",
+   "fieldtype": "Data",
+   "insert_after": "website",
+   "label": "Code",
+   "module": "Victory Farms Custom App"
+  }
+ ]
+}

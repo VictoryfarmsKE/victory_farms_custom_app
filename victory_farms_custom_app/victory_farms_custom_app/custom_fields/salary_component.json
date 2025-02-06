@@ -1,20 +1,41 @@
 {
-    "Salary Component": [
-        {
-            "dt": "Salary Component",
-            "fieldname": "custom_is_in_employee_currency",
-            "fieldtype": "Check",
-            "insert_after": "custom_is_negative_component",
-            "label": "Is In Employee Currency",
-            "module": "Victory Farms Custom App"
-        },
-        {
-            "dt": "Salary Component",
-            "fieldname": "is_for_store_deduction",
-            "fieldtype": "Check",
-            "insert_after": "custom_is_in_employee_currency",
-            "label": "Is for Store Deduction",
-            "module": "Victory Farms Custom App"
-        }
-    ]
+ "Salary Component": [
+  {
+   "dt": "Salary Component",
+   "fieldname": "custom_is_negative_component",
+   "fieldtype": "Check",
+   "insert_after": "remove_if_zero_valued",
+   "is_system_generated": 1,
+   "label": "Is Negative Component",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Salary Component",
+   "fieldname": "is_for_store_deduction",
+   "fieldtype": "Check",
+   "insert_after": "custom_is_in_employee_currency",
+   "is_system_generated": 1,
+   "label": "Is for Store Deduction",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Salary Component",
+   "fieldname": "custom_is_in_employee_currency",
+   "fieldtype": "Check",
+   "insert_after": "custom_is_negative_component",
+   "is_system_generated": 1,
+   "label": "Is In Employee Currency",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Salary Component",
+   "fieldname": "p9a_tax_deduction_card_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "insert_after": "type",
+   "label": "P9A Tax Deduction Card Type",
+   "module": "Victory Farms Custom App",
+   "options": "\nBasic Salary\nBenefits NonCash\nValue of Quarters\nTotal Gross Pay\nE1 Defined Contribution Retirement Scheme\nE2 Defined Contribution Retirement Scheme\nE3 Defined Contribution Retirement Scheme\nOwner Occupied Interest\nRetirement Contribution and Owner Occupied Interest\nChargeable Pay\nTax Charged\nPersonal Relief\nInsurance Relief\nHousing Allowance\nTransport Allowance\nLeave Pay\nOver Time Allowance\nDirectors Fees\nLump Sum Pay if any\nPAYE\nOther Allowance\nValue of Car Benefit\nOther Non cash benefit\nValue of meals\nType of Housing\nSocial Health Insurance Fund\nActual Contribution(NSSF)\nPost Retirement medical Fund\nMortgage Interest\nAffordable Housing Levy\nMonthly Relief\nAmount of Insurance Relief\nSelf Assessed PAYE Tax"
+  }
+ ]
 }
