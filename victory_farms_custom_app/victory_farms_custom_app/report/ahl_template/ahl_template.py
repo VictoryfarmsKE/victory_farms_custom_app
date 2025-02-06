@@ -12,29 +12,36 @@ def execute(filters=None):
 def get_columns():
     return [
         {
-            "label": _("Member Number (ID NUMBER)"),
+            "label": _("Employee"),
             "fieldname": "employee",
-            "fieldtype": "Link",
+            "fieldtype": "link",
             "options": "Employee",
-            "width": 200,
+            "width": 250,
         },
         {
             "label": _("Member Name"),
             "fieldname": "employee_name",
             "fieldtype": "Data",
-            "width": 200,
+            "width": 250,
+        },
+        {
+            "label": _("Member Number (ID NUMBER)"),
+            "fieldname": "national_id",
+            "fieldtype": "Data",
+            "options": "Employee",
+            "width": 250,
         },
         {
             "label": _("KRA PIN"),
             "fieldname": "tax_id",
             "fieldtype": "Data",
-            "width": 200,
+            "width": 250,
         },
         {
             "label": _("Gross Salary"),
             "fieldname": "gross_pay",
             "fieldtype": "Currency",
-            "width": 200,
+            "width": 250,
         },
     ]
 
@@ -62,6 +69,8 @@ def get_data(filters):
         .on(emp.name == salary_slip.employee)
         .select(
             emp.name.as_("employee"),
+            (emp.national_id),
+            (emp.name),
             (emp.employee_name),
             (emp.tax_id),
             (salary_slip.gross_pay)
