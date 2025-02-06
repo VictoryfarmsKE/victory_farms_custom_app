@@ -232,10 +232,4 @@ def get_p10_report_data(filters):
 
         row.update(details)
         report_data.append(row)
-    print("\n\n>>>>>>>>",report_data,"\n\n")
     return report_data
-
-
-
-
-# [{'tax_id': 'A017211510P', 'employee_name': 'Christine Nyathira Kanga', 'type_of_housing': 155.93, 'actual_contribution(nssf)': 25000.0, 'basic_salary': 205740.0, 'other_allowance': 195.0, 'value_of_meals': 1039.5, 'over_time_allowance': 16225.05, 'leave_pay': 2160.0, 'social_health_insurance_fund': 8000.0, 'directors_fees': 5000.0, 'post_retirement_medical_fund': 100.0, 'housing_allowance': 2160.0, 'transport_allowance': 2160.0, 'other_non_cash_benefit': 12174.12, 'value_of_car_benefit': 2400.0, 'lumpsum_pay_if_any': 195.0, 'ahl_relief': 155.93, 'max_mortgage_interest_relief': 25000.0, 'taxable_income': 67140.0, 'gross_pay': 69300.0, 'employer_housing_levy': 1039.5, 'insurance_relief': 195.0, 'employee_housing_levy': 1039.5, 'gross_paye': 14925.05, 'provident_fund_relief': 2160.0, 'max_hosp_relief': 8000.0, 'max_insurance_relief': 5000.0, 'bereavement_fund': 100.0, 'employee_nssf': 2160.0, 'employer_nssf': 2160.0, 'paye': 12174.12, 'basic_pay': 69300.0, 'personal_relief': 2400.0, 'nhif': 1300.0, 'gross_insurance_relief': 195.0}] 
