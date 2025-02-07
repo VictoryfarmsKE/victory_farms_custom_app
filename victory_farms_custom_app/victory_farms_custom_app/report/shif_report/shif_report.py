@@ -47,8 +47,8 @@ def get_columns():
             "width": 150,
         },
         {
-            "label": _("NSSF No"),
-            "fieldname": "nssf_no",
+            "label": _("NHIF No"),
+            "fieldname": "shif_no",
             "fieldtype": "Data",
             "width": 150,
         },
@@ -100,7 +100,7 @@ def get_data(filters):
             (emp.cell_number),
             (emp.national_id),
             (emp.tax_id),
-            (emp.nssf_no),
+            (emp.shif_no),
             (salary_slip.gross_pay),
             (deduction.amount),
             (deduction.name)

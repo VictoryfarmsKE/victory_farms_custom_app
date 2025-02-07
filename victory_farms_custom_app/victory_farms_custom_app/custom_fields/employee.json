@@ -2,6 +2,22 @@
  "Employee": [
   {
    "dt": "Employee",
+   "fieldname": "tax_id",
+   "fieldtype": "Data",
+   "insert_after": "shif_no",
+   "label": "Tax ID",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "shif_no",
+   "fieldtype": "Data",
+   "insert_after": "cb_csf_emp_01",
+   "label": "SHIF No",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
    "fieldname": "custom_create_individual_holiday_list",
    "fieldtype": "Check",
    "insert_after": "attendance_device_id",
@@ -207,13 +223,6 @@
    "label": "Bank",
    "module": "Victory Farms Custom App",
    "options": "Bank"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_section_break_q85v8",
-   "fieldtype": "Section Break",
-   "insert_after": "type_of_housing",
-   "module": "Victory Farms Custom App"
   },
   {
    "dt": "Employee",
@@ -467,22 +476,6 @@
    "fieldtype": "Int",
    "insert_after": "marital_status",
    "label": "No of Dependents",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "tax_id",
-   "fieldtype": "Data",
-   "insert_after": "nhif_no",
-   "label": "Tax ID",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "nhif_no",
-   "fieldtype": "Data",
-   "insert_after": "cb_csf_emp_01",
-   "label": "NHIF No",
    "module": "Victory Farms Custom App"
   },
   {
