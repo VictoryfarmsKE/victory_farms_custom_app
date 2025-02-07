@@ -72,12 +72,6 @@ def get_columns():
             "width": 250
         },
         {
-            "fieldname": "paye", 
-            "label": _("PAYE"), 
-            "fieldtype": "Currency",
-            "width": 150
-        },
-        {
             "fieldname": "other_allowance", 
             "label": _("Other Allowance"), 
             "fieldtype": "Currency", 
@@ -114,8 +108,8 @@ def get_columns():
             "width": 150
         },
         {
-            "fieldname": "actual_contribution_nssf", 
-            "label": _("Actual Contribution(NSSF)"), 
+            "fieldname": "actual_contribution(nssf)", 
+            "label": _("Actual Contribution (NSSF)"), 
             "fieldtype": "Currency", 
             "width": 150
         },
@@ -123,7 +117,7 @@ def get_columns():
             "fieldname": "post_retirement_medical_fund", 
             "label": _("Post Retirement medical Fund"), 
             "fieldtype": "Currency", 
-            "width": 150
+            "width": 280
         },
         {
             "fieldname": "mortgage_interest", 
@@ -232,4 +226,5 @@ def get_p10_report_data(filters):
 
         row.update(details)
         report_data.append(row)
+    print(">>>>>>>>>>>>..",report_data)
     return report_data
