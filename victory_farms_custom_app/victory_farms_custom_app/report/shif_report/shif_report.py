@@ -105,7 +105,7 @@ def get_data(filters):
             (deduction.amount),
             (deduction.name)
         )
-        .where(deduction.salary_component == "Social Health Insurance Fund")
+        .where((deduction.salary_component == "Social Health Insurance Fund") & (salary_slip.docstatus == 1))
     )
 
     if filters.get("employee"):
