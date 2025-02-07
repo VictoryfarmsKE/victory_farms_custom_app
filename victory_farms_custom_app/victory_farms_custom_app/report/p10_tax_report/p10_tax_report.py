@@ -78,6 +78,12 @@ def get_columns():
             "width": 150
         },
         {
+            "fieldname": "total_cash_pay", 
+            "label": _("Total Cash Pay"), 
+            "fieldtype": "Currency", 
+            "width": 150
+        },
+        {
             "fieldname": "value_of_car_benefit", 
             "label": _("Value of Car Benefit"), 
             "fieldtype": "Currency", 
@@ -149,6 +155,7 @@ def get_columns():
             "fieldtype": "Currency", 
             "width": 150
         },
+        
     ]
 
     return columns
