@@ -93,7 +93,6 @@ def get_data(filters):
         .on(salary_slip.name == deduction.parent)
         .select(
             (emp.name.as_("employee")),
-            (emp.employee_name),
             (emp.tax_id),
             (emp.first_name),
             (emp.last_name),
