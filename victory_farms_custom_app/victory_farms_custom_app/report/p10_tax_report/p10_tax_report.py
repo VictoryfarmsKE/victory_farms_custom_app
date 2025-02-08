@@ -37,7 +37,7 @@ def get_columns():
             "width": 100
         },
         {   
-            "fieldname": "type_Of_employee", 
+            "fieldname": "type_of_employee", 
             "label": _("Type Of Employee"),
             "fieldtype": "Data", 
             "read_only": 1,
@@ -118,7 +118,7 @@ def get_columns():
         {
             "fieldname": "type_of_housing", 
             "label": _("Type of Housing"), 
-            "fieldtype": "Currency", 
+            "fieldtype": "Data", 
             "width": 150
         },
         {
@@ -203,6 +203,7 @@ def get_p10_report_data(filters):
             salary_slip.employee_name,
             employee.residential_status,
             employee.type_of_employee,
+            employee.type_of_housing,
             salary_detail.salary_component,
             salary_detail.amount,
             salary_component.p9a_tax_deduction_card_type
@@ -228,6 +229,7 @@ def get_p10_report_data(filters):
                     "tax_id": employee_pin,
                     "residential_status": row.get("residential_status"),
                     "type_of_employee": row.get("type_of_employee"),
+                    "type_of_housing": row.get("type_of_housing"),
                     "components": {}
                 }
 
@@ -247,6 +249,7 @@ def get_p10_report_data(filters):
             "employee_name": details["employee_name"],
             "residential_status": details.get("residential_status"),
             "type_of_employee": details.get("type_of_employee"),
+            "type_of_housing": details.get("type_of_housing"),
         }
         for component_type, total_amount in components.items():
             row[component_type.lower().replace(" ", "_")] = total_amount
