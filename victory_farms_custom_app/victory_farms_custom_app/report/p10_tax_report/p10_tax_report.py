@@ -206,6 +206,12 @@ def get_columns():
 			"width": 150
 		},
 		{
+			"fieldname": "paye", 
+			"label": _("PAYE"), 
+			"fieldtype": "Currency", 
+			"width": 150
+		},
+		{
 			"fieldname": "self_assessed_paye_tax", 
 			"label": _("Self Assessed PAYE Tax"), 
 			"fieldtype": "Currency", 
