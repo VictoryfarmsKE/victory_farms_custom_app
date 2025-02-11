@@ -29,20 +29,20 @@ def get_columns():
 			"read_only": 1,
 			"width": 150
 		},
-        {   
-            "fieldname": "residential_status", 
-            "label": _("Residential Status"),
-            "fieldtype": "Data", 
-            "read_only": 1,
-            "width": 100
-        },
-        {   
-            "fieldname": "type_of_employee", 
-            "label": _("Type Of Employee"),
-            "fieldtype": "Data", 
-            "read_only": 1,
-            "width": 100
-        },
+		{   
+			"fieldname": "residential_status", 
+			"label": _("Residential Status"),
+			"fieldtype": "Data", 
+			"read_only": 1,
+			"width": 100
+		},
+		{   
+			"fieldname": "type_of_employee", 
+			"label": _("Type Of Employee"),
+			"fieldtype": "Data", 
+			"read_only": 1,
+			"width": 100
+		},
 		{   
 			"fieldname": "basic_salary", 
 			"label": _("Basic Salary"), 
@@ -243,9 +243,9 @@ def get_p10_report_data(filters):
 		.select(
 			employee.tax_id,
 			salary_slip.employee_name,
-            employee.residential_status,
-            employee.type_of_employee,
-            employee.type_of_housing,
+			employee.residential_status,
+			employee.type_of_employee,
+			employee.type_of_housing,
 			salary_detail.salary_component,
 			salary_detail.amount,
 			salary_component.p9a_tax_deduction_card_type
@@ -269,9 +269,9 @@ def get_p10_report_data(filters):
 				employee_data[employee_key] = {
 					"employee_name": employee_name,
 					"tax_id": employee_pin,
-                    "residential_status": row.get("residential_status"),
-                    "type_of_employee": row.get("type_of_employee"),
-                    "type_of_housing": row.get("type_of_housing"),
+					"residential_status": row.get("residential_status"),
+					"type_of_employee": row.get("type_of_employee"),
+					"type_of_housing": row.get("type_of_housing"),
 					"components": {}
 				}
 
@@ -283,19 +283,19 @@ def get_p10_report_data(filters):
 			component_key = salary_component.lower().replace(" ", "_")
 			employee_data[employee_key][component_key] = employee_data[employee_key].get(component_key, 0) + amount
 
-    report_data = []
-    for employee_key, details in employee_data.items():
-        components = details.pop("components")
-        row = {
-            "tax_id": details["tax_id"],
-            "employee_name": details["employee_name"],
-            "residential_status": details.get("residential_status"),
-            "type_of_employee": details.get("type_of_employee"),
-            "type_of_housing": details.get("type_of_housing"),
-        }
-        for component_type, total_amount in components.items():
-            row[component_type.lower().replace(" ", "_")] = total_amount
+	report_data = []
+	for employee_key, details in employee_data.items():
+		components = details.pop("components")
+		row = {
+			"tax_id": details["tax_id"],
+			"employee_name": details["employee_name"],
+			"residential_status": details.get("residential_status"),
+			"type_of_employee": details.get("type_of_employee"),
+			"type_of_housing": details.get("type_of_housing"),
+		}
+		for component_type, total_amount in components.items():
+			row[component_type.lower().replace(" ", "_")] = total_amount
 
-        row.update(details)
-        report_data.append(row)
-    return report_data
+		row.update(details)
+		report_data.append(row)
+	return report_data
