@@ -93,7 +93,6 @@ def get_data(filters):
         .on(salary_slip.name == deduction.parent)
         .select(
             (emp.name.as_("employee")),
-            (emp.employee_name),
             (emp.tax_id),
             (emp.first_name),
             (emp.last_name),
@@ -105,7 +104,7 @@ def get_data(filters):
             (deduction.amount),
             (deduction.name)
         )
-        .where(deduction.salary_component == "Voluntary NSSF")
+        .where((deduction.salary_component.isin(["Voluntary NSSF", "Employee NSSF"])) & (salary_slip.docstatus == 1))
     )
 
     if filters.get("employee"):

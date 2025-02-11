@@ -75,6 +75,7 @@ def get_data(filters):
             (emp.tax_id),
             (salary_slip.gross_pay)
         )
+        .where(salary_slip.docstatus == 1)
     )
 
     if filters.get("employee"):
@@ -86,6 +87,5 @@ def get_data(filters):
 
     query = query.where(salary_slip.start_date == start_date)
     query = query.where(salary_slip.end_date == end_date)
-
     
     return query.run(as_dict=True)
