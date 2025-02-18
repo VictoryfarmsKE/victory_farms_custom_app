@@ -36,7 +36,7 @@ def create_leave_allocation(leave_type, is_earned_leave = 0):
 			allocated_leaves = flt(allocated_leaves * condition_value / 12, 2)
 			employee_from_date = employee.date_of_joining
 
-		if frappe.db.get_value("Leave Allocation", {"employee": employee.name, "from_date": employee_from_date}):
+		if frappe.db.get_value("Leave Allocation", {"employee": employee.name, "leave_type": leave_type, "from_date": employee_from_date}):
 			continue
 
 		leave_all_doc = frappe.new_doc("Leave Allocation")
