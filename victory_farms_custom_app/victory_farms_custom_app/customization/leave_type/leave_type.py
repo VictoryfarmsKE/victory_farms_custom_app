@@ -21,7 +21,7 @@ def create_leave_allocation(leave_type, is_earned_leave = 0):
 			employee_filters.update({"grade": ["in", grade_list]})
 	employee_data = frappe.db.get_all("Employee", employee_filters, ["name", "date_of_joining"])
 
-	if is_last_day_of_the_month(today()):
+	if get_last_day(today()) == today():
 		from_date = add_days(today(), days = 1) if is_earned_leave else get_year_start(today())
 	else:
 		from_date = get_first_day(today()) if is_earned_leave else get_year_start(today())
