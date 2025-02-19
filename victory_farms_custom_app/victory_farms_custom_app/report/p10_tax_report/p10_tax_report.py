@@ -46,79 +46,79 @@ def get_columns():
 		{   
 			"fieldname": "basic_salary", 
 			"label": _("Basic Salary"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "housing_allowance",
 			"label": _("Housing Allowance"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 180
 		},
 		{
 			"fieldname": "transport_allowance",
 			"label": _("Transport Allowance"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		 },
 		{
 			"fieldname": "leave_pay", 
 			"label": _("Leave Pay"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "overtime", 
 			"label": _("Over Time Allowance"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 200
 		},
 		{
 			"fieldname": "directors_fees", 
 			"label": _("Directors Fees"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "lump_sum_payment", 
 			"label": _("Lump Sum Pay if any"), 
-			"fieldtype": "Currency",
+			"fieldtype": "Float",
 			"width": 250
 		},
 		{
 			"fieldname": "other_allowance", 
 			"label": _("Other Allowance"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "total_cash_pay", 
 			"label": _("Total Cash Pay"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "value_of_car_benefit", 
 			"label": _("Value of Car Benefit"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "other_non_cash_benefit", 
 			"label": _("Other Non cash benefit"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "total_non_cash_benefits", 
 			"label": _("Total Non Cash Benefits"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "value_of_meals", 
 			"label": _("Value of meals"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
@@ -130,91 +130,103 @@ def get_columns():
 		{
 			"fieldname": "rent_of_house", 
 			"label": _("Rent of House"),
-			"fieldtype": "Currency", 
-			"width": 150
+			"fieldtype": "Float", 
+			"width": 150,
 		},
 		{
 			"fieldname": "computed_rent_of_house", 
 			"label": _("Computed Rent of House"),
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "rent_recovered_from_employee", 
 			"label": _("Rent Recovered from Employee"),
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "net_value_of_housing", 
 			"label": _("Net Value of Housing"),
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "total_gross_pay", 
 			"label": _("Total Gross Pay"),
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "social_health_insurance_fund", 
 			"label": _("Social Health Insurance Fund"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "actual_contribution(nssf)", 
 			"label": _("Actual Contribution (NSSF)"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "post_retirement_medical_fund", 
 			"label": _("Post Retirement medical Fund"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 280
 		},
 		{
 			"fieldname": "mortgage_interest", 
 			"label": _("Mortgage Interest"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "affordable_housing_levy", 
 			"label": _("Affordable Housing Levy"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "amount_of_benefit", 
 			"label": _("Amount of Benefit"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
+			"width": 150
+		},
+		{
+			"fieldname": "taxable_pay", 
+			"label": _("Taxable Pay"), 
+			"fieldtype": "Float", 
+			"width": 150
+		},
+		{
+			"fieldname": "tax_payable", 
+			"label": _("Tax Payable"), 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "monthly_relief", 
 			"label": _("Monthly Relief"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "amount_of_insurance_relief", 
 			"label": _("Amount of Insurance Relief"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
-			"fieldname": "paye", 
+			"fieldname": "paye_allowance", 
 			"label": _("PAYE"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "self_assessed_paye_tax", 
 			"label": _("Self Assessed PAYE Tax"), 
-			"fieldtype": "Currency", 
+			"fieldtype": "Float", 
 			"width": 150
 		},
 		
