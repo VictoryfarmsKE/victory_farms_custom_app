@@ -16,7 +16,7 @@ def execute(filters=None):
 def get_columns():
 	columns = [
 		{
-			"fieldname": "tax_id",
+			"fieldname": "pin_of_employee",
 			"label": _("PIN of Employee"), 
 			"fieldtype": "Link", 
 			"options": "Employee", 
@@ -68,7 +68,7 @@ def get_columns():
 			"width": 150
 		},
 		{
-			"fieldname": "overtime", 
+			"fieldname": "over_time_allowance", 
 			"label": _("Over Time Allowance"), 
 			"fieldtype": "Float", 
 			"width": 200
@@ -80,7 +80,7 @@ def get_columns():
 			"width": 150
 		},
 		{
-			"fieldname": "lump_sum_payment", 
+			"fieldname": "lump_sum_pay_if_any", 
 			"label": _("Lump Sum Pay if any"), 
 			"fieldtype": "Float",
 			"width": 250
@@ -301,6 +301,47 @@ def get_p10_report_data(filters):
 			component_key = salary_component.lower().replace(" ", "_")
 			employee_data[employee_key][component_key] = employee_data[employee_key].get(component_key, 0) + amount
 
+	p9_cards = ["Basic Salary",
+			"Benefits NonCash",
+			"Value of Quarters",
+			"Total Gross Pay",
+			"Rent of House",
+			"E1 Defined Contribution Retirement Scheme",
+			"E2 Defined Contribution Retirement Scheme",
+			"E3 Defined Contribution Retirement Scheme",
+			"Owner Occupied Interest",
+			"Retirement Contribution and Owner Occupied Interest",
+			"Chargeable Pay",
+			"Computed Rent of House",
+			"Tax Charged",
+			"Personal Relief",
+			"Insurance Relief",
+			"Housing Allowance",
+			"Transport Allowance",
+			"Leave Pay",
+			"Over Time Allowance",
+			"Directors Fees",
+			"Lump Sum Pay if any",
+			"PAYE",
+			"Other Allowance",
+			"Value of Car Benefit",
+			"Other Non cash benefit",
+			"Value of meals",
+			"Type of Housing",
+			"Social Health Insurance Fund",
+			"Actual Contribution(NSSF)",
+			"Post Retirement medical Fund",
+			"Mortgage Interest",
+			"Affordable Housing Levy",
+			"Monthly Relief",
+			"Rent Recovered from Employee",
+			"Amount of Insurance Relief",
+			"Self Assessed PAYE Tax",
+			"Amount of Benefit",
+			"Total Cash Pay",
+			"Total Non Cash Benefits",
+			"Net Value of Housing"]
+
 	report_data = []
 	for employee_key, details in employee_data.items():
 		components = details.pop("components")
@@ -312,8 +353,15 @@ def get_p10_report_data(filters):
 			"type_of_housing": details.get("type_of_housing"),
 		}
 		for component_type, total_amount in components.items():
-			row[component_type.lower().replace(" ", "_")] = total_amount
+			key = component_type.lower().replace(" ", "_")
+			p9_cards.append(key)
+			row[key] = total_amount
 
 		row.update(details)
+		for key in p9_cards:
+			act_key = key.lower()
+			if not row.get(act_key):
+				row[act_key] = 0
+
 		report_data.append(row)
 	return report_data
