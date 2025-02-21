@@ -16,10 +16,9 @@ def execute(filters=None):
 def get_columns():
 	columns = [
 		{
-			"fieldname": "pin_of_employee",
+			"fieldname": "tax_id",
 			"label": _("PIN of Employee"), 
-			"fieldtype": "Link", 
-			"options": "Employee", 
+			"fieldtype": "Data", 
 			"width": 150
 		},
 		{   
@@ -304,15 +303,12 @@ def get_p10_report_data(filters):
 	p9_cards = ["Basic Salary",
 			"Benefits NonCash",
 			"Value of Quarters",
-			"Total Gross Pay",
-			"Rent of House",
 			"E1 Defined Contribution Retirement Scheme",
 			"E2 Defined Contribution Retirement Scheme",
 			"E3 Defined Contribution Retirement Scheme",
 			"Owner Occupied Interest",
 			"Retirement Contribution and Owner Occupied Interest",
 			"Chargeable Pay",
-			"Computed Rent of House",
 			"Tax Charged",
 			"Personal Relief",
 			"Insurance Relief",
@@ -334,13 +330,8 @@ def get_p10_report_data(filters):
 			"Mortgage Interest",
 			"Affordable Housing Levy",
 			"Monthly Relief",
-			"Rent Recovered from Employee",
 			"Amount of Insurance Relief",
-			"Self Assessed PAYE Tax",
-			"Amount of Benefit",
-			"Total Cash Pay",
-			"Total Non Cash Benefits",
-			"Net Value of Housing"]
+			"Self Assessed PAYE Tax"]
 
 	report_data = []
 	for employee_key, details in employee_data.items():
@@ -354,12 +345,11 @@ def get_p10_report_data(filters):
 		}
 		for component_type, total_amount in components.items():
 			key = component_type.lower().replace(" ", "_")
-			p9_cards.append(key)
-			row[key] = total_amount
+			row[key] = total_amount if total_amount else 0
 
 		row.update(details)
 		for key in p9_cards:
-			act_key = key.lower()
+			act_key = key.lower().replace(" ", "_")
 			if not row.get(act_key):
 				row[act_key] = 0
 
