@@ -2,80 +2,466 @@
  "Employee": [
   {
    "dt": "Employee",
-   "fieldname": "tax_id",
+   "fieldname": "custom_highest_training_by_employer",
    "fieldtype": "Data",
-   "insert_after": "shif_no",
-   "label": "Tax ID",
+   "insert_after": "custom_area_of_skill_obtained",
+   "label": "Highest Training by Employer",
    "module": "Victory Farms Custom App"
   },
   {
    "dt": "Employee",
-   "fieldname": "shif_no",
+   "fieldname": "custom_terms_of_service",
+   "fieldtype": "Select",
+   "insert_after": "custom_location",
+   "label": "Terms of Service",
+   "module": "Victory Farms Custom App",
+   "options": "\nPermanent\nContract\nCasual\nIntenship\nLocal Agreement\nTemporary\nFixed-term\nSeasonal\nSupernumerary"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_occupation_name",
+   "fieldtype": "Link",
+   "insert_after": "branch",
+   "label": "Occupation Name",
+   "module": "Victory Farms Custom App",
+   "options": "Designation"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_job_title",
+   "fieldtype": "Link",
+   "insert_after": "designation",
+   "label": "Job Title",
+   "module": "Victory Farms Custom App",
+   "options": "Designation"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_area_of_skill_obtained",
+   "fieldtype": "Link",
+   "insert_after": "custom_professional_qualification",
+   "label": "Area of Skill Obtained",
+   "module": "Victory Farms Custom App",
+   "options": "Skill"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_professional_qualification",
+   "fieldtype": "Select",
+   "insert_after": "custom_msisdn",
+   "label": "Professional Qualification",
+   "module": "Victory Farms Custom App",
+   "options": "\nDoctral Degree (Phd)\nMasters Degree\nPost Graduate Diploma\nDiploma\nCertificate\nCertificate of Attendance\nCertificate of Achievement\nTrade Test Certificate\nCraft Certificate\nDriving License"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_disability_type",
+   "fieldtype": "Select",
+   "insert_after": "custom_origin_",
+   "label": "Disability Type",
+   "module": "Victory Farms Custom App",
+   "options": "\nAlbinism\nPhysical\nMental\nVisual\nAutism\nHearing\nEpilepsy\nBlind\nDeaf/using sign language\nDeaf/able to talk normally"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "national_id",
    "fieldtype": "Data",
-   "insert_after": "cb_csf_emp_01",
-   "label": "SHIF No",
+   "insert_after": "custom_validation_id",
+   "label": "National ID",
    "module": "Victory Farms Custom App"
   },
   {
    "dt": "Employee",
-   "fieldname": "custom_create_individual_holiday_list",
-   "fieldtype": "Check",
-   "insert_after": "attendance_device_id",
+   "fieldname": "nssf_no",
+   "fieldtype": "Data",
+   "insert_after": "custom_alien_id",
+   "label": "NSSF No",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "no_of_dependents",
+   "fieldtype": "Int",
+   "insert_after": "marital_status",
+   "label": "No of Dependents",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "statutory",
+   "fieldtype": "Section Break",
+   "insert_after": "personal_details",
    "is_system_generated": 1,
-   "label": "Create individual Holiday List",
+   "label": "Statutory Details",
    "module": "Victory Farms Custom App"
   },
   {
    "dt": "Employee",
-   "fieldname": "custom_not_eligible_for_appraisal_payout",
-   "fieldtype": "Check",
-   "insert_after": "salary_mode",
-   "label": "Not Eligible for Appraisal Payout",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "provident_fund_account",
-   "fieldtype": "Data",
-   "insert_after": "pan_number",
-   "is_system_generated": 1,
-   "label": "Provident Fund Account",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "depends_on": "eval:doc.salary_mode == \"Bank\"",
-   "dt": "Employee",
-   "fieldname": "micr_code",
-   "fieldtype": "Data",
-   "insert_after": "ifsc_code",
-   "is_system_generated": 1,
-   "label": "MICR Code",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "pan_number",
-   "fieldtype": "Data",
-   "insert_after": "payroll_cost_center",
-   "is_system_generated": 1,
-   "label": "PAN Number",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "depends_on": "eval:doc.salary_mode == \"Bank\"",
-   "dt": "Employee",
-   "fieldname": "ifsc_code",
-   "fieldtype": "Data",
-   "insert_after": "bank_cb",
-   "is_system_generated": 1,
-   "label": "IFSC Code",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "bank_cb",
+   "fieldname": "cb_csf_emp_01",
    "fieldtype": "Column Break",
-   "insert_after": "bank_ac_no",
+   "insert_after": "nssf_no",
+   "is_system_generated": 1,
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "sb_csf_emp_01",
+   "fieldtype": "Section Break",
+   "insert_after": "tax_id",
+   "is_system_generated": 1,
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "probation_start_date",
+   "fieldtype": "Date",
+   "insert_after": "col_break_22",
+   "is_system_generated": 1,
+   "label": "Probation Start Date",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "probation_end_date",
+   "fieldtype": "Date",
+   "insert_after": "probation_start_date",
+   "is_system_generated": 1,
+   "label": "Probation End Date",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "cb_navari_vf_emp_01",
+   "fieldtype": "Column Break",
+   "insert_after": "probation_end_date",
+   "is_system_generated": 1,
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fetch_from": "custom_contract.start_date",
+   "fieldname": "contract_start_date",
+   "fieldtype": "Date",
+   "insert_after": "custom_contract",
+   "label": "Contract Start Date",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "depends_on": "eval:doc.salary_mode == 'Bank'",
+   "dt": "Employee",
+   "fieldname": "bank_branch_name",
+   "fieldtype": "Data",
+   "insert_after": "bank_name",
+   "label": "Bank Branch Name",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_location",
+   "fieldtype": "Link",
+   "insert_after": "grade",
+   "label": "Location",
+   "module": "Victory Farms Custom App",
+   "options": "Location"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_origin_",
+   "fieldtype": "Data",
+   "insert_after": "health_details",
+   "label": "Origin ",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_appraisal_template",
+   "fieldtype": "Link",
+   "insert_after": "provident_fund_account",
+   "label": "Appraisal Template",
+   "module": "Victory Farms Custom App",
+   "options": "Appraisal Template"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_employee_category",
+   "fieldtype": "Link",
+   "insert_after": "reports_to",
+   "label": "Employee Category",
+   "module": "Victory Farms Custom App",
+   "options": "Employee Category"
+  },
+  {
+   "allow_on_submit": 1,
+   "dt": "Employee",
+   "fieldname": "bonus_potential",
+   "fieldtype": "Percent",
+   "is_system_generated": 1,
+   "label": "Bonus Potential",
+   "module": "Victory Farms Custom App",
+   "reqd": 1
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_employee_separation_type",
+   "fieldtype": "Link",
+   "insert_after": "reason_for_leaving",
+   "label": "Reason For Leaving",
+   "module": "Victory Farms Custom App",
+   "options": "Employee Separation Type"
+  },
+  {
+   "dt": "Employee",
+   "fetch_from": "custom_employee_separation_type.separation_type",
+   "fieldname": "custom_reasons",
+   "fieldtype": "Data",
+   "insert_after": "custom_employee_separation_type",
+   "label": "Reason",
+   "module": "Victory Farms Custom App",
+   "read_only": 1
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_contract",
+   "fieldtype": "Link",
+   "insert_after": "final_confirmation_date",
+   "label": "Contract",
+   "module": "Victory Farms Custom App",
+   "options": "Contract"
+  },
+  {
+   "depends_on": "eval: doc.custom_validation_id == \"Military ID\"",
+   "dt": "Employee",
+   "fieldname": "custom_military_id",
+   "fieldtype": "Data",
+   "insert_after": "custom_diplomatic_id",
+   "label": "Military ID",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "depends_on": "eval: doc.custom_validation_id == \"Alien ID\"",
+   "dt": "Employee",
+   "fieldname": "custom_alien_id",
+   "fieldtype": "Data",
+   "insert_after": "custom_military_id",
+   "label": "Alien ID",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "depends_on": "eval: doc.custom_validation_id == \"Diplomatic ID\"",
+   "dt": "Employee",
+   "fieldname": "custom_diplomatic_id",
+   "fieldtype": "Data",
+   "insert_after": "national_id",
+   "label": "Diplomatic ID",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_validation_id",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "insert_after": "statutory",
+   "label": "Validation ID",
+   "module": "Victory Farms Custom App",
+   "options": "National ID\nMilitary ID\nPassport\nDiplomatic ID\nAlien ID",
+   "reqd": 1
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_msisdn",
+   "fieldtype": "Data",
+   "insert_after": "tax_id",
+   "label": "MSISDN",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_appraisal_approver",
+   "fieldtype": "Link",
+   "insert_after": "shift_request_approver",
+   "label": "Appraisal Approver",
+   "module": "Victory Farms Custom App",
+   "options": "User"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_last_attendance_sync_date",
+   "fieldtype": "Date",
+   "insert_after": "custom_create_individual_holiday_list",
+   "label": "Last Attendance Sync Date",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "column_break_uhddk",
+   "fieldtype": "Column Break",
+   "insert_after": "type_of_employee",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "type_of_housing",
+   "fieldtype": "Select",
+   "insert_after": "column_break_uhddk",
+   "label": "Type Of Housing",
+   "module": "Victory Farms Custom App",
+   "options": "\nBenefit given\nBenefit not given"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "type_of_employee",
+   "fieldtype": "Select",
+   "insert_after": "residential_status",
+   "label": "Type Of Employee",
+   "module": "Victory Farms Custom App",
+   "options": "\nSecondary Employee\nPrimary Employee"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "section_break_lfr5w",
+   "fieldtype": "Section Break",
+   "insert_after": "custom_highest_training_by_employer",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "residential_status",
+   "fieldtype": "Select",
+   "insert_after": "section_break_lfr5w",
+   "label": "Residential Status",
+   "module": "Victory Farms Custom App",
+   "options": "\nNon Resident\nResident"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "bank",
+   "fieldtype": "Link",
+   "insert_after": "custom_not_eligible_for_appraisal_payout",
+   "label": "Bank",
+   "module": "Victory Farms Custom App",
+   "options": "Bank"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "employment_type",
+   "fieldtype": "Link",
+   "insert_after": "department",
+   "is_system_generated": 1,
+   "label": "Employment Type",
+   "module": "Victory Farms Custom App",
+   "options": "Employment Type"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "job_applicant",
+   "fieldtype": "Link",
+   "insert_after": "employment_details",
+   "is_system_generated": 1,
+   "label": "Job Applicant",
+   "module": "Victory Farms Custom App",
+   "options": "Job Applicant"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "grade",
+   "fieldtype": "Link",
+   "insert_after": "branch",
+   "is_system_generated": 1,
+   "label": "Grade",
+   "module": "Victory Farms Custom App",
+   "options": "Employee Grade"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "default_shift",
+   "fieldtype": "Link",
+   "insert_after": "holiday_list",
+   "is_system_generated": 1,
+   "label": "Default Shift",
+   "module": "Victory Farms Custom App",
+   "options": "Shift Type"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "health_insurance_section",
+   "fieldtype": "Section Break",
+   "insert_after": "health_details",
+   "is_system_generated": 1,
+   "label": "Health Insurance",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "health_insurance_provider",
+   "fieldtype": "Link",
+   "insert_after": "health_insurance_section",
+   "is_system_generated": 1,
+   "label": "Health Insurance Provider",
+   "module": "Victory Farms Custom App",
+   "options": "Employee Health Insurance"
+  },
+  {
+   "depends_on": "eval:doc.health_insurance_provider",
+   "dt": "Employee",
+   "fieldname": "health_insurance_no",
+   "fieldtype": "Data",
+   "insert_after": "health_insurance_provider",
+   "is_system_generated": 1,
+   "label": "Health Insurance No",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "approvers_section",
+   "fieldtype": "Section Break",
+   "insert_after": "default_shift",
+   "is_system_generated": 1,
+   "label": "Approvers",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "expense_approver",
+   "fieldtype": "Link",
+   "insert_after": "approvers_section",
+   "is_system_generated": 1,
+   "label": "Expense Approver",
+   "module": "Victory Farms Custom App",
+   "options": "User"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "leave_approver",
+   "fieldtype": "Link",
+   "insert_after": "expense_approver",
+   "is_system_generated": 1,
+   "label": "Leave Approver",
+   "module": "Victory Farms Custom App",
+   "options": "User"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "column_break_45",
+   "fieldtype": "Column Break",
+   "insert_after": "leave_approver",
+   "is_system_generated": 1,
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "shift_request_approver",
+   "fieldtype": "Link",
+   "insert_after": "column_break_45",
+   "is_system_generated": 1,
+   "label": "Shift Request Approver",
+   "module": "Victory Farms Custom App",
+   "options": "User"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "salary_cb",
+   "fieldtype": "Column Break",
+   "insert_after": "salary_mode",
    "is_system_generated": 1,
    "module": "Victory Farms Custom App"
   },
@@ -93,405 +479,90 @@
   },
   {
    "dt": "Employee",
-   "fieldname": "salary_cb",
+   "fieldname": "bank_cb",
    "fieldtype": "Column Break",
+   "insert_after": "bank_ac_no",
+   "is_system_generated": 1,
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "depends_on": "eval:doc.salary_mode == \"Bank\"",
+   "dt": "Employee",
+   "fieldname": "ifsc_code",
+   "fieldtype": "Data",
+   "insert_after": "bank_cb",
+   "is_system_generated": 1,
+   "label": "IFSC Code",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "pan_number",
+   "fieldtype": "Data",
+   "insert_after": "payroll_cost_center",
+   "is_system_generated": 1,
+   "label": "PAN Number",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "depends_on": "eval:doc.salary_mode == \"Bank\"",
+   "dt": "Employee",
+   "fieldname": "micr_code",
+   "fieldtype": "Data",
+   "insert_after": "ifsc_code",
+   "is_system_generated": 1,
+   "label": "MICR Code",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "provident_fund_account",
+   "fieldtype": "Data",
+   "insert_after": "pan_number",
+   "is_system_generated": 1,
+   "label": "Provident Fund Account",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
+   "fieldname": "custom_not_eligible_for_appraisal_payout",
+   "fieldtype": "Check",
    "insert_after": "salary_mode",
-   "is_system_generated": 1,
+   "label": "Not Eligible for Appraisal Payout",
    "module": "Victory Farms Custom App"
   },
   {
    "dt": "Employee",
-   "fieldname": "shift_request_approver",
-   "fieldtype": "Link",
-   "insert_after": "column_break_45",
+   "fieldname": "custom_create_individual_holiday_list",
+   "fieldtype": "Check",
+   "insert_after": "attendance_device_id",
    "is_system_generated": 1,
-   "label": "Shift Request Approver",
-   "module": "Victory Farms Custom App",
-   "options": "User"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "column_break_45",
-   "fieldtype": "Column Break",
-   "insert_after": "leave_approver",
-   "is_system_generated": 1,
+   "label": "Create individual Holiday List",
    "module": "Victory Farms Custom App"
   },
   {
    "dt": "Employee",
-   "fieldname": "leave_approver",
-   "fieldtype": "Link",
-   "insert_after": "expense_approver",
-   "is_system_generated": 1,
-   "label": "Leave Approver",
-   "module": "Victory Farms Custom App",
-   "options": "User"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "expense_approver",
-   "fieldtype": "Link",
-   "insert_after": "approvers_section",
-   "is_system_generated": 1,
-   "label": "Expense Approver",
-   "module": "Victory Farms Custom App",
-   "options": "User"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "approvers_section",
-   "fieldtype": "Section Break",
-   "insert_after": "default_shift",
-   "is_system_generated": 1,
-   "label": "Approvers",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "depends_on": "eval:doc.health_insurance_provider",
-   "dt": "Employee",
-   "fieldname": "health_insurance_no",
+   "fieldname": "shif_no",
    "fieldtype": "Data",
-   "insert_after": "health_insurance_provider",
+   "insert_after": "cb_csf_emp_01",
    "is_system_generated": 1,
-   "label": "Health Insurance No",
+   "label": "SHIF No",
    "module": "Victory Farms Custom App"
   },
   {
    "dt": "Employee",
-   "fieldname": "health_insurance_provider",
-   "fieldtype": "Link",
-   "insert_after": "health_insurance_section",
-   "is_system_generated": 1,
-   "label": "Health Insurance Provider",
-   "module": "Victory Farms Custom App",
-   "options": "Employee Health Insurance"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "health_insurance_section",
-   "fieldtype": "Section Break",
-   "insert_after": "health_details",
-   "is_system_generated": 1,
-   "label": "Health Insurance",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "default_shift",
-   "fieldtype": "Link",
-   "insert_after": "holiday_list",
-   "is_system_generated": 1,
-   "label": "Default Shift",
-   "module": "Victory Farms Custom App",
-   "options": "Shift Type"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "grade",
-   "fieldtype": "Link",
-   "insert_after": "branch",
-   "is_system_generated": 1,
-   "label": "Grade",
-   "module": "Victory Farms Custom App",
-   "options": "Employee Grade"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "job_applicant",
-   "fieldtype": "Link",
-   "insert_after": "employment_details",
-   "is_system_generated": 1,
-   "label": "Job Applicant",
-   "module": "Victory Farms Custom App",
-   "options": "Job Applicant"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "employment_type",
-   "fieldtype": "Link",
-   "insert_after": "department",
-   "is_system_generated": 1,
-   "label": "Employment Type",
-   "module": "Victory Farms Custom App",
-   "options": "Employment Type"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "bank",
-   "fieldtype": "Link",
-   "insert_after": "custom_not_eligible_for_appraisal_payout",
-   "label": "Bank",
-   "module": "Victory Farms Custom App",
-   "options": "Bank"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "residential_status",
-   "fieldtype": "Select",
-   "insert_after": "section_break_lfr5w",
-   "label": "Residential Status",
-   "module": "Victory Farms Custom App",
-   "options": "\nNon Resident\nResident"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "section_break_lfr5w",
-   "fieldtype": "Section Break",
-   "insert_after": "custom_msisdn",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "type_of_employee",
-   "fieldtype": "Select",
-   "insert_after": "residential_status",
-   "label": "Type Of Employee",
-   "module": "Victory Farms Custom App",
-   "options": "\nSecondary Employee\nPrimary Employee"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "type_of_housing",
-   "fieldtype": "Select",
-   "insert_after": "column_break_uhddk",
-   "label": "Type Of Housing",
-   "module": "Victory Farms Custom App",
-   "options": "\nBenefit given\nBenefit not given"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "column_break_uhddk",
-   "fieldtype": "Column Break",
-   "insert_after": "type_of_employee",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_last_attendance_sync_date",
-   "fieldtype": "Date",
-   "insert_after": "custom_create_individual_holiday_list",
-   "label": "Last Attendance Sync Date",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_appraisal_approver",
-   "fieldtype": "Link",
-   "insert_after": "shift_request_approver",
-   "label": "Appraisal Approver",
-   "module": "Victory Farms Custom App",
-   "options": "User"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_msisdn",
+   "fieldname": "tax_id",
    "fieldtype": "Data",
-   "insert_after": "tax_id",
-   "label": "MSISDN",
+   "insert_after": "nhif_no",
+   "label": "Tax ID",
    "module": "Victory Farms Custom App"
   },
   {
    "dt": "Employee",
-   "fieldname": "custom_validation_id",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "insert_after": "statutory",
-   "label": "Validation ID",
-   "module": "Victory Farms Custom App",
-   "options": "National ID\nMilitary ID\nPassport\nDiplomatic ID\nAlien ID",
-   "reqd": 1
-  },
-  {
-   "depends_on": "eval: doc.custom_validation_id == \"Diplomatic ID\"",
-   "dt": "Employee",
-   "fieldname": "custom_diplomatic_id",
+   "fieldname": "nhif_no",
    "fieldtype": "Data",
-   "insert_after": "national_id",
-   "label": "Diplomatic ID",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "depends_on": "eval: doc.custom_validation_id == \"Alien ID\"",
-   "dt": "Employee",
-   "fieldname": "custom_alien_id",
-   "fieldtype": "Data",
-   "insert_after": "custom_military_id",
-   "label": "Alien ID",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "depends_on": "eval: doc.custom_validation_id == \"Military ID\"",
-   "dt": "Employee",
-   "fieldname": "custom_military_id",
-   "fieldtype": "Data",
-   "insert_after": "custom_diplomatic_id",
-   "label": "Military ID",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_contract",
-   "fieldtype": "Link",
-   "insert_after": "final_confirmation_date",
-   "label": "Contract",
-   "module": "Victory Farms Custom App",
-   "options": "Contract"
-  },
-  {
-   "dt": "Employee",
-   "fetch_from": "custom_employee_separation_type.separation_type",
-   "fieldname": "custom_reasons",
-   "fieldtype": "Data",
-   "insert_after": "custom_employee_separation_type",
-   "label": "Reason",
-   "module": "Victory Farms Custom App",
-   "read_only": 1
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_employee_separation_type",
-   "fieldtype": "Link",
-   "insert_after": "reason_for_leaving",
-   "label": "Reason For Leaving",
-   "module": "Victory Farms Custom App",
-   "options": "Employee Separation Type"
-  },
-  {
-   "allow_on_submit": 1,
-   "dt": "Employee",
-   "fieldname": "bonus_potential",
-   "fieldtype": "Percent",
-   "is_system_generated": 1,
-   "label": "Bonus Potential",
-   "module": "Victory Farms Custom App",
-   "reqd": 1
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_employee_category",
-   "fieldtype": "Link",
-   "insert_after": "reports_to",
-   "label": "Employee Category",
-   "module": "Victory Farms Custom App",
-   "options": "Employee Category"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_appraisal_template",
-   "fieldtype": "Link",
-   "insert_after": "provident_fund_account",
-   "label": "Appraisal Template",
-   "module": "Victory Farms Custom App",
-   "options": "Appraisal Template"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_origin_",
-   "fieldtype": "Data",
-   "insert_after": "health_details",
-   "label": "Origin ",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "custom_location",
-   "fieldtype": "Link",
-   "insert_after": "grade",
-   "label": "Location",
-   "module": "Victory Farms Custom App",
-   "options": "Location"
-  },
-  {
-   "depends_on": "eval:doc.salary_mode == 'Bank'",
-   "dt": "Employee",
-   "fieldname": "bank_branch_name",
-   "fieldtype": "Data",
-   "insert_after": "bank_name",
-   "label": "Bank Branch Name",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fetch_from": "custom_contract.start_date",
-   "fieldname": "contract_start_date",
-   "fieldtype": "Date",
-   "insert_after": "custom_contract",
-   "label": "Contract Start Date",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "cb_navari_vf_emp_01",
-   "fieldtype": "Column Break",
-   "insert_after": "probation_end_date",
-   "is_system_generated": 1,
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "probation_end_date",
-   "fieldtype": "Date",
-   "insert_after": "probation_start_date",
-   "is_system_generated": 1,
-   "label": "Probation End Date",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "probation_start_date",
-   "fieldtype": "Date",
-   "insert_after": "col_break_22",
-   "is_system_generated": 1,
-   "label": "Probation Start Date",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "sb_csf_emp_01",
-   "fieldtype": "Section Break",
-   "insert_after": "tax_id",
-   "is_system_generated": 1,
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "cb_csf_emp_01",
-   "fieldtype": "Column Break",
-   "insert_after": "nssf_no",
-   "is_system_generated": 1,
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "statutory",
-   "fieldtype": "Section Break",
-   "insert_after": "personal_details",
-   "is_system_generated": 1,
-   "label": "Statutory Details",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "no_of_dependents",
-   "fieldtype": "Int",
-   "insert_after": "marital_status",
-   "label": "No of Dependents",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "nssf_no",
-   "fieldtype": "Data",
-   "insert_after": "custom_alien_id",
-   "label": "NSSF No",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Employee",
-   "fieldname": "national_id",
-   "fieldtype": "Data",
-   "insert_after": "custom_validation_id",
-   "label": "National ID",
+   "insert_after": "shif_no",
+   "label": "NHIF No",
    "module": "Victory Farms Custom App"
   }
  ]

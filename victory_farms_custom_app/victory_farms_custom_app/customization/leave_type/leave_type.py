@@ -10,6 +10,9 @@ def auto_create_leave_allocation():
 
 @frappe.whitelist()
 def create_leave_allocation(leave_type, is_earned_leave = 0):
+	if isinstance(is_earned_leave, str):
+		is_earned_leave = int(is_earned_leave)
+
 	lt_data = frappe.db.get_value("Leave Type", leave_type, ["applicable_after", "max_leaves_allowed", "custom_based_on_employee_grade"], as_dict= 1)
 	employee_filters = {"date_of_joining" :["<=", add_days(today(), days = -(lt_data.applicable_after))]}
 	if lt_data.custom_based_on_employee_grade:
@@ -18,8 +21,12 @@ def create_leave_allocation(leave_type, is_earned_leave = 0):
 			employee_filters.update({"grade": ["in", grade_list]})
 	employee_data = frappe.db.get_all("Employee", employee_filters, ["name", "date_of_joining"])
 
-	from_date = today() if is_earned_leave else get_year_start(today())
-	to_date = get_year_ending(today())
+	if get_last_day(today()) == today():
+		from_date = add_days(today(), days = 1) if is_earned_leave else get_year_start(today())
+	else:
+		from_date = get_first_day(today()) if is_earned_leave else get_year_start(today())
+
+	to_date = get_last_day(from_date) if is_earned_leave else get_year_ending(today())
 
 	for employee in employee_data:
 		employee_from_date = from_date
@@ -28,6 +35,10 @@ def create_leave_allocation(leave_type, is_earned_leave = 0):
 			condition_value = month_diff(to_date, employee.date_of_joining) if get_first_day(employee.date_of_joining) == employee.date_of_joining else (month_diff(to_date, employee.date_of_joining) - 1)
 			allocated_leaves = flt(allocated_leaves * condition_value / 12, 2)
 			employee_from_date = employee.date_of_joining
+
+		if frappe.db.get_value("Leave Allocation", {"employee": employee.name, "leave_type": leave_type, "from_date": employee_from_date}):
+			continue
+
 		leave_all_doc = frappe.new_doc("Leave Allocation")
 		leave_all_doc.employee = employee.name
 		leave_all_doc.leave_type = leave_type
