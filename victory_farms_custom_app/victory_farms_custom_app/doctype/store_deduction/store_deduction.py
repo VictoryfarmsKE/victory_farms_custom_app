@@ -84,6 +84,15 @@ def create_remaining_payments():
 			ads_doc.amount = item_cost
 			ads_doc.overwrite_salary_structure_amount = 1
 		try:
+			opening_balance = (sd_doc.remaining_payments + 1) * item_cost
+			closing_balance = sd_doc.remaining_payments * item_cost
+			ads_doc.append("custom_store_deduction_details", {
+				"store_deduction": row,
+				"item_cost": sd_doc.item_cost,
+				"item": sd_doc.item,
+				"opening_balance": opening_balance,
+				"closing_balance": closing_balance
+			})
 			ads_doc.save()
 			sd_doc.db_set("remaining_payments", sd_doc.remaining_payments - 1)
 		except Exception as e:
