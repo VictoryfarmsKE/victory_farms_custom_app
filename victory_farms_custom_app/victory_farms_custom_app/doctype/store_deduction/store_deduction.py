@@ -64,6 +64,9 @@ def create_remaining_payments():
 	today = today()
 	for row in ads_list:
 		sd_doc = frappe.get_doc("Store Deduction", row)
+		emp_data = frappe.db.get_value("Employee", sd_doc.employee, ["salary_currency", "relieving_date", "status"], as_dict = 1)
+		if emp_data.status == "Inactive":
+			continue
 		item_cost = sd_doc.item_cost
 		if sd_doc.period_of_payment > 1:
 			item_cost /= sd_doc.period_of_payment
@@ -73,19 +76,19 @@ def create_remaining_payments():
 			ads_doc.amount += item_cost
 		
 		else:
-			emp_data = frappe.db.get_value("Employee", sd_doc.employee, ["salary_currency", "relieving_date", "status"], as_dict = 1)
-			if emp_data.status == "Inactive":
-				continue
 			ads_doc = frappe.new_doc("Additional Salary")
 			ads_doc.salary_component = salary_component
 			ads_doc.employee = sd_doc.employee
-			ads_doc.payroll_date = emp_data.relieving_date if emp_data.relieving_date and emp_data.relieving_date < today else today
+			ads_doc.payroll_date = today if not emp_data.relieving_date else emp_data.relieving_date
 			ads_doc.currency = emp_data.salary_currency
-			ads_doc.amount = item_cost
+			ads_doc.amount = item_cost if not emp_data.relieving_date else item_cost * sd_doc.remaining_payments
 			ads_doc.overwrite_salary_structure_amount = 1
 		try:
 			opening_balance = (sd_doc.remaining_payments + 1) * item_cost
-			closing_balance = sd_doc.remaining_payments * item_cost
+			if not emp_data.relieving_date:
+				closing_balance = sd_doc.remaining_payments * item_cost
+			else:
+				closing_balance = 0
 			ads_doc.append("custom_store_deduction_details", {
 				"store_deduction": row,
 				"item_cost": sd_doc.item_cost,
@@ -94,6 +97,9 @@ def create_remaining_payments():
 				"closing_balance": closing_balance
 			})
 			ads_doc.save()
-			sd_doc.db_set("remaining_payments", sd_doc.remaining_payments - 1)
+			if not emp_data.relieving_date:
+				sd_doc.db_set("remaining_payments", sd_doc.remaining_payments - 1)
+			else:
+				sd_doc.db_set("remaining_payments", 0)
 		except Exception as e:
 			frappe.log_error(title = f"Additional Salary Generation error for {sd_doc.employee}", message = f"{e}")
