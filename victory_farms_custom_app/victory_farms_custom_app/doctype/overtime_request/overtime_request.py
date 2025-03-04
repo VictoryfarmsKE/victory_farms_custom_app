@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 from erpnext.accounts.utils import get_fiscal_year
+from datetime import datetime
 from pypika import Criterion
 from nl_attendance_timesheet.controllers.generate_overtime_timesheets import calculate_holiday_hours, create_new_timesheet, get_from_time_and_hours
 
@@ -18,6 +19,8 @@ class OvertimeRequest(Document):
 		overtime_20 = frappe.db.get_single_value(SETTINGS_DOCTYPE, 'overtime_20_activity')
 
 		for row in self.employee_list:
+			if isinstance(row.end_time, str):
+				row.end_time = datetime.strptime(row.end_time, "%H:%M:%S")
 			self.create_timesheet(row, overtime_15, overtime_20)
 	
 	def create_timesheet(self, row, overtime_15, overtime_20):
@@ -51,10 +54,12 @@ class OvertimeRequest(Document):
 
 		attendance_records = query.run(as_dict=True)
 
+		fiscal_year = None
+
 		holiday_data= frappe._dict()
 		for entry in attendance_records:
-			change_hours = row.end_time.seconds//3600
-			minutes = (row.end_time.seconds//60)%60
+			change_hours = row.end_time.hour
+			minutes = row.end_time.minute
 			entry.out_time = entry.out_time.replace(hour=change_hours, minute=minutes)
 			if not holiday_data.get(entry.employee):
 				date = entry.in_time.date() or entry.out_time.date()
@@ -67,14 +72,14 @@ class OvertimeRequest(Document):
 					total_work_duration = calculate_holiday_hours(entry)
 					if total_work_duration:
 						create_new_timesheet(entry.employee, entry.employee_name, entry.company, entry.department,
-											overtime_20, entry.in_time, entry.working_hours, entry.name)
+											overtime_20, entry.in_time, entry.working_hours, entry.name, from_ot_req = True)
 				else:
 					from_time, hours = get_from_time_and_hours(entry)
 					if from_time and hours:
 						create_new_timesheet(entry.employee, entry.employee_name, entry.company, entry.department,
-											overtime_15, from_time, hours, entry.name)
+											overtime_15, from_time, hours, entry.name, from_ot_req = True)
 			else:
 				from_time, hours = get_from_time_and_hours(entry)
 				if from_time and hours:
 					create_new_timesheet(entry.employee, entry.employee_name, entry.company, entry.department, overtime_15,
-										from_time, hours, entry.name)
+										from_time, hours, entry.name, from_ot_req = True)
