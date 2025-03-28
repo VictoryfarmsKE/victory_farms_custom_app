@@ -7,6 +7,19 @@ def after_insert(self, method):
 
     create_holiday_list(self)
 
+def validate(self, method):
+    if not self.custom_department_details:
+        return
+    
+    remaining_weightage = 100
+    length = len(self.custom_department_details)
+    for row in self.custom_department_details:
+        if not row.weightage:
+            row.weightage = remaining_weightage / length
+ 
+        length -= 1
+        remaining_weightage -= row.weightage
+
 @frappe.whitelist()
 def create_holiday_list(doc):
     if isinstance(doc, str):

@@ -146,6 +146,7 @@ doc_events = {
         "validate": "victory_farms_custom_app.victory_farms_custom_app.customization.salary_slip.salary_slip.validate"
     },
     "Employee": {
+        "validate": "victory_farms_custom_app.victory_farms_custom_app.customization.employee.employee.validate",
         "after_insert": "victory_farms_custom_app.victory_farms_custom_app.customization.employee.employee.after_insert"
     },
     "Employee Checkin": {

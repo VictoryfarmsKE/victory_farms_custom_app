@@ -1,0 +1,90 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-03-27 14:11:29.930955",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_wurj",
+  "employee",
+  "fiscal_year",
+  "column_break_ijxr",
+  "posting_date",
+  "section_break_l63r",
+  "quarterly_department_details",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_wurj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Annual Appraisal",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "quarterly_department_details",
+   "fieldtype": "Table",
+   "label": "Quarterly Department Details",
+   "options": "Quarterly Department Details"
+  },
+  {
+   "fieldname": "column_break_ijxr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_l63r",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "Fiscal Year",
+   "options": "Fiscal Year"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-03-27 15:59:47.057360",
+ "modified_by": "Administrator",
+ "module": "Victory Farms Custom App",
+ "name": "Annual Appraisal",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
