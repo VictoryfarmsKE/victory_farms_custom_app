@@ -12,6 +12,14 @@
   "posting_date",
   "section_break_l63r",
   "quarterly_department_details",
+  "section_break_hnap",
+  "q1_avg",
+  "q2_avg",
+  "total_avg",
+  "column_break_jyxn",
+  "q3_avg",
+  "q4_avg",
+  "total_individual_score",
   "amended_from"
  ],
  "fields": [
@@ -59,12 +67,60 @@
    "fieldtype": "Link",
    "label": "Fiscal Year",
    "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "section_break_hnap",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "q1_avg",
+   "fieldtype": "Float",
+   "label": "Q1 Avg",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "q2_avg",
+   "fieldtype": "Float",
+   "label": "Q2 Avg",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_jyxn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "q3_avg",
+   "fieldtype": "Float",
+   "label": "Q3 Avg",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "q4_avg",
+   "fieldtype": "Float",
+   "label": "Q4 Avg",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_avg",
+   "fieldtype": "Float",
+   "label": "Total Department Avg",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_individual_score",
+   "fieldtype": "Float",
+   "label": "Total Individual Score"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-27 15:59:47.057360",
+ "modified": "2025-03-31 13:16:58.255463",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Annual Appraisal",

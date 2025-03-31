@@ -9,9 +9,11 @@
   "section_break_y6jn",
   "quarter",
   "department",
+  "appraisal_cycle",
   "column_break_3jjj",
   "weightage",
-  "score"
+  "score",
+  "individual_score"
  ],
  "fields": [
   {
@@ -47,12 +49,23 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Score"
+  },
+  {
+   "fieldname": "appraisal_cycle",
+   "fieldtype": "Link",
+   "label": "Appraisal Cycle",
+   "options": "Appraisal Cycle"
+  },
+  {
+   "fieldname": "individual_score",
+   "fieldtype": "Float",
+   "label": "Individual Score"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-27 14:23:52.973217",
+ "modified": "2025-03-31 13:12:41.008993",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Quarterly Department Details",
