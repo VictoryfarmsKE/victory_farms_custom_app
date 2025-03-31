@@ -21,15 +21,25 @@ class AnnualAppraisal(Document):
 		ap_doc.payout_frequency = "Annually"
 		bonus_calculation_amount = ap_doc.get_amount_used_for_bonus_calculation(self.employee)
 
-		individual_score_value = self.total_avg
+		individual_score_value = self.total_individual_score
 		individual_score = (individual_score_value * 100) / 5
 		matrix_percent = ap_doc.get_matrix_percent(individual_score)
-		frappe.throw(f"{individual_score_value} - {individual_score} - {bonus_calculation_amount}")
-		# individual_bonus_percent = self.get_bonus_percent(entry.bonus_potential, matrix_percent)
+		individual_bonus_percent = ap_doc.get_bonus_percent(self.bonus_potential, matrix_percent)
+		individual_bonus = (individual_bonus_percent / 100) * bonus_calculation_amount
+
+		department_score_value = self.total_avg
+		department_score = (department_score_value * 100) / 5
+		matrix_percent = ap_doc.get_matrix_percent(department_score)
+		department_bonus_percent = ap_doc.get_bonus_percent(self.bonus_potential_department, matrix_percent)
+		department_bonus = (department_bonus_percent / 100) * bonus_calculation_amount
+
 		ap_doc.append("appraisal_payout_details",{
 			"employee": self.employee, 
 			"individual_score_value": self.total_individual_score,
-			"department_score_value": self.total_avg
+			"department_score_value": self.total_avg,
+			"individual_bonus": individual_bonus,
+			"department_bonus": department_bonus
+
 		})
 		ap_doc.flags.ignore_permissions = True
 		ap_doc.save()

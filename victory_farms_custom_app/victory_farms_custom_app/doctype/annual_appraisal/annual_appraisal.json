@@ -8,8 +8,11 @@
   "section_break_wurj",
   "employee",
   "fiscal_year",
+  "bonus_potential",
   "column_break_ijxr",
   "posting_date",
+  "department",
+  "bonus_potential_department",
   "section_break_l63r",
   "quarterly_department_details",
   "section_break_hnap",
@@ -115,12 +118,31 @@
    "fieldname": "total_individual_score",
    "fieldtype": "Float",
    "label": "Total Individual Score"
+  },
+  {
+   "fetch_from": "employee.bonus_potential",
+   "fieldname": "bonus_potential",
+   "fieldtype": "Percent",
+   "label": "Bonus Potential"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fetch_from": "department.bonus_potential",
+   "fieldname": "bonus_potential_department",
+   "fieldtype": "Percent",
+   "label": "Bonus Potential (Department)"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-31 13:16:58.255463",
+ "modified": "2025-03-31 14:07:54.395923",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Annual Appraisal",
