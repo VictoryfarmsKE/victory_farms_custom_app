@@ -19,6 +19,7 @@
   "q1_avg",
   "q2_avg",
   "total_avg",
+  "appraisal_payout",
   "column_break_jyxn",
   "q3_avg",
   "q4_avg",
@@ -44,6 +45,7 @@
    "fieldname": "employee",
    "fieldtype": "Link",
    "label": "Employee",
+   "no_copy": 1,
    "options": "Employee"
   },
   {
@@ -55,7 +57,9 @@
    "fieldname": "quarterly_department_details",
    "fieldtype": "Table",
    "label": "Quarterly Department Details",
-   "options": "Quarterly Department Details"
+   "no_copy": 1,
+   "options": "Quarterly Department Details",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_ijxr",
@@ -117,7 +121,9 @@
   {
    "fieldname": "total_individual_score",
    "fieldtype": "Float",
-   "label": "Total Individual Score"
+   "label": "Total Individual Score",
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "fetch_from": "employee.bonus_potential",
@@ -137,12 +143,20 @@
    "fieldname": "bonus_potential_department",
    "fieldtype": "Percent",
    "label": "Bonus Potential (Department)"
+  },
+  {
+   "fieldname": "appraisal_payout",
+   "fieldtype": "Link",
+   "label": "Appraisal Payout",
+   "no_copy": 1,
+   "options": "Appraisal Payout",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-31 14:07:54.395923",
+ "modified": "2025-04-01 08:26:17.959235",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Annual Appraisal",

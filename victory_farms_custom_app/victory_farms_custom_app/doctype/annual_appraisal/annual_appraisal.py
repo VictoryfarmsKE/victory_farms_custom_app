@@ -43,6 +43,7 @@ class AnnualAppraisal(Document):
 		})
 		ap_doc.flags.ignore_permissions = True
 		ap_doc.save()
+		self.db_set("appraisal_payout", ap_doc.name)
 
 	@frappe.whitelist()
 	def get_department_data(self):
@@ -69,7 +70,7 @@ class AnnualAppraisal(Document):
 			dep_quarter_data.setdefault((row.quarter, row.department, weightage), 0) 
 			dep_quarter_data[(row.quarter, row.department, weightage)] += row.total_goal_score
 
-		# self.total_individual_score /= 4
+		self.total_individual_score /= 4
 
 		self.q1_avg = 0
 		self.q2_avg = 0

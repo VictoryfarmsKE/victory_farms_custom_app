@@ -10,10 +10,7 @@ frappe.ui.form.on("Annual Appraisal", {
                     doc: frm.doc,
                     method: "get_department_data",
                     callback: function (r) {
-                        if (r.message) {
-                            row.unit_price = r.message
-                            frm.refresh_fields("items")
-                        }
+                        frm.dirty();
                     },
                 });
             },
