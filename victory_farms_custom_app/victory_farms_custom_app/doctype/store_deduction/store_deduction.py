@@ -56,12 +56,13 @@ class StoreDeduction(Document):
 
 
 def create_remaining_payments():
-	if get_last_day(today()) != today():
+	from frappe.utils import today
+	todays_date = today()
+	if get_last_day(todays_date) != todays_date:
 		return
 
 	ads_list = frappe.db.get_all("Store Deduction", {"remaining_payments": [">", 0], "docstatus": 1}, pluck = "name")
 	salary_component = frappe.db.get_value("Salary Component", {"is_for_store_deduction": 1})
-	today = today()
 	for row in ads_list:
 		sd_doc = frappe.get_doc("Store Deduction", row)
 		emp_data = frappe.db.get_value("Employee", sd_doc.employee, ["salary_currency", "relieving_date", "status"], as_dict = 1)
@@ -71,7 +72,7 @@ def create_remaining_payments():
 		if sd_doc.period_of_payment > 1:
 			item_cost /= sd_doc.period_of_payment
 
-		if ads_name:= frappe.db.get_value("Additional Salary", {"docstatus": 0, "payroll_date": today, "salary_component": salary_component, "employee": sd_doc.employee}):
+		if ads_name:= frappe.db.get_value("Additional Salary", {"docstatus": 0, "payroll_date": todays_date, "salary_component": salary_component, "employee": sd_doc.employee}):
 			ads_doc = frappe.get_doc("Additional Salary", ads_name)
 			ads_doc.amount += item_cost
 		
@@ -79,7 +80,7 @@ def create_remaining_payments():
 			ads_doc = frappe.new_doc("Additional Salary")
 			ads_doc.salary_component = salary_component
 			ads_doc.employee = sd_doc.employee
-			ads_doc.payroll_date = today if not emp_data.relieving_date else emp_data.relieving_date
+			ads_doc.payroll_date = todays_date if not emp_data.relieving_date else emp_data.relieving_date
 			ads_doc.currency = emp_data.salary_currency
 			ads_doc.amount = item_cost if not emp_data.relieving_date else item_cost * sd_doc.remaining_payments
 			ads_doc.overwrite_salary_structure_amount = 1
