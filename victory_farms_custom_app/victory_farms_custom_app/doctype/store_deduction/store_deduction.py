@@ -85,9 +85,9 @@ def create_remaining_payments():
 			ads_doc.amount = item_cost if not emp_data.relieving_date else item_cost * sd_doc.remaining_payments
 			ads_doc.overwrite_salary_structure_amount = 1
 		try:
-			opening_balance = (sd_doc.remaining_payments + 1) * item_cost
+			opening_balance = sd_doc.remaining_payments * item_cost
 			if not emp_data.relieving_date:
-				closing_balance = sd_doc.remaining_payments * item_cost
+				closing_balance = (sd_doc.remaining_payments - 1) * item_cost
 			else:
 				closing_balance = 0
 			ads_doc.append("custom_store_deduction_details", {
