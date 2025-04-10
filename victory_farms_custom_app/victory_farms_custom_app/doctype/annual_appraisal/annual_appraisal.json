@@ -13,6 +13,7 @@
   "posting_date",
   "department",
   "bonus_potential_department",
+  "bonus_potential_company",
   "section_break_l63r",
   "quarterly_department_details",
   "section_break_hnap",
@@ -23,8 +24,16 @@
   "column_break_jyxn",
   "q3_avg",
   "q4_avg",
-  "total_individual_score",
-  "amended_from"
+  "amended_from",
+  "section_break_abqn",
+  "q1_individual",
+  "q2_individual",
+  "company_score",
+  "final_score",
+  "column_break_sqol",
+  "q3_individual",
+  "q4_individual",
+  "total_individual_score"
  ],
  "fields": [
   {
@@ -151,12 +160,56 @@
    "no_copy": 1,
    "options": "Appraisal Payout",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_abqn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "q1_individual",
+   "fieldtype": "Float",
+   "label": "Q1 Individual"
+  },
+  {
+   "fieldname": "q2_individual",
+   "fieldtype": "Float",
+   "label": "Q2 Individual"
+  },
+  {
+   "fieldname": "column_break_sqol",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "q3_individual",
+   "fieldtype": "Float",
+   "label": "Q3 Individual"
+  },
+  {
+   "fieldname": "q4_individual",
+   "fieldtype": "Float",
+   "label": "Q4 Individual"
+  },
+  {
+   "fieldname": "company_score",
+   "fieldtype": "Float",
+   "label": "Company Score"
+  },
+  {
+   "fieldname": "final_score",
+   "fieldtype": "Float",
+   "label": "Final Score"
+  },
+  {
+   "fetch_from": "employee.custom_companygroup_bonus",
+   "fieldname": "bonus_potential_company",
+   "fieldtype": "Percent",
+   "label": "Bonus Potential (Company)"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-04-01 08:26:17.959235",
+ "modified": "2025-04-10 13:05:00.944135",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Annual Appraisal",
