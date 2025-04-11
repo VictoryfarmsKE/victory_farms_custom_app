@@ -19,7 +19,6 @@
   "section_break_hnap",
   "q1_avg",
   "q2_avg",
-  "total_avg",
   "appraisal_payout",
   "column_break_jyxn",
   "q3_avg",
@@ -28,12 +27,15 @@
   "section_break_abqn",
   "q1_individual",
   "q2_individual",
-  "company_score",
-  "final_score",
   "column_break_sqol",
   "q3_individual",
   "q4_individual",
-  "total_individual_score"
+  "total_section",
+  "total_individual_score",
+  "company_score",
+  "column_break_yjbw",
+  "total_avg",
+  "final_score"
  ],
  "fields": [
   {
@@ -86,7 +88,8 @@
   },
   {
    "fieldname": "section_break_hnap",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Quarterly"
   },
   {
    "fieldname": "q1_avg",
@@ -163,7 +166,8 @@
   },
   {
    "fieldname": "section_break_abqn",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Individual"
   },
   {
    "fieldname": "q1_individual",
@@ -204,12 +208,21 @@
    "fieldname": "bonus_potential_company",
    "fieldtype": "Percent",
    "label": "Bonus Potential (Company)"
+  },
+  {
+   "fieldname": "total_section",
+   "fieldtype": "Section Break",
+   "label": "Total"
+  },
+  {
+   "fieldname": "column_break_yjbw",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-04-10 13:05:00.944135",
+ "modified": "2025-04-11 15:34:01.443267",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Annual Appraisal",
@@ -229,6 +242,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
