@@ -83,7 +83,6 @@ class AnnualAppraisal(Document):
 
         for row in dep_quarter_data:
             dep_avg = flt(flt(dep_quarter_data[row] / 3, 2) * row[2] / 100, 2)
-            self.total_individual_score += self.get(f"{row[0].lower()}_individual")
             if row[0] == "Q1":
                 self.q1_avg += dep_avg
             elif row[0] == "Q2":
@@ -93,7 +92,7 @@ class AnnualAppraisal(Document):
             else:
                 self.q4_avg += dep_avg
 
-        self.total_individual_score /= 4
+        self.total_individual_score = flt((self.q1_individual + self.q2_individual + self.q3_individual + self.q4_individual) / 4, 2)
         self.total_avg = flt((self.q1_avg + self.q2_avg + self.q3_avg + self.q4_avg) / 4, 2)
 
     def get_employee_department_data(self):
