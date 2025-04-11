@@ -76,8 +76,6 @@ class AnnualAppraisal(Document):
             dep_quarter_data.setdefault((row.quarter, row.department, weightage), 0) 
             dep_quarter_data[(row.quarter, row.department, weightage)] += row.total_goal_score
 
-        self.total_individual_score /= 12
-
         self.q1_avg = 0
         self.q2_avg = 0
         self.q3_avg = 0
@@ -85,6 +83,7 @@ class AnnualAppraisal(Document):
 
         for row in dep_quarter_data:
             dep_avg = flt(flt(dep_quarter_data[row] / 3, 2) * row[2] / 100, 2)
+            self.total_individual_score += self.get(f"{row[0].lower()}_individual")
             if row[0] == "Q1":
                 self.q1_avg += dep_avg
             elif row[0] == "Q2":
@@ -93,9 +92,9 @@ class AnnualAppraisal(Document):
                 self.q3_avg += dep_avg
             else:
                 self.q4_avg += dep_avg
-            
+
+        self.total_individual_score /= 4
         self.total_avg = flt((self.q1_avg + self.q2_avg + self.q3_avg + self.q4_avg) / 4, 2)
-        
 
     def get_employee_department_data(self):
         return frappe.db.get_all("Department Details", {"parent": self.employee}, ["department", "weightage"])
@@ -159,17 +158,4 @@ class AnnualAppraisal(Document):
             self.bonus_potential * self.company_score
         ])
 
-        self.final_score = total / (self.bonus_potential + self.bonus_potential + self.bonus_potential)
-        
-  
-# total_individual_score
-# total_avg
-# company_score
-# bonus_potential
-# bonus_potential_department
-# bonus_potential_company
-
-# total=SUM(bonus_potential%*total_individual_score,bonus_potential%*total_avg,bonus_potential%*company_score)
-# SUM(5%*D33,20%*E33,5%*F33)
-
-# self.total_score =total/(bonus_potential+bonus_potential+bonus_potential)
+        self.final_score = flt(total / (self.bonus_potential + self.bonus_potential + self.bonus_potential), 2)
