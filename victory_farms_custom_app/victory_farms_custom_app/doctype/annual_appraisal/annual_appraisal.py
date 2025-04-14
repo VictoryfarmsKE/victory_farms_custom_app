@@ -153,8 +153,8 @@ class AnnualAppraisal(Document):
 
         total = sum([
             self.bonus_potential * self.total_individual_score,
-            self.bonus_potential * self.total_avg,
-            self.bonus_potential * self.company_score
+            self.bonus_potential_department * self.total_avg,
+            self.bonus_potential_company * self.company_score
         ])
 
-        self.final_score = flt(total / (self.bonus_potential + self.bonus_potential + self.bonus_potential), 2)
+        self.final_score = flt(total / (self.bonus_potential + self.bonus_potential_department + self.bonus_potential_company), 2)
