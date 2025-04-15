@@ -9,10 +9,6 @@ from datetime import datetime
 
 
 class AnnualAppraisal(Document):
-
-    def validate(self):
-        self.get_individual_score()
-        
     def on_submit(self):
         self.create_appraisal_payout()
 
@@ -82,7 +78,7 @@ class AnnualAppraisal(Document):
         self.q4_avg = 0
 
         for row in dep_quarter_data:
-            dep_avg = flt(flt(dep_quarter_data[row] / 3, 2) * row[2] / 100, 2)
+            dep_avg = flt((dep_quarter_data[row] / 3) * (row[2] / 100), 3)
             if row[0] == "Q1":
                 self.q1_avg += dep_avg
             elif row[0] == "Q2":
@@ -94,6 +90,26 @@ class AnnualAppraisal(Document):
 
         self.total_individual_score = flt((self.q1_individual + self.q2_individual + self.q3_individual + self.q4_individual) / 4, 2)
         self.total_avg = flt((self.q1_avg + self.q2_avg + self.q3_avg + self.q4_avg) / 4, 2)
+        
+        december_start = datetime(int(self.fiscal_year), 12, 1).date()
+        december_end = datetime(int(self.fiscal_year), 12, 31).date()
+
+        appraisal_cycle = frappe.db.get_value("Appraisal Cycle", {"start_date": ["<=", december_start], "end_date": [">=", december_end]}, "name")
+        self.company_score = frappe.db.get_value("Company Appraisal",{"appraisal_cycle": appraisal_cycle,"docstatus":1},"score")
+
+        if not self.company_score:
+            self.company_score = 0
+            frappe.msgprint("No Company Appraisal found for the given date range.")
+        
+        self.company_score  = flt(self.company_score * (5 / 100), 3)
+
+        total = flt(sum([
+            self.bonus_potential * self.total_individual_score,
+            self.bonus_potential_department* self.total_avg,
+            self.bonus_potential_company * self.company_score
+        ]), 3)
+
+        self.final_score = flt(total / (self.bonus_potential + self.bonus_potential_department + self.bonus_potential_company),3)
 
     def get_employee_department_data(self):
         return frappe.db.get_all("Department Details", {"parent": self.employee}, ["department", "weightage"])
@@ -137,24 +153,3 @@ class AnnualAppraisal(Document):
             & (APC.start_date[quarter_data["Year"][0] : quarter_data["Year"][1]])).orderby(APC.start_date)
 
         return query.run(as_dict = 1)
-
-    def get_individual_score(self):
-        december_start = datetime(int(self.fiscal_year), 12, 1).date()
-        december_end = datetime(int(self.fiscal_year), 12, 31).date()
-
-        appraisal_cycle = frappe.db.get_value("Appraisal Cycle", {"start_date": ["<=", december_start], "end_date": [">=", december_end]}, "name")
-        self.company_score = frappe.db.get_value("Company Appraisal",{"appraisal_cycle": appraisal_cycle,"docstatus":1},"score")
-
-        if not self.company_score:
-            self.company_score = 0
-            frappe.msgprint("No Company Appraisal found for the given date range.")
-        
-        self.company_score  = self.company_score * (5 / 100)
-
-        total = sum([
-            self.bonus_potential * self.total_individual_score,
-            self.bonus_potential_department * self.total_avg,
-            self.bonus_potential_company * self.company_score
-        ])
-
-        self.final_score = flt(total / (self.bonus_potential + self.bonus_potential_department + self.bonus_potential_company), 2)

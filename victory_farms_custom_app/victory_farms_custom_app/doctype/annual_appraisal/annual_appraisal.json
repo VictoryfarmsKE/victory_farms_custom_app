@@ -172,12 +172,14 @@
   {
    "fieldname": "q1_individual",
    "fieldtype": "Float",
-   "label": "Q1 Individual"
+   "label": "Q1 Individual",
+   "read_only": 1
   },
   {
    "fieldname": "q2_individual",
    "fieldtype": "Float",
-   "label": "Q2 Individual"
+   "label": "Q2 Individual",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_sqol",
@@ -186,22 +188,26 @@
   {
    "fieldname": "q3_individual",
    "fieldtype": "Float",
-   "label": "Q3 Individual"
+   "label": "Q3 Individual",
+   "read_only": 1
   },
   {
    "fieldname": "q4_individual",
    "fieldtype": "Float",
-   "label": "Q4 Individual"
+   "label": "Q4 Individual",
+   "read_only": 1
   },
   {
    "fieldname": "company_score",
    "fieldtype": "Float",
-   "label": "Company Score"
+   "label": "Company Score",
+   "read_only": 1
   },
   {
    "fieldname": "final_score",
    "fieldtype": "Float",
-   "label": "Final Score"
+   "label": "Final Score",
+   "read_only": 1
   },
   {
    "fetch_from": "employee.custom_companygroup_bonus",
@@ -222,7 +228,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-04-11 15:34:01.443267",
+ "modified": "2025-04-11 16:06:00.304026",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Annual Appraisal",
