@@ -12,8 +12,7 @@
   "appraisal_cycle",
   "column_break_3jjj",
   "weightage",
-  "score",
-  "individual_score"
+  "score"
  ],
  "fields": [
   {
@@ -55,22 +54,19 @@
    "fieldtype": "Link",
    "label": "Appraisal Cycle",
    "options": "Appraisal Cycle"
-  },
-  {
-   "fieldname": "individual_score",
-   "fieldtype": "Float",
-   "label": "Individual Score"
   }
  ],
+ "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-31 13:12:41.008993",
+ "modified": "2025-04-15 15:40:17.466565",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Quarterly Department Details",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

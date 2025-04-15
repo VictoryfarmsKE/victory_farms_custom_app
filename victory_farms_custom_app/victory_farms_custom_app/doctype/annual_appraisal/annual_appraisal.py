@@ -5,6 +5,8 @@ import frappe
 from frappe.utils import getdate, get_quarter_ending, get_year_start, get_year_ending, flt, get_first_day, get_last_day
 from frappe.model.document import Document
 from datetime import datetime
+from frappe.query_builder.custom import ConstantColumn
+
 
 
 
@@ -56,7 +58,7 @@ class AnnualAppraisal(Document):
 
         dep_quarter_data = frappe._dict({})
         self.quarterly_department_details = []
-
+        individual_scr = 0
         for row in dep_score_data:
             weightage = self.department_map[row.department]
             self.append("quarterly_department_details", {
@@ -64,14 +66,15 @@ class AnnualAppraisal(Document):
                 "appraisal_cycle": row.appraisal_cycle,
                 "department": row.department,
                 "weightage": weightage,
-                "score": row.total_goal_score,
-                "individual_score": row.get("custom_total_individual_goal_score")
+                "score": row.total_goal_score
             })
             if self.get(f"{row.quarter.lower()}_individual") != row.get("custom_total_individual_goal_score"):
+                individual_scr += int(row.get("count")) if row.get("count") else 0
                 self.db_set(f"{row.quarter.lower()}_individual", row.get("custom_total_individual_goal_score") if row.get("custom_total_individual_goal_score") else 0)
             dep_quarter_data.setdefault((row.quarter, row.department, weightage), 0) 
             dep_quarter_data[(row.quarter, row.department, weightage)] += row.total_goal_score
-
+        print(">>>>>>>>>>",individual_scr)
+        score_count = individual_scr
         self.q1_avg = 0
         self.q2_avg = 0
         self.q3_avg = 0
@@ -87,8 +90,8 @@ class AnnualAppraisal(Document):
                 self.q3_avg += dep_avg
             else:
                 self.q4_avg += dep_avg
-
-        self.total_individual_score = flt((self.q1_individual + self.q2_individual + self.q3_individual + self.q4_individual) / 4, 2)
+        
+        self.total_individual_score = flt((self.q1_individual + self.q2_individual + self.q3_individual + self.q4_individual) / score_count, 2)
         self.total_avg = flt((self.q1_avg + self.q2_avg + self.q3_avg + self.q4_avg) / 4, 2)
         
         december_start = datetime(int(self.fiscal_year), 12, 1).date()
@@ -136,12 +139,12 @@ class AnnualAppraisal(Document):
         APC = frappe.qb.DocType("Appraisal Cycle")
         APP = frappe.qb.DocType("Appraisal")
 
-        indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(APP.custom_total_individual_goal_score, APP.appraisal_cycle, APC.start_date
+        indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(APP.custom_total_individual_goal_score, ConstantColumn(1).as_("count"), APP.appraisal_cycle, APC.start_date
             ).where((APP.employee == self.employee)  & (APP.docstatus == 1) 
             & (APC.end_date.isin(quarter_data["dates"]))).orderby(APC.start_date)
 
 
-        query = frappe.qb.from_(DPA).inner_join(APC).on(DPA.appraisal_cycle == APC.name).left_join(indi_query).on((indi_query.appraisal_cycle == APC.name) & (indi_query.start_date == APC.start_date)).select(DPA.department, DPA.appraisal_cycle, indi_query.custom_total_individual_goal_score,
+        query = frappe.qb.from_(DPA).inner_join(APC).on(DPA.appraisal_cycle == APC.name).left_join(indi_query).on((indi_query.appraisal_cycle == APC.name) & (indi_query.start_date == APC.start_date)).select(DPA.department, DPA.appraisal_cycle, indi_query.custom_total_individual_goal_score, indi_query.count,
             DPA.total_goal_score,
             frappe.qb.terms.Case()
             .when(APC.start_date[quarter_data["Q1"][0] : quarter_data["Q1"][1]], "Q1")
@@ -151,5 +154,6 @@ class AnnualAppraisal(Document):
             .else_("No Quarter").as_("quarter")
             ).where((DPA.department.isin(list(self.department_map.keys()))) & (DPA.docstatus == 1) 
             & (APC.start_date[quarter_data["Year"][0] : quarter_data["Year"][1]])).orderby(APC.start_date)
-
+        data = query.run(as_dict = 1)
+        print(f"{data}")
         return query.run(as_dict = 1)

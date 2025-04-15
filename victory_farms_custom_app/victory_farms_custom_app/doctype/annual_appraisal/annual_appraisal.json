@@ -151,7 +151,7 @@
    "options": "Department"
   },
   {
-   "fetch_from": "department.bonus_potential",
+   "fetch_from": "employee.custom_department_bonus_potential_",
    "fieldname": "bonus_potential_department",
    "fieldtype": "Percent",
    "label": "Bonus Potential (Department)"
@@ -228,7 +228,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-04-11 16:06:00.304026",
+ "modified": "2025-04-15 12:35:40.931757",
  "modified_by": "Administrator",
  "module": "Victory Farms Custom App",
  "name": "Annual Appraisal",
