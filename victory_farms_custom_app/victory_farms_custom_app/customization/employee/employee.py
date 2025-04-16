@@ -64,6 +64,8 @@ def duplicate_holiday_list(template_doc, emp):
     emp_holiday_doc = frappe.copy_doc(template_doc)
     emp_holiday_doc.holiday_list_name = holiday_list_name
     emp_holiday_doc.custom_template_holiday_list = 0
+    emp_holiday_doc.employee = emp
+    emp_holiday_doc.fiscal_year = template_doc.custom_fiscal_year
     emp_holiday_doc.flags.ignore_permissions = True
     emp_holiday_doc.save()
     frappe.db.set_value("Employee", emp, "holiday_list", emp_holiday_doc.name)
