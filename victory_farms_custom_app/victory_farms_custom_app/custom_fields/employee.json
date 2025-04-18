@@ -2,6 +2,14 @@
  "Employee": [
   {
    "dt": "Employee",
+   "fieldname": "custom_appraisal_on_group",
+   "fieldtype": "Check",
+   "insert_after": "custom_department_bonus_potential_",
+   "label": "Appraisal On Group",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Employee",
    "fieldname": "custom_department_bonus_potential_",
    "fieldtype": "Percent",
    "insert_after": "bank",

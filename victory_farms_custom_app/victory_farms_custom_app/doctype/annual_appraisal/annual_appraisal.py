@@ -98,7 +98,15 @@ class AnnualAppraisal(Document):
         december_end = datetime(int(self.fiscal_year), 12, 31).date()
 
         appraisal_cycle = frappe.db.get_value("Appraisal Cycle", {"start_date": ["<=", december_start], "end_date": [">=", december_end]}, "name")
-        self.company_score = frappe.db.get_value("Company Appraisal",{"appraisal_cycle": appraisal_cycle,"docstatus":1},"score")
+        
+        employee_data = frappe.db.get_value("Employee", self.employee, ["custom_appraisal_on_group", "company"], as_dict=1)
+        
+        if employee_data.get("custom_appraisal_on_group"):
+            company = frappe.db.get_single_value("Navari Custom Payroll Setting", "group_company")
+        else:
+            company = employee_data.get("company")
+            
+        self.company_score = frappe.db.get_value("Company Appraisal",{"appraisal_cycle": appraisal_cycle,"docstatus":1, "company": company},"score")
 
         if not self.company_score:
             self.company_score = 0
