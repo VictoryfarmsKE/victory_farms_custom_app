@@ -73,7 +73,7 @@ class AnnualAppraisal(Document):
                 self.db_set(f"{row.quarter.lower()}_individual", row.get("custom_total_individual_goal_score") if row.get("custom_total_individual_goal_score") else 0)
             dep_quarter_data.setdefault((row.quarter, row.department, weightage), 0) 
             dep_quarter_data[(row.quarter, row.department, weightage)] += row.total_goal_score
-        print(">>>>>>>>>>",individual_scr)
+
         score_count = individual_scr
         self.q1_avg = 0
         self.q2_avg = 0
@@ -162,6 +162,5 @@ class AnnualAppraisal(Document):
             .else_("No Quarter").as_("quarter")
             ).where((DPA.department.isin(list(self.department_map.keys()))) & (DPA.docstatus == 1) 
             & (APC.start_date[quarter_data["Year"][0] : quarter_data["Year"][1]])).orderby(APC.start_date)
-        data = query.run(as_dict = 1)
-        print(f"{data}")
+
         return query.run(as_dict = 1)
