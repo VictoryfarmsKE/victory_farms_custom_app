@@ -6,6 +6,16 @@ def create_additional_salary(self):
     if self.status != "Approved":
         return
 
+    # Check if Leave Type is "Unpaid Leave" and Employee Grade contains "H"
+    employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
+    if self.leave_type == "Unpaid Leave" and employee_grade and "H" in employee_grade:
+        frappe.msgprint(
+            msg="Additional Salary will not be created for 'Unpaid Leave' when the employee grade contains 'H'.",
+            title="Notice",
+            indicator="orange"
+        )
+        return  # Prevent additional salary creation
+
     salary_component = frappe.db.get_value("Leave Type", self.leave_type, "custom_salary_component")
 
     if not salary_component:
