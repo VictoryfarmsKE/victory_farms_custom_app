@@ -43,7 +43,6 @@ def get_columns():
             "width": 250,
         }
     ]
-
 def get_data(filters):
     months = {
         "January": 1,
@@ -88,19 +87,24 @@ def get_data(filters):
     
     data = query.run(as_dict=True)
 
-    # List of bonus components to fetch
-    bonus_components = {
+    # List of salary components to fetch and subtract from gross
+    components_to_subtract = {
         "bonus_individual_quarterly": "Bonus Individual (Quarterly)",
         "bonus_department_quarterly": "Bonus Department (Quarterly)",
         "bonus_company_annual": "Bonus Company (Annual)",
         "bonus_individual_annual": "Bonus Individual (Annual)",
         "bonus_department_annual": "Bonus Department (Annual)",
+        "notice_allowance": "Notice Allowance",
+        "notice_pay_deduction": "Notice Pay Deduction",
+        "in_lieu_of_notice_deduction": "In Lieu of notice-Deduction",
+        "gratuity": "Gratuity",
+        "leave_encashment": "Leave Encashment",
     }
 
     for row in data:
-        total_bonus = 0.0
-        for field, component in bonus_components.items():
-            bonus = frappe.db.get_value(
+        total_subtractions = 0.0
+        for field, component in components_to_subtract.items():
+            amount = frappe.db.get_value(
                 "Salary Detail",
                 {
                     "parent": row["salary_slip_name"],
@@ -109,10 +113,10 @@ def get_data(filters):
                 },
                 "amount"
             )
-            row[field] = bonus or 0.0
-            total_bonus += row[field]
-        # Subtract total bonuses from gross_pay
-        row["gross_pay"] = (row["gross_pay"] or 0.0) - total_bonus
+            row[field] = amount or 0.0
+            total_subtractions += row[field]
+        # Subtract all specified components from gross_pay
+        row["gross_pay"] = (row["gross_pay"] or 0.0) - total_subtractions
         row.pop("salary_slip_name", None)
 
     return data
