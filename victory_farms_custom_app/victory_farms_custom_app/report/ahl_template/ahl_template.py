@@ -8,7 +8,6 @@ def execute(filters=None):
 
     return columns, data
 
-
 def get_columns():
     return [
         {
@@ -42,7 +41,7 @@ def get_columns():
             "fieldname": "gross_pay",
             "fieldtype": "Currency",
             "width": 250,
-        },
+        }
     ]
 
 def get_data(filters):
@@ -62,18 +61,18 @@ def get_data(filters):
     }
     emp = frappe.qb.DocType("Employee")
     salary_slip = frappe.qb.DocType("Salary Slip")
-
+    
     query = (
         frappe.qb.from_(emp)
         .inner_join(salary_slip)
         .on(emp.name == salary_slip.employee)
         .select(
             emp.name.as_("employee"),
-            (emp.national_id),
-            (emp.name),
-            (emp.employee_name),
-            (emp.tax_id),
-            (salary_slip.gross_pay)
+            emp.employee_name,
+            emp.national_id,
+            emp.tax_id,
+            salary_slip.gross_pay,
+            salary_slip.name.as_("salary_slip_name")
         )
         .where(salary_slip.docstatus == 1)
     )
@@ -81,11 +80,39 @@ def get_data(filters):
     if filters.get("employee"):
         query = query.where(emp.name == filters["employee"])
 
-
     start_date = datetime(int(filters.get("year")), months.get(filters.get("month")), 1).date()
     end_date = frappe.utils.get_last_day(start_date)
 
     query = query.where(salary_slip.start_date >= start_date)
     query = query.where(salary_slip.end_date <= end_date)
     
-    return query.run(as_dict=True)
+    data = query.run(as_dict=True)
+
+    # List of bonus components to fetch
+    bonus_components = {
+        "bonus_individual_quarterly": "Bonus Individual (Quarterly)",
+        "bonus_department_quarterly": "Bonus Department (Quarterly)",
+        "bonus_company_annual": "Bonus Company (Annual)",
+        "bonus_individual_annual": "Bonus Individual (Annual)",
+        "bonus_department_annual": "Bonus Department (Annual)",
+    }
+
+    for row in data:
+        total_bonus = 0.0
+        for field, component in bonus_components.items():
+            bonus = frappe.db.get_value(
+                "Salary Detail",
+                {
+                    "parent": row["salary_slip_name"],
+                    "parenttype": "Salary Slip",
+                    "salary_component": component
+                },
+                "amount"
+            )
+            row[field] = bonus or 0.0
+            total_bonus += row[field]
+        # Subtract total bonuses from gross_pay
+        row["gross_pay"] = (row["gross_pay"] or 0.0) - total_bonus
+        row.pop("salary_slip_name", None)
+
+    return data
