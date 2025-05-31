@@ -15,7 +15,7 @@ def create_leave_allocation(leave_type, is_earned_leave=0):
 		is_earned_leave = int(is_earned_leave)
 
 	lt_data = frappe.db.get_value("Leave Type", leave_type, ["applicable_after", "max_leaves_allowed", "custom_based_on_employee_grade"], as_dict=1)
-	employee_filters = {"date_of_joining": ["<=", add_days(today(), days=-(lt_data.applicable_after))]}
+	employee_filters = {}
 	if lt_data.custom_based_on_employee_grade:
 		grade_list = frappe.db.get_all("Leave Grade", {"parent": leave_type}, pluck="employee_grade")
 		if grade_list:
@@ -23,10 +23,7 @@ def create_leave_allocation(leave_type, is_earned_leave=0):
 
 	employee_data = frappe.db.get_all("Employee", employee_filters, ["name", "date_of_joining"])
 
-	if get_last_day(today()) == today():
-		from_date = add_days(today(), days=1) if is_earned_leave else get_year_start(today())
-	else:
-		from_date = get_first_day(today()) if is_earned_leave else get_year_start(today())
+	from_date = get_year_start(today())
 
 	to_date = get_year_ending(today())
 
@@ -38,17 +35,16 @@ def create_leave_allocation(leave_type, is_earned_leave=0):
 			allocated_leaves = flt(allocated_leaves * condition_value / 12, 2)
 			employee_from_date = employee.date_of_joining
 
-		
+		if from_date < employee.date_of_joining:
+			employee_from_date = employee.date_of_joining
 		update_new_leaves_allocated(employee.name, leave_type, employee_from_date, to_date, allocated_leaves)
 
 
 def update_new_leaves_allocated(employee_name, leave_type, from_date, to_date, allocated_leaves):
-	year_start_date = get_year_start(today())
-	# to_date = get_year_ending(year_start_date)
-	from_date = year_start_date if from_date < year_start_date else from_date
-	if leave_allocation := frappe.get_doc("Leave Allocation", {"employee": employee_name, "leave_type": leave_type,"from_date":  from_date, "to_date": to_date}):
+
+	if leave_allocation := frappe.get_doc("Leave Allocation", {"employee": employee_name, "leave_type": leave_type, "to_date": to_date}):
 		leave_allocation.new_leaves_allocated += allocated_leaves
-		leave_allocation.add_comment(text=_("Auto Allocation of {0} Days has been added").fromat(allocated_leaves))
+		leave_allocation.add_comment(text=_("Auto Allocation of {0} Days has been added").format(allocated_leaves))
 		leave_allocation.save()
 	
 	else:
@@ -59,5 +55,5 @@ def update_new_leaves_allocated(employee_name, leave_type, from_date, to_date, a
 		leave_allocation.to_date = to_date
 		leave_allocation.new_leaves_allocated = allocated_leaves
 		leave_allocation.carry_forward = True
-		leave_allocation.add_comment(text=_("Auto Allocation of {0} Days has been added").fromat(allocated_leaves))
+		leave_allocation.add_comment(text=_("Auto Allocation of {0} Days has been added").format(allocated_leaves))
 		leave_allocation.save()

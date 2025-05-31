@@ -58,7 +58,7 @@ class StoreDeduction(Document):
 def create_remaining_payments():
 	from frappe.utils import today
 	todays_date = today()
-	if get_last_day(todays_date) != todays_date:
+	if str(get_last_day(todays_date)) != str(todays_date):
 		return
 
 	ads_list = frappe.db.get_all("Store Deduction", {"remaining_payments": [">", 0], "docstatus": 1}, pluck = "name")
