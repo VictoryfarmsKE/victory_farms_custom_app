@@ -1,56 +1,91 @@
 import frappe
+from frappe import _
 from frappe.utils import flt, get_last_day, date_diff
 from datetime import timedelta
+from victory_farms_custom_app.victory_farms_custom_app.customization.leave_allocation.leave_allocation import get_assigned_salary_structure_assignment
 
 def create_additional_salary(self):
-    if self.status != "Approved":
-        return
+	if self.status != "Approved":
+		return
 
-    # Check if Leave Type is "Unpaid Leave" and Employee Grade contains "H"
-    employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
-    if self.leave_type == "Unpaid Leave" and employee_grade and "H" in employee_grade:
-        frappe.msgprint(
-            msg="Additional Salary will not be created for 'Unpaid Leave' when the employee grade contains 'H'.",
-            title="Notice",
-            indicator="orange"
-        )
-        return  # Prevent additional salary creation
+	# Check if Leave Type is "Unpaid Leave" and Employee Grade contains "H"
+	employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
+	if self.leave_type == "Unpaid Leave" and employee_grade and "H" in employee_grade:
+		frappe.msgprint(
+			msg="Additional Salary will not be created for 'Unpaid Leave' when the employee grade contains 'H'.",
+			title="Notice",
+			indicator="orange"
+		)
+		return  # Prevent additional salary creation
 
-    salary_component = frappe.db.get_value("Leave Type", self.leave_type, "custom_salary_component")
+	salary_component = frappe.db.get_value("Leave Type", self.leave_type, "custom_salary_component")
 
-    if not salary_component:
-        return
-    
-    gross_pay, currency = frappe.db.get_value("Employee", self.employee, ["ctc", "salary_currency"])
+	if not salary_component:
+		return
+	
+	gross_pay, currency = frappe.db.get_value("Employee", self.employee, ["ctc", "salary_currency"])
 
-    daily_pay = gross_pay / 30
+	daily_pay = gross_pay / 30
 
-    date_range = {}
+	date_range = {}
 
-    month_last_day = get_last_day(self.from_date)
-    next_month_last_date = None
-    if month_last_day >= self.to_date:
-        date_range.update({month_last_day : [self.from_date, self.to_date]})
-    else:
-        next_month_start_date = month_last_day + timedelta(days = 1)
-        next_month_last_date = get_last_day(self.to_date)
-        date_range.update({month_last_day : [self.from_date, month_last_day], next_month_last_date : [next_month_start_date, self.to_date]})
+	month_last_day = get_last_day(self.from_date)
+	next_month_last_date = None
+	if month_last_day >= self.to_date:
+		date_range.update({month_last_day : [self.from_date, self.to_date]})
+	else:
+		next_month_start_date = month_last_day + timedelta(days = 1)
+		next_month_last_date = get_last_day(self.to_date)
+		date_range.update({month_last_day : [self.from_date, month_last_day], next_month_last_date : [next_month_start_date, self.to_date]})
 
-    for row in date_range:
-        leave_days = (date_diff(date_range[row][1], date_range[row][0]) + 1 )if date_range[row][1] != date_range[row][0] else 1
+	for row in date_range:
+		leave_days = (date_diff(date_range[row][1], date_range[row][0]) + 1 )if date_range[row][1] != date_range[row][0] else 1
 
-        if add_doc_name := frappe.db.get_value("Additional Salary", {"docstatus": 0, "employee": self.employee, "salary_component": salary_component, "payroll_date": row}):
-            ads_doc = frappe.get_doc("Additional Salary", add_doc_name)
-            ads_doc.amount += flt(leave_days * daily_pay, self.precision)
-        else:
-            ads_doc = frappe.new_doc("Additional Salary")
-            ads_doc.employee = self.employee
-            ads_doc.salary_component = salary_component
-            ads_doc.currency = currency
-            ads_doc.payroll_date = row
-            ads_doc.amount = flt(leave_days * daily_pay, self.precision)
-        # ads_doc.ref_doctype = "Leave Application"
-        # ads_doc.ref_docname = self.name
+		if add_doc_name := frappe.db.get_value("Additional Salary", {"docstatus": 0, "employee": self.employee, "salary_component": salary_component, "payroll_date": row}):
+			ads_doc = frappe.get_doc("Additional Salary", add_doc_name)
+			ads_doc.amount += flt(leave_days * daily_pay, self.precision)
+		else:
+			ads_doc = frappe.new_doc("Additional Salary")
+			ads_doc.employee = self.employee
+			ads_doc.salary_component = salary_component
+			ads_doc.currency = currency
+			ads_doc.payroll_date = row
+			ads_doc.amount = flt(leave_days * daily_pay, self.precision)
+		# ads_doc.ref_doctype = "Leave Application"
+		# ads_doc.ref_docname = self.name
 
-        ads_doc.save()
-    # ads_doc.submit()
+		ads_doc.save()
+	# ads_doc.submit()
+
+def create_reverse_jv(self):
+	if not frappe.db.get_value("Leave Type", self.leave_type, "custom_create_liability_entries"):
+		return
+	
+	liability_accounts = frappe.get_cached_value("Company", self.company, ["custom_default_debit_account", "custom_default_credit_account"], as_dict=True)
+
+	if not liability_accounts.get("custom_default_debit_account") or not liability_accounts.get("custom_default_credit_account"):
+		frappe.throw(_("Please set the default debit and credit accounts in Company"))
+	
+	assigned_ssa = get_assigned_salary_structure_assignment(self.employee, frappe.utils.today())
+
+	base_amount = frappe.db.get_value("Salary Structure Assignment", assigned_ssa, "base") / 30
+
+	actual_amount = self.total_leave_days * base_amount
+	
+	jv_doc = frappe.new_doc("Journal Entry")
+	jv_doc.voucher_type = "Journal Entry"
+	jv_doc.company = self.company
+	jv_doc.posting_date = frappe.utils.today()
+
+	jv_doc.cheque_no = self.name
+	jv_doc.cheque_date = frappe.utils.today()
+
+	jv_doc.append("accounts", {
+		"account": liability_accounts.custom_default_debit_account,
+		"credit_in_account_currency": actual_amount
+	})
+	jv_doc.append("accounts", {
+		"account": liability_accounts.custom_default_credit_account,
+		"debit_in_account_currency": actual_amount
+	})
+	jv_doc.save()

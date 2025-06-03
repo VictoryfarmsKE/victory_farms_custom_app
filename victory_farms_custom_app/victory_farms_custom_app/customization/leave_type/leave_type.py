@@ -3,7 +3,7 @@ from frappe import _
 from frappe.utils import today, add_days, flt, get_year_ending, month_diff, get_year_start, get_first_day, get_last_day
 
 def auto_create_leave_allocation():
-	if get_last_day(today()) == today():
+	if str(get_last_day(today())) == str(today()):
 		leave_type_list = frappe.db.get_all("Leave Type", {"custom_create_auto_allocation": 1, "is_earned_leave": 1}, pluck="name")
 
 		for row in leave_type_list:
@@ -37,7 +37,10 @@ def create_leave_allocation(leave_type, is_earned_leave=0):
 
 		if from_date < employee.date_of_joining:
 			employee_from_date = employee.date_of_joining
-		update_new_leaves_allocated(employee.name, leave_type, employee_from_date, to_date, allocated_leaves)
+		try:
+			update_new_leaves_allocated(employee.name, leave_type, employee_from_date, to_date, allocated_leaves)
+		except Exception as e:
+			frappe.log_error(title = "Leave Allocation Error", message = f"{e}")
 
 
 def update_new_leaves_allocated(employee_name, leave_type, from_date, to_date, allocated_leaves):
