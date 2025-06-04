@@ -110,7 +110,7 @@ class AnnualAppraisal(Document):
         employee_data = frappe.db.get_value("Employee", self.employee, ["custom_appraisal_on_group", "company"], as_dict=1)
         
         if employee_data.get("custom_appraisal_on_group"):
-            company = frappe.db.get_single_value("Navari Custom Payroll Setting", "group_company")
+            company = frappe.db.get_single_value("Navari Custom Payroll Settings", "group_company")
         else:
             company = employee_data.get("company")
             
