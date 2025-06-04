@@ -36,12 +36,20 @@ class AnnualAppraisal(Document):
         department_bonus_percent = ap_doc.get_bonus_percent(self.bonus_potential_department, matrix_percent)
         department_bonus = (department_bonus_percent / 100) * bonus_calculation_amount
 
+        company_score_value = self.company_score
+        company_score = (company_score_value * 100) / 5
+        matrix_percent = ap_doc.get_matrix_percent(company_score)
+        company_bonus_percent = ap_doc.get_bonus_percent(self.company_bonus_potential, matrix_percent)
+        company_bonus = (company_bonus_percent / 100) * bonus_calculation_amount
+
         ap_doc.append("appraisal_payout_details",{
             "employee": self.employee, 
             "individual_score_value": self.total_individual_score,
             "department_score_value": self.total_avg,
+            "company_score_value": self.company_score,
             "individual_bonus": individual_bonus,
-            "department_bonus": department_bonus
+            "department_bonus": department_bonus,
+            "company_bonus": company_bonus
 
         })
         ap_doc.flags.ignore_permissions = True
