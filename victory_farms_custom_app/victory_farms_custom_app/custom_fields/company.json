@@ -1,0 +1,172 @@
+{
+ "Company": [
+  {
+   "dt": "Company",
+   "fieldname": "custom_leave_expense_account",
+   "fieldtype": "Link",
+   "insert_after": "custom_column_break_7frco",
+   "label": "Leave Expense Account",
+   "module": "Victory Farms Custom App",
+   "options": "Account"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "custom_column_break_7frco",
+   "fieldtype": "Column Break",
+   "insert_after": "custom_leave_liability_account",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "custom_leave_liability_account",
+   "fieldtype": "Link",
+   "insert_after": "custom_leave_liability_accounts",
+   "label": "Leave Liability Account",
+   "module": "Victory Farms Custom App",
+   "options": "Account"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "custom_leave_liability_accounts",
+   "fieldtype": "Section Break",
+   "insert_after": "unrealized_exchange_gain_loss_account",
+   "label": "Leave Liability Accounts",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "hr_settings_section",
+   "fieldtype": "Section Break",
+   "insert_after": "hr_and_payroll_tab",
+   "is_system_generated": 1,
+   "label": "HR & Payroll Settings",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "hr_and_payroll_tab",
+   "fieldtype": "Tab Break",
+   "insert_after": "credit_limit",
+   "is_system_generated": 1,
+   "label": "HR & Payroll",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "default_creditors_withholding_account",
+   "fieldtype": "Link",
+   "insert_after": "withholding_accounts",
+   "label": "Default Creditors Withholding Account",
+   "module": "Victory Farms Custom App",
+   "options": "Account"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "withholding_accounts",
+   "fieldtype": "Column Break",
+   "insert_after": "default_debitors_withholding_account",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "custom_withholding_accounts",
+   "fieldtype": "Section Break",
+   "insert_after": "default_finance_book",
+   "label": "Withholding Accounts",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "default_debitors_withholding_account",
+   "fieldtype": "Link",
+   "insert_after": "custom_withholding_accounts",
+   "label": "Default Debitors Withholding Account",
+   "module": "Victory Farms Custom App",
+   "options": "Account"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "custom_bonus_potential_company",
+   "fieldtype": "Percent",
+   "insert_after": "default_expense_claim_payable_account",
+   "label": "Bonus Potential Company",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "depends_on": "eval:!doc.__islocal",
+   "dt": "Company",
+   "fieldname": "default_payroll_payable_account",
+   "fieldtype": "Link",
+   "insert_after": "column_break_10",
+   "is_system_generated": 1,
+   "label": "Default Payroll Payable Account",
+   "module": "Victory Farms Custom App",
+   "no_copy": 1,
+   "options": "Account"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break",
+   "insert_after": "default_employee_advance_account",
+   "is_system_generated": 1,
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "default_employee_advance_account",
+   "fieldtype": "Link",
+   "insert_after": "default_expense_claim_payable_account",
+   "is_system_generated": 1,
+   "label": "Default Employee Advance Account",
+   "module": "Victory Farms Custom App",
+   "no_copy": 1,
+   "options": "Account"
+  },
+  {
+   "depends_on": "eval:!doc.__islocal",
+   "dt": "Company",
+   "fieldname": "default_expense_claim_payable_account",
+   "fieldtype": "Link",
+   "insert_after": "hr_settings_section",
+   "is_system_generated": 1,
+   "label": "Default Expense Claim Payable Account",
+   "module": "Victory Farms Custom App",
+   "no_copy": 1,
+   "options": "Account"
+  },
+  {
+   "depends_on": "posa_auto_referral",
+   "dt": "Company",
+   "fieldname": "posa_referral_campaign",
+   "fieldtype": "Link",
+   "insert_after": "dashboard_tab",
+   "label": "Referral Campaign",
+   "module": "Victory Farms Custom App",
+   "options": "Campaign"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "posa_column_break_22",
+   "fieldtype": "Column Break",
+   "insert_after": "posa_auto_referral",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "posa_auto_referral",
+   "fieldtype": "Check",
+   "insert_after": "posa_referral_section",
+   "label": "Auto Create Referral For New Customers",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Company",
+   "fieldname": "posa_referral_section",
+   "fieldtype": "Section Break",
+   "insert_after": "total_monthly_sales",
+   "label": "Referral Code",
+   "module": "Victory Farms Custom App"
+  }
+ ]
+}

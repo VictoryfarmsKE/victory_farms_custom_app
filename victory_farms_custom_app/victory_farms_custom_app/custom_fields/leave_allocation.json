@@ -1,0 +1,13 @@
+{
+ "Leave Allocation": [
+  {
+   "dt": "Leave Allocation",
+   "fieldname": "custom_journal_entries",
+   "fieldtype": "Table",
+   "insert_after": "description",
+   "label": "Journal Entries",
+   "module": "Victory Farms Custom App",
+   "options": "Liability JV"
+  }
+ ]
+}

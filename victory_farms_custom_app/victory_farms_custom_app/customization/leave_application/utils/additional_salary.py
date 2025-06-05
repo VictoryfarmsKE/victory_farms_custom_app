@@ -61,9 +61,9 @@ def create_reverse_jv(self):
 	if not frappe.db.get_value("Leave Type", self.leave_type, "custom_create_liability_entries"):
 		return
 	
-	liability_accounts = frappe.get_cached_value("Company", self.company, ["custom_default_debit_account", "custom_default_credit_account"], as_dict=True)
+	liability_accounts = frappe.get_cached_value("Company", self.company, ["custom_leave_liability_account", "custom_leave_expense_account"], as_dict=True)
 
-	if not liability_accounts.get("custom_default_debit_account") or not liability_accounts.get("custom_default_credit_account"):
+	if not liability_accounts.get("custom_leave_liability_account") or not liability_accounts.get("custom_leave_expense_account"):
 		frappe.throw(_("Please set the default debit and credit accounts in Company"))
 	
 	assigned_ssa = get_assigned_salary_structure_assignment(self.employee, frappe.utils.today())
@@ -81,11 +81,11 @@ def create_reverse_jv(self):
 	jv_doc.cheque_date = frappe.utils.today()
 
 	jv_doc.append("accounts", {
-		"account": liability_accounts.custom_default_debit_account,
-		"credit_in_account_currency": actual_amount
+		"account": liability_accounts.custom_leave_liability_account,
+		"debit_in_account_currency": actual_amount
 	})
 	jv_doc.append("accounts", {
-		"account": liability_accounts.custom_default_credit_account,
-		"debit_in_account_currency": actual_amount
+		"account": liability_accounts.custom_leave_expense_account,
+		"credit_in_account_currency": actual_amount
 	})
 	jv_doc.save()
