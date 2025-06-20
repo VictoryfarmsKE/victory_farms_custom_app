@@ -36,6 +36,15 @@
    "is_system_generated": 1,
    "label": "Is for Store Deduction",
    "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Salary Component",
+   "fieldname": "ignore_for_jv",
+   "fieldtype": "Check",
+   "insert_after": "is_for_store_deduction",
+   "is_system_generated": 0,
+   "label": "Do not include in Journal Entry",
+   "module": "Victory Farms Custom App"
   }
  ]
 }

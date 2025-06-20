@@ -25,22 +25,22 @@ class AnnualAppraisal(Document):
         bonus_calculation_amount = ap_doc.get_amount_used_for_bonus_calculation(self.employee)
 
         individual_score_value = self.total_individual_score
-        individual_score = (individual_score_value * 100) / 5
+        individual_score = flt((individual_score_value * 100) / 5, 2)
         matrix_percent = ap_doc.get_matrix_percent(individual_score)
         individual_bonus_percent = ap_doc.get_bonus_percent(self.bonus_potential, matrix_percent)
-        individual_bonus = (individual_bonus_percent / 100) * bonus_calculation_amount
+        individual_bonus = flt((individual_bonus_percent / 100) * bonus_calculation_amount, 3)
 
         department_score_value = self.total_avg
-        department_score = (department_score_value * 100) / 5
+        department_score = flt((department_score_value * 100) / 5, 2)
         matrix_percent = ap_doc.get_matrix_percent(department_score)
         department_bonus_percent = ap_doc.get_bonus_percent(self.bonus_potential_department, matrix_percent)
-        department_bonus = (department_bonus_percent / 100) * bonus_calculation_amount
+        department_bonus = flt((department_bonus_percent / 100) * bonus_calculation_amount, 3)
 
         company_score_value = self.company_score
-        company_score = (company_score_value * 100) / 5
+        company_score = flt((company_score_value * 100) / 5, 2)
         matrix_percent = ap_doc.get_matrix_percent(company_score)
         company_bonus_percent = ap_doc.get_bonus_percent(self.company_bonus_potential, matrix_percent)
-        company_bonus = (company_bonus_percent / 100) * bonus_calculation_amount
+        company_bonus = flt((company_bonus_percent / 100) * bonus_calculation_amount, 3)
 
         ap_doc.append("appraisal_payout_details",{
             "employee": self.employee, 
@@ -49,8 +49,8 @@ class AnnualAppraisal(Document):
             "company_score_value": self.company_score,
             "individual_bonus": individual_bonus,
             "department_bonus": department_bonus,
-            "company_bonus": company_bonus
-
+            "company_bonus": company_bonus,
+            "total_bonus": individual_bonus + department_bonus + company_bonus
         })
         ap_doc.flags.ignore_permissions = True
         ap_doc.save()
