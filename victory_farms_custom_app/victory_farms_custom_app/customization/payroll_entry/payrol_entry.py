@@ -1,7 +1,7 @@
 import frappe
 import erpnext
 from frappe.utils import add_days, cint
-from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry remove_payrolled_employees, get_salary_structure
+from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, remove_payrolled_employees, get_salary_structure
 
 def get_filter_condition(filters):
     cond = ""
