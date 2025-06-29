@@ -47,13 +47,77 @@ class CustomPayrollEntry(PayrollEntry):
 	def should_add_component_to_accrual_jv(self, component_type: str, item: dict) -> bool:
 		add_component_to_accrual_jv = True
 		if component_type == "earnings":
-			is_flexible_benefit, only_tax_impact, ignore_for_jv = frappe.get_cached_value(
-				"Salary Component", item["salary_component"], ["is_flexible_benefit", "only_tax_impact", "ignore_for_jv"]
+			is_flexible_benefit, only_tax_impact, ignore_for_jv, do_not_include_in_total = frappe.get_cached_value(
+				"Salary Component", item["salary_component"], ["is_flexible_benefit", "only_tax_impact", "ignore_for_jv", "do_not_include_in_total"]
 			)
-			if (cint(is_flexible_benefit) and cint(only_tax_impact)) or cint(ignore_for_jv):
+			if (cint(is_flexible_benefit) and cint(only_tax_impact)) or (cint(ignore_for_jv) and cint(do_not_include_in_total)):
+				add_component_to_accrual_jv = False
+
+		if component_type == "deductions":
+			do_not_include_in_total, ignore_for_jv = frappe.get_cached_value(
+				"Salary Component", item["salary_component"], ["do_not_include_in_total", "ignore_for_jv"]
+			)
+			if (cint(do_not_include_in_total) and cint(ignore_for_jv)):
 				add_component_to_accrual_jv = False
 
 		return add_component_to_accrual_jv 
+
+	def make_journal_entry(
+		self,
+		accounts,
+		currencies,
+		payroll_payable_account=None,
+		voucher_type="Journal Entry",
+		user_remark="",
+		submitted_salary_slips: list | None = None,
+		submit_journal_entry=False,
+	) -> str:
+		multi_currency = 0
+		if len(currencies) > 1:
+			multi_currency = 1
+
+		journal_entry = frappe.new_doc("Journal Entry")
+		journal_entry.voucher_type = voucher_type
+		journal_entry.user_remark = user_remark
+		journal_entry.company = self.company
+		journal_entry.posting_date = self.posting_date
+
+		journal_entry.set("accounts", accounts)
+		journal_entry.multi_currency = multi_currency
+
+		if voucher_type == "Journal Entry":
+			journal_entry.title = payroll_payable_account
+
+		account_data = {row.account: row.debit_in_account_currency for row in accounts if row.debit_in_account_currency > 0}
+
+		add_sc_com = frappe.db.get_all("Salary Component", {"type": "Deduction", "do_not_include_in_total": 1, "custom_debit_account": ["is", "set"]}, ["name", "custom_debit_account"])
+
+		if add_sc_com:
+			for row in add_sc_com:
+				account = self.get_salary_component_account(row.name)
+				journal_entry.append("accounts", {
+					"account": row.custom_debit_account,
+					"debit_in_account_currency": account_data.get(account, 0),
+					"credit_in_account_currency": 0,
+					"cost_center": self.cost_center
+				})
+
+		journal_entry.save(ignore_permissions=True)
+		try:
+			if submit_journal_entry:
+				journal_entry.submit()
+
+			if submitted_salary_slips:
+				self.set_journal_entry_in_salary_slips(submitted_salary_slips, jv_name=journal_entry.name)
+
+		except Exception as e:
+			if type(e) in (str, list, tuple):
+				frappe.msgprint(e)
+
+			self.log_error("Journal Entry creation against Salary Slip failed")
+			raise
+
+		return journal_entry
 		
 def remove_wrong_ssa_applied(emp_list, start_date, end_date):
 	start_date = add_days(start_date, 1)
