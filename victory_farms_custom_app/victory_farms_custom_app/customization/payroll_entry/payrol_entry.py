@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 import erpnext
 from frappe.utils import add_days, cint
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
@@ -66,6 +67,7 @@ class CustomPayrollEntry(PayrollEntry):
         return add_component_to_accrual_jv 
     
     def make_accrual_jv_entry(self):
+        frappe.log_error(title="Called Je", message="Called")
         self.check_permission("write")
         process_payroll_accounting_entry_based_on_employee = frappe.db.get_single_value(
             "Payroll Settings", "process_payroll_accounting_entry_based_on_employee"
