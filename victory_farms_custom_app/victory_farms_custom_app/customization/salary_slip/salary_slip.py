@@ -27,7 +27,7 @@ class CustomSalarySlip(SalarySlip):
 
 				self.default_data[struct_row.abbr] = flt(amount)
 				if struct_row.depends_on_payment_days:
-					joining_date, relieving_date = self.get_joining_and_relieving_dates()
+					# joining_date, relieving_date = self.get_joining_and_relieving_dates()
 					payment_days_amount = (
 						flt(amount) * flt(self.payment_days) / cint(self.total_working_days)
 						if self.total_working_days
