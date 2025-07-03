@@ -1,78 +1,74 @@
 import frappe
 import erpnext
 from frappe.utils import add_days, cint
-from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_employee_list, get_salary_structure
+from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry
 from frappe.utils.data import getdate
 from frappe import _
 
-def get_filter_condition(filters):
-	cond = ""
-	for f in ["company", "branch", "department", "designation"]:
-		if filters.get(f):
-			cond += " and t1." + f + " = " + frappe.db.escape(filters.get(f))
-	return cond
-
 class CustomPayrollEntry(PayrollEntry):
-	def get_employee_list(self):
-		"""
-		Returns list of active employees based on selected criteria
-		and for which salary structure exists
-		"""
-		self.check_mandatory()
-		filters = self.make_filters()
-		cond = get_filter_condition(filters)
-		cond += get_joining_relieving_condition(self.start_date, self.end_date)
+    @frappe.whitelist()
+    def fill_employee_details(self):
+        filters = self.make_filters()
 
-		if values := frappe.db.get_all("Salary Structure Multiselect", {"parent": self.name}, pluck = "salary_structure"):
-			sal_struct = values
-		else:
-			sal_struct = get_salary_structure(
-				self.company, self.currency, self.salary_slip_based_on_timesheet, self.payroll_frequency
-			)
+        # Get all salary currencies for employees matching the other filters
+        Employee = frappe.qb.DocType("Employee")
+        employee_currency_list = (
+            frappe.qb.from_(Employee)
+            .select(Employee.salary_currency)
+            .where(
+                (Employee.company == self.company)
+                & (Employee.status != "Inactive")
+                & (Employee.salary_currency == filters.currency)
+            )
+            .groupby(Employee.salary_currency)
+        ).run(pluck=True)
 
-		if erpnext.get_company_currency(self.company) != self.currency:
-			cond += "and t1.salary_currency = %(salary_currency)s "
-			cond += "and t2.payroll_payable_account = %(payroll_payable_account)s "
-			cond += "and %(from_date)s >= t2.from_date"
-			emp_list = get_other_currency_emp(cond, self.currency, self.end_date, self.payroll_payable_account)
-			return emp_list
-	
-		if sal_struct:
-			cond += "and t2.salary_structure IN %(sal_struct)s "
-			cond += "and t2.payroll_payable_account = %(payroll_payable_account)s "
-			cond += "and %(from_date)s >= t2.from_date"
-			emp_list = get_emp_list(sal_struct, cond, self.end_date, self.payroll_payable_account)
-			emp_list = remove_wrong_ssa_applied(emp_list, self.start_date, self.end_date)
-			emp_list = remove_payrolled_employees(emp_list, self.start_date, self.end_date)
-			return emp_list
-	
-	def should_add_component_to_accrual_jv(self, component_type: str, item: dict) -> bool:
-		add_component_to_accrual_jv = True
-		if component_type == "earnings":
-			is_flexible_benefit, only_tax_impact, ignore_for_jv = frappe.get_cached_value(
-				"Salary Component", item["salary_component"], ["is_flexible_benefit", "only_tax_impact", "ignore_for_jv"]
-			)
-			if (cint(is_flexible_benefit) and cint(only_tax_impact)) or cint(ignore_for_jv):
-				add_component_to_accrual_jv = False
+        employees = []
+        for salary_currency in employee_currency_list:
+            cond = "and t1.salary_currency = '{0}'".format(salary_currency)
+            if self.branch:
+                cond += " and t1.branch = '{0}'".format(self.branch)
+            if self.department:
+                cond += " and t1.department = '{0}'".format(self.department)
+            if self.designation:
+                cond += " and t1.designation = '{0}'".format(self.designation)
+            frappe.log_error(f"SQL condition for currency {salary_currency}: {cond}")
 
-		return add_component_to_accrual_jv 
-		
-def remove_wrong_ssa_applied(emp_list, start_date, end_date):
-	start_date = add_days(start_date, 1)
-	new_emp_list = []
-	for employee_details in emp_list:
-		if not frappe.db.exists(
-			"Salary Structure Assignment",
-			{
-				"employee": employee_details.employee,
-				"from_date": ["between", [start_date, end_date]],
-				"docstatus": 1,
-			},
-		):
-			new_emp_list.append(employee_details)
+            emp_list = get_other_currency_emp(
+                cond,
+                salary_currency,
+                self.end_date,
+                self.payroll_payable_account,
+            )
+            employees += emp_list
 
-	return new_emp_list
+        self.set("employees", [])
+        if not employees:
+            error_msg = _(
+                "No employees found for the mentioned criteria:<br>Company: {0}<br> Currency: {1}<br>Payroll Payable Account: {2}"
+            ).format(
+                frappe.bold(self.company),
+                frappe.bold(self.currency),
+                frappe.bold(self.payroll_payable_account),
+            )
+            if self.branch:
+                error_msg += "<br>" + _("Branch: {0}").format(frappe.bold(self.branch))
+            if self.department:
+                error_msg += "<br>" + _("Department: {0}").format(frappe.bold(self.department))
+            if self.designation:
+                error_msg += "<br>" + _("Designation: {0}").format(frappe.bold(self.designation))
+            if self.start_date:
+                error_msg += "<br>" + _("Start date: {0}").format(frappe.bold(self.start_date))
+            if self.end_date:
+                error_msg += "<br>" + _("End date: {0}").format(frappe.bold(self.end_date))
+            frappe.log_error(f"Throwing error: {error_msg}")
+            frappe.throw(error_msg, title=_("No employees found"))
 
+        self.set("employees", employees)
+        self.number_of_employees = len(self.employees)
+        self.update_employees_with_withheld_salaries()
+        return self.get_employees_with_unmarked_attendance()
+    
 def get_other_currency_emp(cond, salary_currency, end_date, payroll_payable_account):
 	return frappe.db.sql(
 		"""
@@ -94,11 +90,5 @@ def get_other_currency_emp(cond, salary_currency, end_date, payroll_payable_acco
 		},
 		as_dict=True,
 	)
- 
-def get_joining_relieving_condition(start_date, end_date):
-	cond = f"""
-		and ifnull(t1.date_of_joining, '1900-01-01') <= '{end_date}'
-		and ifnull(t1.relieving_date, '2199-12-31') >= '{start_date}'
-	"""
-	return cond
+
 
