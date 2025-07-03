@@ -7,6 +7,10 @@ from frappe import _
 
 class CustomPayrollEntry(PayrollEntry):
     @frappe.whitelist()
+    def create_salary_slips(self):
+        return super().create_salary_slips()
+    
+    @frappe.whitelist()
     def fill_employee_details(self):
         filters = self.make_filters()
 
@@ -17,7 +21,7 @@ class CustomPayrollEntry(PayrollEntry):
             .select(Employee.salary_currency)
             .where(
                 (Employee.company == self.company)
-                & (Employee.status != "Inactive")
+                & (Employee.status == "Active")
                 & (Employee.salary_currency == filters.currency)
             )
             .groupby(Employee.salary_currency)
@@ -32,7 +36,6 @@ class CustomPayrollEntry(PayrollEntry):
                 cond += " and t1.department = '{0}'".format(self.department)
             if self.designation:
                 cond += " and t1.designation = '{0}'".format(self.designation)
-            frappe.log_error(f"SQL condition for currency {salary_currency}: {cond}")
 
             emp_list = get_other_currency_emp(
                 cond,
@@ -79,13 +82,13 @@ def get_other_currency_emp(cond, salary_currency, end_date, payroll_payable_acco
 			where
 				t1.name = t2.employee
 				and t2.docstatus = 1
-				and t1.status != 'Inactive'
+				and t1.status = 'Active'
 		%s order by t2.from_date desc
 		"""
 		% cond,
 		{
 			"salary_currency": salary_currency,
-			"from_date": end_date,
+            "end_date": end_date,
 			"payroll_payable_account": payroll_payable_account,
 		},
 		as_dict=True,
