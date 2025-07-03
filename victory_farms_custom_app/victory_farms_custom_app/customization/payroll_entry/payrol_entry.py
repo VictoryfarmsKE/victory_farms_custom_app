@@ -7,10 +7,6 @@ from frappe import _
 
 class CustomPayrollEntry(PayrollEntry):
     @frappe.whitelist()
-    def create_salary_slips(self):
-        return super().create_salary_slips()
-    
-    @frappe.whitelist()
     def fill_employee_details(self):
         filters = self.make_filters()
 
