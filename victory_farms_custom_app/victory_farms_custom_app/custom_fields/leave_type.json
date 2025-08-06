@@ -1,50 +1,40 @@
 {
  "Leave Type": [
   {
-   "depends_on": "eval: doc.custom_create_auto_allocation == 1;",
    "dt": "Leave Type",
-   "fieldname": "custom_based_on_employee_grade",
-   "fieldtype": "Check",
-   "insert_after": "custom_create_auto_allocation",
-   "is_system_generated": 1,
-   "label": "Based on Employee Grade",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Leave Type",
-   "fieldname": "custom_create_auto_allocation",
-   "fieldtype": "Check",
-   "insert_after": "earned_leave_frequency",
-   "is_system_generated": 1,
-   "label": "Create Auto Allocation",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Leave Type",
-   "fieldname": "custom_leave_grade",
+   "fieldname": "custom_working_grade",
    "fieldtype": "Table MultiSelect",
-   "insert_after": "custom_employee_grade",
+   "insert_after": "custom_working_hours",
    "is_system_generated": 1,
-   "label": "Leave Grade",
+   "label": "Working Grade",
    "module": "Victory Farms Custom App",
    "options": "Leave Grade"
   },
   {
-   "depends_on": "eval: doc.custom_based_on_employee_grade == 1;",
    "dt": "Leave Type",
-   "fieldname": "custom_employee_grade",
-   "fieldtype": "Section Break",
-   "insert_after": "rounding",
+   "fieldname": "custom_working_hours",
+   "fieldtype": "Float",
+   "insert_after": "custom_hourly_details",
    "is_system_generated": 1,
-   "label": "Employee Grade",
+   "label": "Working Hours",
    "module": "Victory Farms Custom App"
   },
   {
    "dt": "Leave Type",
-   "fieldname": "custom_create_liability_entries",
+   "fieldname": "custom_hourly_details",
+   "fieldtype": "Section Break",
+   "insert_after": "custom_leave_grade",
+   "is_system_generated": 1,
+   "label": "Hourly Details",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Leave Type",
+   "fieldname": "custom_is_wfh",
    "fieldtype": "Check",
-   "insert_after": "custom_salary_component",
-   "label": "Create Liability Entries",
+   "insert_after": "is_compensatory",
+   "is_system_generated": 1,
+   "label": "Is WFH",
    "module": "Victory Farms Custom App"
   },
   {
@@ -59,40 +49,59 @@
   },
   {
    "dt": "Leave Type",
-   "fieldname": "custom_is_wfh",
+   "fieldname": "custom_create_liability_entries",
    "fieldtype": "Check",
-   "insert_after": "is_compensatory",
+   "insert_after": "custom_salary_component",
    "is_system_generated": 1,
-   "label": "Is WFH",
+   "label": "Create Liability Entries",
    "module": "Victory Farms Custom App"
   },
   {
+   "depends_on": "eval: doc.custom_based_on_employee_grade == 1;",
    "dt": "Leave Type",
-   "fieldname": "custom_hourly_details",
+   "fieldname": "custom_employee_grade",
    "fieldtype": "Section Break",
-   "insert_after": "custom_leave_grade",
+   "insert_after": "rounding",
    "is_system_generated": 1,
-   "label": "Hourly Details",
+   "label": "Employee Grade",
    "module": "Victory Farms Custom App"
   },
   {
    "dt": "Leave Type",
-   "fieldname": "custom_working_hours",
-   "fieldtype": "Float",
-   "insert_after": "custom_hourly_details",
-   "is_system_generated": 1,
-   "label": "Working Hours",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Leave Type",
-   "fieldname": "custom_working_grade",
+   "fieldname": "custom_leave_grade",
    "fieldtype": "Table MultiSelect",
-   "insert_after": "custom_working_hours",
+   "insert_after": "custom_employee_grade",
    "is_system_generated": 1,
-   "label": "Working Grade",
+   "label": "Leave Grade",
    "module": "Victory Farms Custom App",
    "options": "Leave Grade"
+  },
+  {
+   "dt": "Leave Type",
+   "fieldname": "custom_create_auto_allocation",
+   "fieldtype": "Check",
+   "insert_after": "earned_leave_frequency",
+   "is_system_generated": 1,
+   "label": "Create Auto Allocation",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "depends_on": "eval: doc.custom_create_auto_allocation == 1;",
+   "dt": "Leave Type",
+   "fieldname": "custom_based_on_employee_grade",
+   "fieldtype": "Check",
+   "insert_after": "custom_create_auto_allocation",
+   "is_system_generated": 1,
+   "label": "Based on Employee Grade",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Leave Type",
+   "fieldname": "custom_restricted_in_probation",
+   "fieldtype": "Check",
+   "insert_after": "column_break_3",
+   "label": "Restricted in Probation",
+   "module": "Victory Farms Custom App"
   }
  ]
 }
