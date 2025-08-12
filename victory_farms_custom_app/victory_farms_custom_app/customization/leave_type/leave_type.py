@@ -16,7 +16,7 @@ def create_leave_allocation(leave_type, is_earned_leave=0):
 		is_earned_leave = int(is_earned_leave)
 
 	lt_data = frappe.db.get_value("Leave Type", leave_type, ["applicable_after", "max_leaves_allowed", "custom_based_on_employee_grade"], as_dict=1)
-	max_allowed_leaves = 21 #lt_data.max_leaves_allowed
+	max_allowed_leaves = lt_data.max_leaves_allowed
 	employee_filters = {}
 	if lt_data.custom_based_on_employee_grade:
 		grade_list = frappe.db.get_all("Leave Grade", {"parent": leave_type}, pluck="employee_grade")
