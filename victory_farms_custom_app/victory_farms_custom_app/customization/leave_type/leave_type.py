@@ -5,17 +5,17 @@ from hrms.hr.doctype.leave_application.leave_application import get_leave_balanc
 
 
 def auto_create_leave_allocation():
-	# if str(get_last_day(today())) == str(today()):
-	leave_type_list = frappe.db.get_all("Leave Type", {"custom_create_auto_allocation": 1, "is_earned_leave": 1}, pluck="name")
-	for row in leave_type_list:
-		frappe.enqueue(create_leave_allocation, queue="long", event="Create Leave Allocation", leave_type=row, is_earned_leave=1)
+	if str(get_last_day(today())) == str(today()):
+		leave_type_list = frappe.db.get_all("Leave Type", {"custom_create_auto_allocation": 1, "is_earned_leave": 1}, pluck="name")
+		for row in leave_type_list:
+			frappe.enqueue(create_leave_allocation, queue="long", event="Create Leave Allocation", leave_type=row, is_earned_leave=1)
 
 @frappe.whitelist()
 def create_leave_allocation(leave_type, is_earned_leave=0):
 	if isinstance(is_earned_leave, str):
 		is_earned_leave = int(is_earned_leave)
 
-	lt_data = frappe.db.get_value("Leave Type", leave_type, ["applicable_after", "max_leaves_allowed", "custom_based_on_employee_grade"], as_dict=1)
+	lt_data = frappe.db.get_value("Leave Type", leave_type, ["applicable_after", "custom_max_active_allowed_leaves as max_leaves_allowed", "custom_based_on_employee_grade",], as_dict=1)
 	max_allowed_leaves = lt_data.max_leaves_allowed
 	employee_filters = {}
 	if lt_data.custom_based_on_employee_grade:
@@ -49,6 +49,7 @@ def update_new_leaves_allocated(employee_name, leave_type, from_date, to_date, a
 
 	if leave_allocation := frappe.get_doc("Leave Allocation", {"employee": employee_name, "leave_type": leave_type, "to_date": to_date}):
 		remaining_leaves =  get_leave_balance_on(employee_name,leave_type,from_date,to_date=to_date,consider_all_leaves_in_the_allocation_period=True)
+
 		new_leaves_total = remaining_leaves + allocated_leaves
 		if new_leaves_total > max_allowed_leaves:
 			extra_leave = max_allowed_leaves - remaining_leaves
