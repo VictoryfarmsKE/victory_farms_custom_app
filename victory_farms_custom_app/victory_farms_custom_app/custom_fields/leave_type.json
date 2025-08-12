@@ -2,6 +2,23 @@
  "Leave Type": [
   {
    "dt": "Leave Type",
+   "fieldname": "custom_max_active_allowed_leaves",
+   "fieldtype": "Float",
+   "insert_after": "max_leaves_allowed",
+   "label": "Max Active Allowed Leaves",
+   "module": "Victory Farms Custom App",
+   "reqd": 1
+  },
+  {
+   "dt": "Leave Type",
+   "fieldname": "custom_restricted_in_probation",
+   "fieldtype": "Check",
+   "insert_after": "column_break_3",
+   "label": "Restricted in Probation",
+   "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Leave Type",
    "fieldname": "custom_working_grade",
    "fieldtype": "Table MultiSelect",
    "insert_after": "custom_working_hours",
@@ -93,14 +110,6 @@
    "insert_after": "custom_create_auto_allocation",
    "is_system_generated": 1,
    "label": "Based on Employee Grade",
-   "module": "Victory Farms Custom App"
-  },
-  {
-   "dt": "Leave Type",
-   "fieldname": "custom_restricted_in_probation",
-   "fieldtype": "Check",
-   "insert_after": "column_break_3",
-   "label": "Restricted in Probation",
    "module": "Victory Farms Custom App"
   }
  ]
