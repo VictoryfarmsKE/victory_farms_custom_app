@@ -1,15 +1,80 @@
 import frappe
 import erpnext
-from frappe.utils import add_days, cint
+from frappe.utils import add_days, cint, get_link_to_form
 from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry
 from frappe.utils.data import getdate
 from frappe import _
 
 class CustomPayrollEntry(PayrollEntry):
+    def get_salary_component_account(self, employee, salary_component):
+        emp_cost_center = frappe.db.get_value("Employee", employee, "payroll_cost_center")
+        account = frappe.db.get_value(
+            "Salary Component Account",
+            {"parent": salary_component, "company": self.company, "custom_cost_center": "Solufy - S"},
+            "account",
+            cache=True,
+        )
+
+        if not account:
+            frappe.throw(
+                _("Please set account in Salary Component {0}").format(
+                    get_link_to_form("Salary Component", salary_component)
+                )
+            )
+
+        return account
+    def get_salary_component_total(
+        self,
+        component_type=None,
+        employee_wise_accounting_enabled=False,
+    ):
+        salary_components = self.get_salary_components(component_type)
+        if salary_components:
+            component_dict = {}
+
+            for item in salary_components:
+                if not self.should_add_component_to_accrual_jv(component_type, item):
+                    continue
+
+                employee_cost_centers = self.get_payroll_cost_centers_for_employee(
+                    item.employee, item.salary_structure
+                )
+                employee_advance = self.get_advance_deduction(component_type, item)
+
+                for cost_center, percentage in employee_cost_centers.items():
+                    amount_against_cost_center = flt(item.amount) * percentage / 100
+
+                    if employee_advance:
+                        self.add_advance_deduction_entry(
+                            item, amount_against_cost_center, cost_center, employee_advance
+                        )
+                    else:
+                        key = (item.employee, item.salary_component, cost_center)
+                        component_dict[key] = component_dict.get(key, 0) + amount_against_cost_center
+
+                    if employee_wise_accounting_enabled:
+                        self.set_employee_based_payroll_payable_entries(
+                            component_type, item.employee, amount_against_cost_center
+                        )
+
+            account_details = self.get_account(component_dict=component_dict)
+
+            return account_details
+        
+    def get_account(self, component_dict=None):
+        account_dict = {}
+        for key, amount in component_dict.items():
+            employee, component, cost_center = key
+            account = self.get_salary_component_account(employee, component)
+            accounting_key = (account, cost_center)
+
+            account_dict[accounting_key] = account_dict.get(accounting_key, 0) + amount
+
+        return account_dict
+
     @frappe.whitelist()
     def fill_employee_details(self):
         filters = self.make_filters()
-
         # Get all salary currencies for employees matching the other filters
         Employee = frappe.qb.DocType("Employee")
         employee_currency_list = (
@@ -69,25 +134,25 @@ class CustomPayrollEntry(PayrollEntry):
         return self.get_employees_with_unmarked_attendance()
     
 def get_other_currency_emp(cond, salary_currency, end_date, payroll_payable_account):
-	return frappe.db.sql(
-		"""
-			select
-				distinct t1.name as employee, t1.employee_name, t1.department, t1.designation
-			from
-				`tabEmployee` t1, `tabSalary Structure Assignment` t2
-			where
-				t1.name = t2.employee
-				and t2.docstatus = 1
-				and t1.status = 'Active'
-		%s order by t2.from_date desc
-		"""
-		% cond,
-		{
-			"salary_currency": salary_currency,
+    return frappe.db.sql(
+        """
+            select
+                distinct t1.name as employee, t1.employee_name, t1.department, t1.designation
+            from
+                `tabEmployee` t1, `tabSalary Structure Assignment` t2
+            where
+                t1.name = t2.employee
+                and t2.docstatus = 1
+                and t1.status = 'Active'
+        %s order by t2.from_date desc
+        """
+        % cond,
+        {
+            "salary_currency": salary_currency,
             "end_date": end_date,
-			"payroll_payable_account": payroll_payable_account,
-		},
-		as_dict=True,
-	)
+            "payroll_payable_account": payroll_payable_account,
+        },
+        as_dict=True,
+    )
 
 
