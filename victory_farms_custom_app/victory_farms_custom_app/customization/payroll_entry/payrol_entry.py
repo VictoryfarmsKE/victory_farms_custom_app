@@ -1,19 +1,61 @@
 import frappe
 import erpnext
-from frappe.utils import add_days, cint, get_link_to_form
+from frappe.utils import add_days, cint, get_link_to_form, flt
 from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry
 from frappe.utils.data import getdate
 from frappe import _
 
+
 class CustomPayrollEntry(PayrollEntry):
-    def get_salary_component_account(self, employee, salary_component):
-        emp_cost_center = frappe.db.get_value("Employee", employee, "payroll_cost_center")
-        account = frappe.db.get_value(
-            "Salary Component Account",
-            {"parent": salary_component, "company": self.company, "custom_cost_center": "Solufy - S"},
-            "account",
-            cache=True,
+
+    def get_parent_cost_center(self, employee):
+        emp_cost_center = frappe.db.get_value(
+            "Employee", employee, "payroll_cost_center"
         )
+        if not emp_cost_center:
+            frappe.throw(_("No Cost Center set for Employee {0}").format(employee))
+
+        while emp_cost_center:
+            cost_center = frappe.db.get_value(
+                "Cost Center",
+                emp_cost_center,
+                ["custom_is_payroll_cost_center", "is_group", "name", "parent_cost_center"],
+                as_dict=True,
+            )
+            if not cost_center.parent_cost_center:
+                break
+        
+            if not cost_center:
+                break
+
+            if cost_center.custom_is_payroll_cost_center:
+                return cost_center.name
+        
+            emp_cost_center = cost_center.parent_cost_center
+
+    def get_salary_component_account(self, employee, salary_component):
+        emp_cost_center = self.get_parent_cost_center(employee)
+        if emp_cost_center:
+            account = frappe.db.get_value(
+                "Salary Component Account",
+                {
+                    "parent": salary_component,
+                    "company": self.company,
+                    "custom_cost_center": emp_cost_center,
+                },
+                "account",
+                cache=True,
+            )
+        else:
+            account = frappe.db.get_value(
+                "Salary Component Account",
+                {
+                    "parent": salary_component,
+                    "company": self.company
+                },
+                "account",
+                cache=True,
+            )
 
         if not account:
             frappe.throw(
@@ -23,6 +65,7 @@ class CustomPayrollEntry(PayrollEntry):
             )
 
         return account
+
     def get_salary_component_total(
         self,
         component_type=None,
@@ -46,11 +89,16 @@ class CustomPayrollEntry(PayrollEntry):
 
                     if employee_advance:
                         self.add_advance_deduction_entry(
-                            item, amount_against_cost_center, cost_center, employee_advance
+                            item,
+                            amount_against_cost_center,
+                            cost_center,
+                            employee_advance,
                         )
                     else:
                         key = (item.employee, item.salary_component, cost_center)
-                        component_dict[key] = component_dict.get(key, 0) + amount_against_cost_center
+                        component_dict[key] = (
+                            component_dict.get(key, 0) + amount_against_cost_center
+                        )
 
                     if employee_wise_accounting_enabled:
                         self.set_employee_based_payroll_payable_entries(
@@ -60,7 +108,7 @@ class CustomPayrollEntry(PayrollEntry):
             account_details = self.get_account(component_dict=component_dict)
 
             return account_details
-        
+
     def get_account(self, component_dict=None):
         account_dict = {}
         for key, amount in component_dict.items():
@@ -118,13 +166,21 @@ class CustomPayrollEntry(PayrollEntry):
             if self.branch:
                 error_msg += "<br>" + _("Branch: {0}").format(frappe.bold(self.branch))
             if self.department:
-                error_msg += "<br>" + _("Department: {0}").format(frappe.bold(self.department))
+                error_msg += "<br>" + _("Department: {0}").format(
+                    frappe.bold(self.department)
+                )
             if self.designation:
-                error_msg += "<br>" + _("Designation: {0}").format(frappe.bold(self.designation))
+                error_msg += "<br>" + _("Designation: {0}").format(
+                    frappe.bold(self.designation)
+                )
             if self.start_date:
-                error_msg += "<br>" + _("Start date: {0}").format(frappe.bold(self.start_date))
+                error_msg += "<br>" + _("Start date: {0}").format(
+                    frappe.bold(self.start_date)
+                )
             if self.end_date:
-                error_msg += "<br>" + _("End date: {0}").format(frappe.bold(self.end_date))
+                error_msg += "<br>" + _("End date: {0}").format(
+                    frappe.bold(self.end_date)
+                )
             frappe.log_error(f"Throwing error: {error_msg}")
             frappe.throw(error_msg, title=_("No employees found"))
 
@@ -132,7 +188,8 @@ class CustomPayrollEntry(PayrollEntry):
         self.number_of_employees = len(self.employees)
         self.update_employees_with_withheld_salaries()
         return self.get_employees_with_unmarked_attendance()
-    
+
+
 def get_other_currency_emp(cond, salary_currency, end_date, payroll_payable_account):
     return frappe.db.sql(
         """
@@ -154,5 +211,3 @@ def get_other_currency_emp(cond, salary_currency, end_date, payroll_payable_acco
         },
         as_dict=True,
     )
-
-
