@@ -1,0 +1,12 @@
+{
+ "Cost Center": [
+  {
+   "dt": "Cost Center",
+   "fieldname": "custom_is_payroll_cost_center",
+   "fieldtype": "Check",
+   "insert_after": "disabled",
+   "label": "Is Payroll Cost Center",
+   "module": "Victory Farms Custom App"
+  }
+ ]
+}
