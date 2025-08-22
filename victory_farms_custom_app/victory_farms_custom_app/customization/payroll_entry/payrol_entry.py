@@ -46,7 +46,7 @@ class CustomPayrollEntry(PayrollEntry):
                 "account",
                 cache=True,
             )
-        else:
+        if not account:
             account = frappe.db.get_value(
                 "Salary Component Account",
                 {
