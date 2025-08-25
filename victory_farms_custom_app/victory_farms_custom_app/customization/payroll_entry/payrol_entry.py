@@ -14,24 +14,27 @@ class CustomPayrollEntry(PayrollEntry):
         )
         if not emp_cost_center:
             frappe.throw(_("No Cost Center set for Employee {0}").format(employee))
-
-        while emp_cost_center:
-            cost_center = frappe.db.get_value(
-                "Cost Center",
-                emp_cost_center,
-                ["custom_is_payroll_cost_center", "is_group", "name", "parent_cost_center"],
-                as_dict=True,
-            )
-            if not cost_center.parent_cost_center:
-                break
         
-            if not cost_center:
-                break
+        return emp_cost_center
 
-            if cost_center.custom_is_payroll_cost_center:
-                return cost_center.name
+
+        # while emp_cost_center:
+        #     cost_center = frappe.db.get_value(
+        #         "Cost Center",
+        #         emp_cost_center,
+        #         ["custom_is_payroll_cost_center", "is_group", "name", "parent_cost_center"],
+        #         as_dict=True,
+        #     )
+        #     if not cost_center.parent_cost_center:
+        #         break
         
-            emp_cost_center = cost_center.parent_cost_center
+        #     if not cost_center:
+        #         break
+
+        #     if cost_center.custom_is_payroll_cost_center:
+        #         return cost_center.name
+        
+        #     emp_cost_center = cost_center.parent_cost_center
 
     def get_salary_component_account(self, employee, salary_component):
         emp_cost_center = self.get_parent_cost_center(employee)
