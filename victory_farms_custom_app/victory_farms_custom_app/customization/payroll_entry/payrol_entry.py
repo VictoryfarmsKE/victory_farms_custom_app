@@ -81,7 +81,7 @@ def get_salary_component_account(self, employee, salary_component):
 def get_salary_component_total(
     self,
     component_type=None,
-    employee_wise_accounting_enabled=False,
+    process_payroll_accounting_entry_based_on_employee=False,
 ):
     salary_components = self.get_salary_components(component_type)
     if salary_components:
@@ -112,7 +112,7 @@ def get_salary_component_total(
                         component_dict.get(key, 0) + amount_against_cost_center
                     )
 
-                if employee_wise_accounting_enabled:
+                if process_payroll_accounting_entry_based_on_employee:
                     self.set_employee_based_payroll_payable_entries(
                         component_type, item.employee, amount_against_cost_center
                     )
