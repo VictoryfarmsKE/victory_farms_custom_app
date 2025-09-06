@@ -34,6 +34,12 @@ def get_columns():
             "fieldtype": "Data",
             "width": 150,
         },
+         {
+            "label": _("Validation ID"),
+            "fieldname": "custom_validation_id",
+            "fieldtype": "Data",
+            "width": 150,
+        },
         {
             "label": _("National ID"),
             "fieldname": "national_id",
@@ -97,6 +103,7 @@ def get_data(filters):
             (emp.first_name),
             (emp.last_name),
             (emp.cell_number),
+            (emp.custom_validation_id),
             (emp.national_id),
             (emp.tax_id),
             (emp.shif_no),
