@@ -1,0 +1,14 @@
+{
+ "Salary Component Account": [
+  {
+   "dt": "Salary Component Account",
+   "fieldname": "custom_cost_center",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "insert_after": "account",
+   "label": "Cost Center",
+   "module": "Victory Farms Custom App",
+   "options": "Cost Center"
+  }
+ ]
+}
