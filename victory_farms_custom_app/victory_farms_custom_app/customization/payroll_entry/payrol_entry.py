@@ -9,7 +9,7 @@ from frappe.utils import add_days, cint, get_link_to_form, flt
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
 	get_accounting_dimensions,
 )
-from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_joining_relieving_condition, get_emp_list, remove_payrolled_employees, get_salary_structure
+from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_emp_list, remove_payrolled_employees, get_salary_structure
 
 def get_filter_condition(filters):
     cond = ""
@@ -17,6 +17,13 @@ def get_filter_condition(filters):
         if filters.get(f):
             cond += " and t1." + f + " = " + frappe.db.escape(filters.get(f))
     return cond
+
+def get_joining_relieving_condition(start_date, end_date):
+	cond = f"""
+		and ifnull(t1.date_of_joining, '1900-01-01') <= '{end_date}'
+		and ifnull(t1.relieving_date, '2199-12-31') >= '{start_date}'
+	"""
+	return cond
 
 
 def get_parent_cost_center(self, employee):
