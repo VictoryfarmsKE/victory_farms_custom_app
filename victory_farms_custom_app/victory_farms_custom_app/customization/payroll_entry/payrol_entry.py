@@ -9,7 +9,7 @@ from frappe.utils import add_days, cint, get_link_to_form, flt
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
 	get_accounting_dimensions,
 )
-from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_emp_list, remove_payrolled_employees, get_salary_structure
+from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, remove_payrolled_employees, get_salary_structure
 
 def get_filter_condition(filters):
     cond = ""
@@ -140,6 +140,69 @@ def get_account(self, component_dict=None):
     return account_dict
 
 class CustomPayrollEntry(PayrollEntry):
+    @frappe.whitelist()
+    def fill_employee_details(self):
+        filters = self.make_filters()
+
+        # Get all salary currencies for employees matching the other filters
+        Employee = frappe.qb.DocType("Employee")
+        employee_currency_list = (
+            frappe.qb.from_(Employee)
+            .select(Employee.salary_currency)
+            .where(
+                (Employee.company == self.company)
+                & (Employee.status == "Active")
+                & (Employee.salary_currency == filters.currency)
+            )
+            .groupby(Employee.salary_currency)
+        ).run(pluck=True)
+
+        employees = []
+        for salary_currency in employee_currency_list:
+            cond = "and t1.salary_currency = '{0}'".format(salary_currency)
+            if self.branch:
+                cond += " and t1.branch = '{0}'".format(self.branch)
+            if self.department:
+                cond += " and t1.department = '{0}'".format(self.department)
+            if self.designation:
+                cond += " and t1.designation = '{0}'".format(self.designation)
+
+            emp_list = get_other_currency_emp(
+                cond,
+                salary_currency,
+                self.end_date,
+                self.payroll_payable_account,
+            )
+            employees += emp_list
+
+        self.set("employees", [])
+        if not employees:
+            error_msg = _(
+                "No employees found for the mentioned criteria:<br>Company: {0}<br> Currency: {1}<br>Payroll Payable Account: {2}"
+            ).format(
+                frappe.bold(self.company),
+                frappe.bold(self.currency),
+                frappe.bold(self.payroll_payable_account),
+            )
+            if self.branch:
+                error_msg += "<br>" + _("Branch: {0}").format(frappe.bold(self.branch))
+            if self.department:
+                error_msg += "<br>" + _("Department: {0}").format(frappe.bold(self.department))
+            if self.designation:
+                error_msg += "<br>" + _("Designation: {0}").format(frappe.bold(self.designation))
+            if self.start_date:
+                error_msg += "<br>" + _("Start date: {0}").format(frappe.bold(self.start_date))
+            if self.end_date:
+                error_msg += "<br>" + _("End date: {0}").format(frappe.bold(self.end_date))
+            frappe.log_error(f"Throwing error: {error_msg}")
+            frappe.throw(error_msg, title=_("No employees found"))
+
+        self.set("employees", employees)
+        self.number_of_employees = len(self.employees)
+        self.update_employees_with_withheld_salaries()
+        return self.get_employees_with_unmarked_attendance()
+    
+  
     def get_emp_list(self):
         """
         Returns list of active employees based on selected criteria
