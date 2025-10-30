@@ -23,14 +23,14 @@ def get_columns():
 		},
 		{   
 			"fieldname": "employee_name", 
-			"label": _("Name of Employee"),
+			"label": _("Employee Name"),
 			"fieldtype": "Data", 
 			"read_only": 1,
 			"width": 150
 		},
 		{   
 			"fieldname": "residential_status", 
-			"label": _("Resident Status"),
+			"label": _("Residential Status"),
 			"fieldtype": "Data", 
 			"read_only": 1,
 			"width": 100
@@ -39,20 +39,6 @@ def get_columns():
 			"fieldname": "type_of_employee", 
 			"label": _("Type Of Employee"),
 			"fieldtype": "Data", 
-			"read_only": 1,
-			"width": 100
-		},
-		{   
-			"fieldname": "custom_disablity", 
-			"label": _("Persons with Disability"),
-			"fieldtype": "Data", 
-			"read_only": 1,
-			"width": 100
-		},
-		{   
-			"fieldname": "custom_tax_exemption_certificate", 
-			"label": _("Exemption Certificate Number"),
-			"fieldtype": "Float", 
 			"read_only": 1,
 			"width": 100
 		},
@@ -116,12 +102,6 @@ def get_columns():
 			"fieldtype": "Float", 
 			"width": 150
 		},
-  		{
-			"fieldname": "value_of_meals", 
-			"label": _("Value of meals"), 
-			"fieldtype": "Float", 
-			"width": 150
-		},
 		{
 			"fieldname": "other_non_cash_benefit", 
 			"label": _("Other Non cash benefit"), 
@@ -131,6 +111,12 @@ def get_columns():
 		{
 			"fieldname": "total_non_cash_benefits", 
 			"label": _("Total Non Cash Benefits"), 
+			"fieldtype": "Float", 
+			"width": 150
+		},
+		{
+			"fieldname": "value_of_meals", 
+			"label": _("Value of meals"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
@@ -178,19 +164,13 @@ def get_columns():
 		},
 		{
 			"fieldname": "actual_contribution(nssf)", 
-			"label": _("NSSF Contribution (NSSF)"), 
+			"label": _("Actual Contribution (NSSF)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
-  		{
-			"fieldname": "other_pension_contribution", 
-			"label": _("Other Pension Contribution"), 
-			"fieldtype": "Float", 
-			"width": 280
-		},
 		{
 			"fieldname": "post_retirement_medical_fund", 
-			"label": _("Post Retirement Medical Fund"), 
+			"label": _("Post Retirement medical Fund"), 
 			"fieldtype": "Float", 
 			"width": 280
 		},
@@ -219,8 +199,14 @@ def get_columns():
 			"width": 150
 		},
 		{
+			"fieldname": "tax_payable", 
+			"label": _("Tax Payable"), 
+			"fieldtype": "Float", 
+			"width": 150
+		},
+		{
 			"fieldname": "monthly_relief", 
-			"label": _("Monthly Personal Relief"), 
+			"label": _("Monthly Relief"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
@@ -275,8 +261,6 @@ def get_p10_report_data(filters):
 			employee.tax_id,
 			salary_slip.employee_name,
 			employee.residential_status,
-			employee.custom_disablity,
-			employee.custom_tax_exemption_certificate,
 			employee.type_of_employee,
 			employee.type_of_housing,
 			salary_detail.salary_component,
@@ -303,8 +287,6 @@ def get_p10_report_data(filters):
 					"employee_name": employee_name,
 					"tax_id": employee_pin,
 					"residential_status": row.get("residential_status"),
-					"custom_disablity": row.get("custom_disablity"),
-					"custom_tax_exemption_certificate": row.get("custom_tax_exemption_certificate"),
 					"type_of_employee": row.get("type_of_employee"),
 					"type_of_housing": row.get("type_of_housing"),
 					"components": {}
@@ -349,9 +331,7 @@ def get_p10_report_data(filters):
 			"Affordable Housing Levy",
 			"Monthly Relief",
 			"Amount of Insurance Relief",
-			"Self Assessed PAYE Tax",
-			"Custom Tax Exemption Certificate"
-		]
+			"Self Assessed PAYE Tax"]
 
 	report_data = []
 	for employee_key, details in employee_data.items():
@@ -360,9 +340,7 @@ def get_p10_report_data(filters):
 			"tax_id": details["tax_id"],
 			"employee_name": details["employee_name"],
 			"residential_status": details.get("residential_status"),
-			"custom_disablity": details.get("custom_disablity"),
-			"custom_tax_exemption_certificate": details.get("custom_tax_exemption_certificate"),
-			"type_of_employee": details.get("type_of_employee"),		
+			"type_of_employee": details.get("type_of_employee"),
 			"type_of_housing": details.get("type_of_housing"),
 		}
 		for component_type, total_amount in components.items():
