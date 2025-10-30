@@ -17,7 +17,7 @@ def create_leave_allocation(leave_type, is_earned_leave=0):
 
 	lt_data = frappe.db.get_value("Leave Type", leave_type, ["applicable_after", "custom_max_active_allowed_leaves as max_leaves_allowed", "custom_based_on_employee_grade",], as_dict=1)
 	max_allowed_leaves = lt_data.max_leaves_allowed
-	employee_filters = {}
+	employee_filters = {"status": "Active"}
 	if lt_data.custom_based_on_employee_grade:
 		grade_list = frappe.db.get_all("Leave Grade", {"parent": leave_type}, pluck="employee_grade")
 		if grade_list:
@@ -48,16 +48,17 @@ def create_leave_allocation(leave_type, is_earned_leave=0):
 def update_new_leaves_allocated(employee_name, leave_type, from_date, to_date, allocated_leaves, max_allowed_leaves):
 
 	if leave_allocation := frappe.get_doc("Leave Allocation", {"employee": employee_name, "leave_type": leave_type, "to_date": to_date}):
-		remaining_leaves =  get_leave_balance_on(employee_name,leave_type,from_date,to_date=to_date,consider_all_leaves_in_the_allocation_period=True)
+		remaining_leaves =  get_leave_balance_on(employee_name,leave_type,leave_allocation.from_date,to_date=leave_allocation.to_date,consider_all_leaves_in_the_allocation_period=True)
 
 		new_leaves_total = remaining_leaves + allocated_leaves
+		extra_leave = allocated_leaves
 		if new_leaves_total > max_allowed_leaves:
 			extra_leave = max_allowed_leaves - remaining_leaves
 			leave_allocation.new_leaves_allocated = leave_allocation.new_leaves_allocated + extra_leave
 		else:
 			leave_allocation.new_leaves_allocated += allocated_leaves
 
-		leave_allocation.add_comment(text=_("Auto Allocation of {0} Days has been added").format(allocated_leaves))
+		leave_allocation.add_comment(text=_("Auto Allocation of {0} Days has been added").format(extra_leave))
 		leave_allocation.save()
 	
 	else:
