@@ -281,29 +281,42 @@ class CustomPayrollEntry(PayrollEntry):
 
 		if voucher_type == "Journal Entry":
 			journal_entry.title = payroll_payable_account
+
+		account_data = {}
+		for row in journal_entry.accounts:
+			if row.get("credit_in_account_currency", 0) > 0:
+				if account_data.get(row.account):
+					account_data[row.get("account")][1] += row.get("credit_in_account_currency")
+				else:
+					account_data[row.get("account")] = [row.idx, row.get("credit_in_account_currency")]
 		
-		account_data = {row.get("account"): row.get("credit_in_account_currency") for row in accounts if row.get("credit_in_account_currency", 0) > 0}
+		# account_data = {row.get("account"): [row.idx, row.get("credit_in_account_currency")] for row in accounts if row.get("credit_in_account_currency", 0) > 0}
 
 		add_sc_com = frappe.db.get_all("Salary Component", {"type": "Deduction", "do_not_include_in_total": 1, "custom_debit_account": ["is", "set"]}, ["name", "custom_debit_account"])
 
+		remove_idx = []
 		if add_sc_com:
 			for row in add_sc_com:
 				account = self.get_salary_component_account(row.name)
-				if not account_data.get(account):
-					continue
-				journal_entry.append("accounts", {
-					"account": row.custom_debit_account,
-					"debit_in_account_currency": account_data.get(account, 0),
-					"credit_in_account_currency": 0,
-					"cost_center": self.cost_center
-				})
-				journal_entry.append("accounts", {
-					"account": account,
-					"debit_in_account_currency": 0,
-					"credit_in_account_currency": account_data.get(account, 0),
-					"cost_center": self.cost_center
-				})
-
+				if account in account_data.keys():
+					journal_entry.append("accounts", {
+						"account": row.custom_debit_account,
+						"debit_in_account_currency": account_data.get(account)[1],
+						"credit_in_account_currency": 0,
+						"cost_center": self.cost_center
+					})
+					journal_entry.append("accounts", {
+						"account": account,
+						"debit_in_account_currency": 0,
+						"credit_in_account_currency": account_data.get(account, 0)[1],
+						"cost_center": self.cost_center
+					})
+					remove_idx.append(account_data.get(account, 0)[0])
+		journal_entry.save(ignore_permissions=True)
+		
+		for i in journal_entry.accounts:
+			if i.idx in remove_idx:
+				i.delete()
 		journal_entry.save(ignore_permissions=True)
 
 		try:
