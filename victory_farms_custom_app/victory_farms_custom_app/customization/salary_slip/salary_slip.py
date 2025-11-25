@@ -268,3 +268,35 @@ def udpate_foreign_currency(self):
 	self.custom_foreign_total_deduction = fmt_money(flt(self.total_deduction / exchange_rate, 2), 2, foreign_currency)
 	self.custom_foreign_net_pay = fmt_money(flt(self.net_pay / exchange_rate, 2), 2, foreign_currency)
 	self.custom_foreign_rounded_total = fmt_money(flt(self.rounded_total / exchange_rate, 0), 2, foreign_currency)
+ 
+ #Including a field to show a new salary component named Net Pay (excluding Bonus)
+ #Net Pay excluding Bonus = net_pay - (B_Dept + B_Ind + B_Company + B_Company_An + B_Dept_An + B_Ind_An + B_Company_Q + B_Dept_Q + B_Ind_q + Bonus)
+def validate(self, method):
+	# Debug: log earnings rows for troubleshooting
+	try:
+		for e in self.earnings:
+			frappe.log_error(
+				f"SalarySlip earnings: {e.salary_component} amount={e.amount} default_amount={getattr(e, 'default_amount', None)} additional_amount={getattr(e, 'additional_amount', None)}"
+			)
+	except Exception:
+		frappe.log_error("Failed to log self.earnings")
+
+	bonus_components = [
+		"Bonus Department",
+		"Bonus Individual",
+		"Bonus Company",
+		"Bonus Company (Annual)",
+		"Bonus Department (Annual)",
+		"Bonus Individual (Annual)",
+		"Bonus Company (Quarterly)",
+		"Bonus Department (Quarterly)",
+		"Bonus Individual (Quarterly)",
+		"Bonus"
+	]
+	bonus_amount = 0
+	for row in self.earnings:
+		if row.salary_component in bonus_components:
+			bonus_amount += row.amount or 0
+	self.custom_net_pay_excluding_bonus = self.net_pay - bonus_amount
+	
+   
