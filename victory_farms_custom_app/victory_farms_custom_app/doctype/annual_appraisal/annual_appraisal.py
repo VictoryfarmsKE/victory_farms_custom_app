@@ -39,7 +39,7 @@ class AnnualAppraisal(Document):
         company_score_value = self.company_score
         company_score = flt((company_score_value * 100) / 5, 2)
         matrix_percent = ap_doc.get_matrix_percent(company_score)
-        company_bonus_percent = ap_doc.get_bonus_percent(self.company_bonus_potential, matrix_percent)
+        company_bonus_percent = ap_doc.get_bonus_percent(self.bonus_potential_company, matrix_percent)
         company_bonus = flt((company_bonus_percent / 100) * bonus_calculation_amount, 3)
 
         ap_doc.append("appraisal_payout_details",{
@@ -155,7 +155,7 @@ class AnnualAppraisal(Document):
         APC = frappe.qb.DocType("Appraisal Cycle")
         APP = frappe.qb.DocType("Appraisal")
 
-        indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(APP.custom_total_individual_goal_score, ConstantColumn(1).as_("count"), APP.appraisal_cycle, APC.start_date
+        indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(APP.total_score.as_("custom_total_individual_goal_scor"), ConstantColumn(1).as_("count"), APP.appraisal_cycle, APC.start_date
             ).where((APP.employee == self.employee)  & (APP.docstatus == 1) 
             & (APC.end_date.isin(quarter_data["dates"]))).orderby(APC.start_date)
 
