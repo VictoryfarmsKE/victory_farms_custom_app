@@ -148,7 +148,9 @@ doc_events = {
     },
     "Employee": {
         "validate": "victory_farms_custom_app.victory_farms_custom_app.customization.employee.employee.validate",
-        "after_insert": "victory_farms_custom_app.victory_farms_custom_app.customization.employee.employee.after_insert"
+        "after_insert": [
+            "victory_farms_custom_app.victory_farms_custom_app.customization.leave_type.leave_type.enqueue_create_allocations_for_new_employee"
+        ]
     },
     "Employee Checkin": {
         "validate": "victory_farms_custom_app.victory_farms_custom_app.customization.employee_checkin.employee_checkin.validate"

@@ -47,8 +47,24 @@ def create_leave_allocation(leave_type, is_earned_leave=0):
 
 def update_new_leaves_allocated(employee_name, leave_type, from_date, to_date, allocated_leaves, max_allowed_leaves):
 
-	if leave_allocation := frappe.get_doc("Leave Allocation", {"employee": employee_name, "leave_type": leave_type, "to_date": to_date}):
-		remaining_leaves =  get_leave_balance_on(employee_name,leave_type,leave_allocation.from_date,to_date=leave_allocation.to_date,consider_all_leaves_in_the_allocation_period=True)
+	# Look for an existing Leave Allocation for this employee, leave type and period
+	existing = frappe.get_all(
+		"Leave Allocation",
+		filters={"employee": employee_name, "leave_type": leave_type, "to_date": to_date},
+		fields=["name"],
+		limit_page_length=1,
+	)
+
+	if existing:
+		leave_allocation = frappe.get_doc("Leave Allocation", existing[0].name)
+
+		remaining_leaves = get_leave_balance_on(
+			employee_name,
+			leave_type,
+			leave_allocation.from_date,
+			to_date=leave_allocation.to_date,
+			consider_all_leaves_in_the_allocation_period=True,
+		)
 
 		new_leaves_total = remaining_leaves + allocated_leaves
 		extra_leave = allocated_leaves
@@ -60,7 +76,6 @@ def update_new_leaves_allocated(employee_name, leave_type, from_date, to_date, a
 
 		leave_allocation.add_comment(text=_("Auto Allocation of {0} Days has been added").format(extra_leave))
 		leave_allocation.save()
-	
 	else:
 		leave_allocation = frappe.new_doc("Leave Allocation")
 		leave_allocation.employee = employee_name
@@ -71,3 +86,101 @@ def update_new_leaves_allocated(employee_name, leave_type, from_date, to_date, a
 		leave_allocation.carry_forward = True
 		leave_allocation.add_comment(text=_("Auto Allocation of {0} Days has been added").format(allocated_leaves))
 		leave_allocation.save()
+ 
+
+def create_allocations_for_new_employee(doc, method=None):
+	"""Create initial leave allocations for a newly created employee.
+
+	This hook is intended to be called from `doc_events` on Employee `after_insert`.
+	It will attempt to find common leave types (annual, sick full-day, sick half-day,
+	and parental leave) and create allocations for the employee for the remainder
+	of the current year (from the employee's date_of_joining).
+	"""
+	if not getattr(doc, "name", None):
+		return
+
+	employee_name = doc.name
+	doj = getattr(doc, "date_of_joining", None) or today()
+	gender = getattr(doc, "gender", "").lower()
+
+	year_start = get_year_start(doj)
+	year_end = get_year_ending(doj)
+
+	# Exact Leave Type names to consider
+	leave_type_names = {
+		"annual": "Annual Leave",
+		"sick_full": "Sick Leave - Full Days",
+		"sick_half": "Sick Leave - Half Days",
+		"maternity": "Maternity Leave",
+		"paternity": "Paternity Leave",
+	}
+
+	# Determine which parental type to allocate based on gender
+	parental_key = "maternity" if gender in ("female", "f") else "paternity"
+
+	# Build list of leave type names we will query (only those relevant)
+	requested = [leave_type_names["annual"], leave_type_names["sick_full"], leave_type_names["sick_half"], leave_type_names[parental_key]]
+
+	# Fetch leave type rows in a single DB call
+	lt_rows = frappe.get_all(
+		"Leave Type",
+		filters={"name": ["in", requested]},
+		fields=["name", "custom_max_active_allowed_leaves", "is_earned_leave"],
+	)
+	lt_map = {row.name: row for row in lt_rows}
+
+	# Standard defaults
+	defaults = {"Sick Leave - Full Days": 7, "Sick Leave - Half Days": 7, "Maternity Leave": 90, "Paternity Leave": 14, "Annual Leave": 0}
+
+	# Iterate requested leave types (stable order) and allocate
+	for lt_name in requested:
+		try:
+			if lt_name not in lt_map:
+				# skip missing leave types
+				continue
+
+			row = lt_map[lt_name]
+			max_allowed = row.custom_max_active_allowed_leaves or defaults.get(lt_name, 0)
+			is_earned = bool(row.is_earned_leave)
+
+			# Calculate allocation:
+			if is_earned:
+				allocated = flt(max_allowed / 12, 2)
+				employee_from_date = doj
+			else:
+				allocated = max_allowed
+				employee_from_date = year_start
+				if lt_name == "Annual Leave" and year_start < doj < year_end:
+					months = month_diff(year_end, doj) if get_first_day(doj) == doj else (month_diff(year_end, doj) - 1)
+					allocated = flt((allocated * months) / 12, 2)
+					employee_from_date = doj
+
+			update_new_leaves_allocated(employee_name, lt_name, employee_from_date, year_end, allocated, max_allowed)
+		except Exception as e:
+			frappe.log_error(title="New Employee Leave Allocation Error", message=f"{employee_name} / {lt_name}: {e}")
+
+
+def create_allocations_for_new_employee_from_name(docname):
+	"""Helper to call allocation function by docname (safe for background jobs)."""
+	try:
+		doc = frappe.get_doc("Employee", docname)
+	except Exception:
+		return
+	create_allocations_for_new_employee(doc)
+
+
+def enqueue_create_allocations_for_new_employee(doc, method=None):
+	"""Enqueue the allocation job to avoid long-running locks during Employee creation."""
+	try:
+		frappe.enqueue(
+			method="victory_farms_custom_app.victory_farms_custom_app.customization.leave_type.leave_type.create_allocations_for_new_employee_from_name",
+			queue="long",
+			timeout=600,
+			docname=doc.name,
+		)
+	except Exception as e:
+		frappe.log_error(title="Enqueue Allocation Failed", message=str(e))
+		try:
+			create_allocations_for_new_employee(doc)
+		except Exception:
+			pass
