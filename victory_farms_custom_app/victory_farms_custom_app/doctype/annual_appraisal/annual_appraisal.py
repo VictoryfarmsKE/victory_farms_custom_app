@@ -221,11 +221,7 @@ class AnnualAppraisal(Document):
         APC = frappe.qb.DocType("Appraisal Cycle")
         APP = frappe.qb.DocType("Appraisal")
 
-<<<<<<< HEAD
         indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(APP.total_score, ConstantColumn(1).as_("count"), APP.appraisal_cycle, APC.start_date
-=======
-        indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(APP.total_score.as_("custom_total_individual_goal_scor"), ConstantColumn(1).as_("count"), APP.appraisal_cycle, APC.start_date
->>>>>>> 1346290d85cd89cfad799d6cee2a27e3d7940048
             ).where((APP.employee == self.employee)  & (APP.docstatus == 1) 
             & (APC.end_date.isin(quarter_data["dates"]))).orderby(APC.start_date)
 
