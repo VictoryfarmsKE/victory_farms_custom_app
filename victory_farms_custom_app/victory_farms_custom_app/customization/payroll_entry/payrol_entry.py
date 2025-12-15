@@ -281,31 +281,43 @@ class CustomPayrollEntry(PayrollEntry):
 
 		if voucher_type == "Journal Entry":
 			journal_entry.title = payroll_payable_account
-		
-		account_data = {row.get("account"): row.get("credit_in_account_currency") for row in accounts if row.get("credit_in_account_currency", 0) > 0}
+
+		account_data = {}
+		last_index = 0
+		for row in journal_entry.accounts:
+			if row.get("credit_in_account_currency") and row.get("credit_in_account_currency", 0) > 0:
+				if account_data.get(row.account):
+					account_data[row.get("account")][1] += row.get("credit_in_account_currency")
+				else:
+					account_data[row.get("account")] = [row.idx, row.get("credit_in_account_currency")]
+			last_index = row.idx
+			
+		# account_data = {row.get("account"): [row.idx, row.get("credit_in_account_currency")] for row in accounts if row.get("credit_in_account_currency", 0) > 0}
 
 		add_sc_com = frappe.db.get_all("Salary Component", {"type": "Deduction", "do_not_include_in_total": 1, "custom_debit_account": ["is", "set"]}, ["name", "custom_debit_account"])
+		
 
+		value = 0
+		total_debit_amount = 0
 		if add_sc_com:
 			for row in add_sc_com:
 				account = self.get_salary_component_account(row.name)
-				if not account_data.get(account):
-					continue
-				journal_entry.append("accounts", {
-					"account": row.custom_debit_account,
-					"debit_in_account_currency": account_data.get(account, 0),
-					"credit_in_account_currency": 0,
-					"cost_center": self.cost_center
-				})
-				journal_entry.append("accounts", {
-					"account": account,
-					"debit_in_account_currency": 0,
-					"credit_in_account_currency": account_data.get(account, 0),
-					"cost_center": self.cost_center
-				})
-
+				if account in account_data.keys():
+					amt = account_data.get(account)[1]/2
+					value += amt
+					debit_amount = account_data.get(account)[1] / 2
+					journal_entry.append("accounts", {
+						"account": row.custom_debit_account,
+						"debit_in_account_currency": debit_amount,
+						"credit_in_account_currency": 0,
+						"cost_center": self.cost_center
+					})
+					total_debit_amount += debit_amount
+		for i in journal_entry.accounts:
+			if i.idx == last_index:
+				i.credit_in_account_currency += value
 		journal_entry.save(ignore_permissions=True)
-
+		
 		try:
 			if submit_journal_entry:
 				journal_entry.submit()
