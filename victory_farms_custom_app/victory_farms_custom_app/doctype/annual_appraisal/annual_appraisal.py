@@ -39,7 +39,7 @@ class AnnualAppraisal(Document):
         company_score_value = self.company_score
         company_score = flt((company_score_value * 100) / 5, 2)
         matrix_percent = ap_doc.get_matrix_percent(company_score)
-        company_bonus_percent = ap_doc.get_bonus_percent(self.company_bonus_potential, matrix_percent)
+        company_bonus_percent = ap_doc.get_bonus_percent(self.bonus_potential_company, matrix_percent)
         company_bonus = flt((company_bonus_percent / 100) * bonus_calculation_amount, 3)
 
         ap_doc.append("appraisal_payout_details",{
@@ -62,11 +62,53 @@ class AnnualAppraisal(Document):
 
         self.department_map = {row.department: row.weightage for row in department_data}
     
-        dep_score_data = self.get_appraisal_data()
+        # If there are no departments, avoid querying appraisal data
+        # which would produce an empty IN () clause in SQL. Use an
+        # empty list for subsequent processing.
+        # Build quarter ranges once and reuse
+        quarter_data = self._build_quarter_data()
+
+        # prepare counter for individual scores (used whether departments exist or not)
+        individual_scr = 0
+
+        # If there are no departments, still fetch individual appraisal
+        # scores (they are recorded separately) and populate the
+        # per-quarter individual fields. Department appraisal data is
+        # independent, so we only call get_appraisal_data when there
+        # are departments to fetch.
+        if not self.department_map:
+            APC = frappe.qb.DocType("Appraisal Cycle")
+            APP = frappe.qb.DocType("Appraisal")
+            indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(
+                APP.total_score, ConstantColumn(1).as_("count"), APP.appraisal_cycle, APC.start_date
+            ).where((APP.employee == self.employee) & (APP.docstatus == 1) & (APC.end_date.isin(quarter_data["dates"]))).orderby(APC.start_date)
+
+            indi_rows = indi_query.run(as_dict=1)
+            # Map appraisal rows to quarters and set qX_individual fields
+            for row in indi_rows:
+                start_date = row.get("start_date")
+                quarter_label = None
+                if quarter_data["Q1"][0] <= start_date <= quarter_data["Q1"][1]:
+                    quarter_label = "Q1"
+                elif quarter_data["Q2"][0] <= start_date <= quarter_data["Q2"][1]:
+                    quarter_label = "Q2"
+                elif quarter_data["Q3"][0] <= start_date <= quarter_data["Q3"][1]:
+                    quarter_label = "Q3"
+                elif quarter_data["Q4"][0] <= start_date <= quarter_data["Q4"][1]:
+                    quarter_label = "Q4"
+
+                if quarter_label:
+                    if self.get(f"{quarter_label.lower()}_individual") != row.get("total_score"):
+                        individual_scr += int(row.get("count")) if row.get("count") else 0
+                        self.db_set(f"{quarter_label.lower()}_individual", row.get("total_score") if row.get("total_score") else 0)
+
+            # proceed with empty department scores
+            dep_score_data = []
+        else:
+            dep_score_data = self.get_appraisal_data()
 
         dep_quarter_data = frappe._dict({})
         self.quarterly_department_details = []
-        individual_scr = 0
         for row in dep_score_data:
             weightage = self.department_map[row.department]
             self.append("quarterly_department_details", {
@@ -76,13 +118,25 @@ class AnnualAppraisal(Document):
                 "weightage": weightage,
                 "score": row.total_goal_score
             })
-            if self.get(f"{row.quarter.lower()}_individual") != row.get("custom_total_individual_goal_score"):
+            if self.get(f"{row.quarter.lower()}_individual") != row.get("total_score"):
                 individual_scr += int(row.get("count")) if row.get("count") else 0
-                self.db_set(f"{row.quarter.lower()}_individual", row.get("custom_total_individual_goal_score") if row.get("custom_total_individual_goal_score") else 0)
+                self.db_set(f"{row.quarter.lower()}_individual", row.get("total_score") if row.get("total_score") else 0)
             dep_quarter_data.setdefault((row.quarter, row.department, weightage), 0) 
             dep_quarter_data[(row.quarter, row.department, weightage)] += row.total_goal_score
 
         score_count = individual_scr
+        # If we didn't count any individual appraisal rows (because
+        # the quarter fields were already set), derive the count from
+        # the existing q1..q4 individual fields so we can compute the
+        # average correctly.
+        if not score_count:
+            q1 = flt(getattr(self, "q1_individual", 0))
+            q2 = flt(getattr(self, "q2_individual", 0))
+            q3 = flt(getattr(self, "q3_individual", 0))
+            q4 = flt(getattr(self, "q4_individual", 0))
+            non_empty = sum(1 for v in (q1, q2, q3, q4) if v is not None and v != "")
+            if non_empty:
+                score_count = non_empty
         self.q1_avg = 0
         self.q2_avg = 0
         self.q3_avg = 0
@@ -99,7 +153,15 @@ class AnnualAppraisal(Document):
             else:
                 self.q4_avg += dep_avg
         
-        self.total_individual_score = flt((self.q1_individual + self.q2_individual + self.q3_individual + self.q4_individual) / score_count, 2)
+        # Prevent division by zero when there are no individual scores counted
+        if score_count:
+            q1 = flt(getattr(self, "q1_individual", 0))
+            q2 = flt(getattr(self, "q2_individual", 0))
+            q3 = flt(getattr(self, "q3_individual", 0))
+            q4 = flt(getattr(self, "q4_individual", 0))
+            self.total_individual_score = flt((q1 + q2 + q3 + q4) / score_count, 2)
+        else:
+            self.total_individual_score = 0
         self.total_avg = flt((self.q1_avg + self.q2_avg + self.q3_avg + self.q4_avg) / 4, 2)
         
         december_start = datetime(int(self.fiscal_year), 12, 1).date()
@@ -133,8 +195,7 @@ class AnnualAppraisal(Document):
     def get_employee_department_data(self):
         return frappe.db.get_all("Department Details", {"parent": self.employee}, ["department", "weightage"])
 
-    def get_appraisal_data(self):
-
+    def _build_quarter_data(self):
         quarter_data = frappe._dict({
             "Q1": [],
             "Q3": [],
@@ -151,16 +212,21 @@ class AnnualAppraisal(Document):
             quarter_data["dates"].append(to_date)
             quarter_data[f"Q{idx + 1}"] = [from_date, to_date]
 
+        return quarter_data
+
+    def get_appraisal_data(self):
+        quarter_data = self._build_quarter_data()
+
         DPA = frappe.qb.DocType("Department Appraisal")
         APC = frappe.qb.DocType("Appraisal Cycle")
         APP = frappe.qb.DocType("Appraisal")
 
-        indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(APP.custom_total_individual_goal_score, ConstantColumn(1).as_("count"), APP.appraisal_cycle, APC.start_date
+        indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(APP.total_score, ConstantColumn(1).as_("count"), APP.appraisal_cycle, APC.start_date
             ).where((APP.employee == self.employee)  & (APP.docstatus == 1) 
             & (APC.end_date.isin(quarter_data["dates"]))).orderby(APC.start_date)
 
 
-        query = frappe.qb.from_(DPA).inner_join(APC).on(DPA.appraisal_cycle == APC.name).left_join(indi_query).on((indi_query.appraisal_cycle == APC.name) & (indi_query.start_date == APC.start_date)).select(DPA.department, DPA.appraisal_cycle, indi_query.custom_total_individual_goal_score, indi_query.count,
+        query = frappe.qb.from_(DPA).inner_join(APC).on(DPA.appraisal_cycle == APC.name).left_join(indi_query).on((indi_query.appraisal_cycle == APC.name) & (indi_query.start_date == APC.start_date)).select(DPA.department, DPA.appraisal_cycle, indi_query.total_score, indi_query.count,
             DPA.total_goal_score,
             frappe.qb.terms.Case()
             .when(APC.start_date[quarter_data["Q1"][0] : quarter_data["Q1"][1]], "Q1")
