@@ -154,15 +154,30 @@ class AnnualAppraisal(Document):
                 self.q4_avg += dep_avg
         
         # Prevent division by zero when there are no individual scores counted
-        if score_count:
-            q1 = flt(getattr(self, "q1_individual", 0))
-            q2 = flt(getattr(self, "q2_individual", 0))
-            q3 = flt(getattr(self, "q3_individual", 0))
-            q4 = flt(getattr(self, "q4_individual", 0))
-            self.total_individual_score = flt((q1 + q2 + q3 + q4) / score_count, 2)
+        # Only average quarters that have actual values (non-zero)
+        q1 = flt(getattr(self, "q1_individual", 0))
+        q2 = flt(getattr(self, "q2_individual", 0))
+        q3 = flt(getattr(self, "q3_individual", 0))
+        q4 = flt(getattr(self, "q4_individual", 0))
+        
+        # Count only quarters with actual individual scores
+        individual_quarters_with_scores = sum(1 for v in (q1, q2, q3, q4) if v and v > 0)
+        individual_total = sum(v for v in (q1, q2, q3, q4) if v and v > 0)
+        
+        if individual_quarters_with_scores:
+            self.total_individual_score = flt(individual_total / individual_quarters_with_scores, 2)
         else:
             self.total_individual_score = 0
-        self.total_avg = flt((self.q1_avg + self.q2_avg + self.q3_avg + self.q4_avg) / 4, 2)
+        
+        # Only average department quarters that have actual values (non-zero)
+        dept_quarters = [self.q1_avg, self.q2_avg, self.q3_avg, self.q4_avg]
+        dept_quarters_with_scores = sum(1 for v in dept_quarters if v and v > 0)
+        dept_total = sum(v for v in dept_quarters if v and v > 0)
+        
+        if dept_quarters_with_scores:
+            self.total_avg = flt(dept_total / dept_quarters_with_scores, 2)
+        else:
+            self.total_avg = 0
         
         december_start = datetime(int(self.fiscal_year), 12, 1).date()
         december_end = datetime(int(self.fiscal_year), 12, 31).date()
