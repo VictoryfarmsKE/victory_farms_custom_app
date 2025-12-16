@@ -30,7 +30,7 @@ class StoreDeduction(Document):
 				ads_doc.salary_component = salary_component
 				ads_doc.employee = self.employee
 				ads_doc.payroll_date = payroll_date
-				ads_doc.currency = frappe.db.get_value("Employee", self.employee, "salary_currency")
+				ads_doc.currency = "KES"
 				ads_doc.amount = item_cost
 				ads_doc.overwrite_salary_structure_amount = 1
 
@@ -81,7 +81,7 @@ def create_remaining_payments():
 			ads_doc.salary_component = salary_component
 			ads_doc.employee = sd_doc.employee
 			ads_doc.payroll_date = todays_date if not emp_data.relieving_date else emp_data.relieving_date
-			ads_doc.currency = emp_data.salary_currency
+			ads_doc.currency = "KES"
 			ads_doc.amount = item_cost if not emp_data.relieving_date else item_cost * sd_doc.remaining_payments
 			ads_doc.overwrite_salary_structure_amount = 1
 		try:
