@@ -62,20 +62,12 @@ class AnnualAppraisal(Document):
 
         self.department_map = {row.department: row.weightage for row in department_data}
     
-        # If there are no departments, avoid querying appraisal data
-        # which would produce an empty IN () clause in SQL. Use an
-        # empty list for subsequent processing.
-        # Build quarter ranges once and reuse
         quarter_data = self._build_quarter_data()
 
         # prepare counter for individual scores (used whether departments exist or not)
         individual_scr = 0
 
-        # If there are no departments, still fetch individual appraisal
-        # scores (they are recorded separately) and populate the
-        # per-quarter individual fields. Department appraisal data is
-        # independent, so we only call get_appraisal_data when there
-        # are departments to fetch.
+
         if not self.department_map:
             APC = frappe.qb.DocType("Appraisal Cycle")
             APP = frappe.qb.DocType("Appraisal")
@@ -102,12 +94,12 @@ class AnnualAppraisal(Document):
                         individual_scr += int(row.get("count")) if row.get("count") else 0
                         self.db_set(f"{quarter_label.lower()}_individual", row.get("total_score") if row.get("total_score") else 0)
 
-            # proceed with empty department scores
             dep_score_data = []
         else:
             dep_score_data = self.get_appraisal_data()
 
-        dep_quarter_data = frappe._dict({})
+        dep_quarter_data = frappe._dict({})  # stores sum of scores
+        dep_quarter_count = frappe._dict({})  # stores count of scores
         self.quarterly_department_details = []
         for row in dep_score_data:
             weightage = self.department_map[row.department]
@@ -123,12 +115,12 @@ class AnnualAppraisal(Document):
                 self.db_set(f"{row.quarter.lower()}_individual", row.get("total_score") if row.get("total_score") else 0)
             dep_quarter_data.setdefault((row.quarter, row.department, weightage), 0) 
             dep_quarter_data[(row.quarter, row.department, weightage)] += row.total_goal_score
+            # Track count of actual scores per group
+            dep_quarter_count.setdefault((row.quarter, row.department, weightage), 0)
+            dep_quarter_count[(row.quarter, row.department, weightage)] += 1
 
         score_count = individual_scr
-        # If we didn't count any individual appraisal rows (because
-        # the quarter fields were already set), derive the count from
-        # the existing q1..q4 individual fields so we can compute the
-        # average correctly.
+       
         if not score_count:
             q1 = flt(getattr(self, "q1_individual", 0))
             q2 = flt(getattr(self, "q2_individual", 0))
@@ -143,7 +135,9 @@ class AnnualAppraisal(Document):
         self.q4_avg = 0
 
         for row in dep_quarter_data:
-            dep_avg = flt((dep_quarter_data[row] / 3) * (row[2] / 100), 3)
+            # Divide by actual count of scores instead of hardcoded 3
+            actual_count = dep_quarter_count.get(row, 1)
+            dep_avg = flt((dep_quarter_data[row] / actual_count) * (row[2] / 100), 3)
             if row[0] == "Q1":
                 self.q1_avg += dep_avg
             elif row[0] == "Q2":
@@ -152,8 +146,7 @@ class AnnualAppraisal(Document):
                 self.q3_avg += dep_avg
             else:
                 self.q4_avg += dep_avg
-        
-        # Prevent division by zero when there are no individual scores counted
+        d
         # Only average quarters that have actual values (non-zero)
         q1 = flt(getattr(self, "q1_individual", 0))
         q2 = flt(getattr(self, "q2_individual", 0))
