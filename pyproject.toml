@@ -1,5 +1,5 @@
 [project]
-name = "victory-farms-custom-app"
+name = "victory_farms_custom_app"
 version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = []
