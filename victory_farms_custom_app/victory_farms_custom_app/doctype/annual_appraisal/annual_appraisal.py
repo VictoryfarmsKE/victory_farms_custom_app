@@ -146,7 +146,7 @@ class AnnualAppraisal(Document):
                 self.q3_avg += dep_avg
             else:
                 self.q4_avg += dep_avg
-        d
+    
         # Only average quarters that have actual values (non-zero)
         q1 = flt(getattr(self, "q1_individual", 0))
         q2 = flt(getattr(self, "q2_individual", 0))
