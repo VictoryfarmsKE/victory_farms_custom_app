@@ -156,10 +156,10 @@ doc_events = {
     "Appraisal": {
         "before_validate": "victory_farms_custom_app.victory_farms_custom_app.customization.appraisal.appraisal.before_validate"
     },
-    "Leave Allocation": {
-        "on_submit": "victory_farms_custom_app.victory_farms_custom_app.customization.leave_allocation.leave_allocation.on_submit",
-        "on_update_after_submit": "victory_farms_custom_app.victory_farms_custom_app.customization.leave_allocation.leave_allocation.on_update_after_submit"
-    },
+    # "Leave Allocation": {
+    #     "on_submit": "victory_farms_custom_app.victory_farms_custom_app.customization.leave_allocation.leave_allocation.on_submit",
+    #     "on_update_after_submit": "victory_farms_custom_app.victory_farms_custom_app.customization.leave_allocation.leave_allocation.on_update_after_submit"
+    # },
     "Salary Structure Assignment": {
         "on_submit": "victory_farms_custom_app.victory_farms_custom_app.customization.salary_structure_assignment.salary_structure_assignment.on_submit",
     }
