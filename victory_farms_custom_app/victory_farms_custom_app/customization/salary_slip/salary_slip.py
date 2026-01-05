@@ -275,9 +275,10 @@ def validate(self, method):
 	# Debug: log earnings rows for troubleshooting
 	try:
 		for e in self.earnings:
-			frappe.log_error(
-				f"SalarySlip earnings: {e.salary_component} amount={e.amount} default_amount={getattr(e, 'default_amount', None)} additional_amount={getattr(e, 'additional_amount', None)}"
-			)
+			# frappe.log_error(
+			# 	f"SalarySlip earnings: {e.salary_component} amount={e.amount} default_amount={getattr(e, 'default_amount', None)} additional_amount={getattr(e, 'additional_amount', None)}"
+			# )
+			return
 	except Exception:
 		frappe.log_error("Failed to log self.earnings")
 

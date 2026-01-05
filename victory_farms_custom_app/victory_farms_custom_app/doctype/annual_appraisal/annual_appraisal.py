@@ -63,17 +63,25 @@ class AnnualAppraisal(Document):
         self.department_map = {row.department: row.weightage for row in department_data}
     
         quarter_data = self._build_quarter_data()
-
-        # prepare counter for individual scores (used whether departments exist or not)
         individual_scr = 0
 
 
         if not self.department_map:
+            # Get employee's date of joining to filter scores for mid-year joiners
+            date_of_joining = frappe.db.get_value("Employee", self.employee, "date_of_joining")
+            joining_month_start = get_first_day(date_of_joining) if date_of_joining else None
+            
             APC = frappe.qb.DocType("Appraisal Cycle")
             APP = frappe.qb.DocType("Appraisal")
             indi_query = frappe.qb.from_(APP).inner_join(APC).on(APP.appraisal_cycle == APC.name).select(
                 APP.total_score, ConstantColumn(1).as_("count"), APP.appraisal_cycle, APC.start_date
-            ).where((APP.employee == self.employee) & (APP.docstatus == 1) & (APC.end_date.isin(quarter_data["dates"]))).orderby(APC.start_date)
+            ).where((APP.employee == self.employee) & (APP.docstatus == 1) & (APC.end_date.isin(quarter_data["dates"])))
+            
+            # Filter by joining month - only include cycles from the month employee joined
+            if joining_month_start:
+                indi_query = indi_query.where(APC.start_date >= joining_month_start)
+            
+            indi_query = indi_query.orderby(APC.start_date)
 
             indi_rows = indi_query.run(as_dict=1)
             # Map appraisal rows to quarters and set qX_individual fields
@@ -179,19 +187,24 @@ class AnnualAppraisal(Document):
         
         employee_data = frappe.db.get_value("Employee", self.employee, ["custom_appraisal_on_group", "company"], as_dict=1)
         
+        #Weighted company score calculation for group
         if employee_data.get("custom_appraisal_on_group"):
-            company = frappe.db.get_single_value("Navari Custom Payroll Settings", "group_company")
+            self.company_score = self.get_weighted_company_score(appraisal_cycle)
         else:
+            #Single company - use Employee's company directly
             company = employee_data.get("company")
+            raw_score = frappe.db.get_value(
+                "Company Appraisal",
+                {"appraisal_cycle": appraisal_cycle, "docstatus": 1, "company": company},
+                "score"
+            )
             
-        self.company_score = frappe.db.get_value("Company Appraisal",{"appraisal_cycle": appraisal_cycle,"docstatus":1, "company": company},"score")
-
-        if not self.company_score:
-            self.company_score = 0
-            frappe.msgprint("No Company Appraisal found for the given date range.")
-        
-        self.company_score  = flt(self.company_score * (5 / 100), 3)
-
+            if not raw_score:
+                raw_score = 0
+                frappe.msgprint("No Company Appraisal found for the given date range.")
+            
+            self.company_score = flt(raw_score * (5 / 100), 3)
+    
         total = flt(sum([
             self.bonus_potential * self.total_individual_score,
             self.bonus_potential_department* self.total_avg,
@@ -199,6 +212,50 @@ class AnnualAppraisal(Document):
         ]), 3)
 
         self.final_score = flt(total / (self.bonus_potential + self.bonus_potential_department + self.bonus_potential_company),3)
+
+    def get_weighted_company_score(self, appraisal_cycle):
+        """Calculate weighted company score from multiple Company Appraisals.
+        
+        Fetches company weights from Employee's custom_group_company_details child table
+        and calculates: score = Σ (company_score_i × weight_i / 100)
+        
+        Returns:
+            float: Weighted company score on 0-5 scale
+        """
+        group_companies = frappe.get_all(
+            "Employee Group Appraisal Company",
+            filters={"parent": self.employee, "parentfield": "custom_group_company_details"},
+            fields=["company", "weight"]
+        )
+        
+        if not group_companies:
+            frappe.msgprint("No group companies defined for employee. Using 0 for company score.")
+            return 0
+        
+        weighted_score = 0
+        missing_appraisals = []
+        
+        for row in group_companies:
+            raw_score = frappe.db.get_value(
+                "Company Appraisal",
+                {"appraisal_cycle": appraisal_cycle, "docstatus": 1, "company": row.company},
+                "score"
+            )
+            
+            if raw_score is None:
+                missing_appraisals.append(row.company)
+                raw_score = 0
+            
+            # Convert to 0-5 scale and apply weight
+            score_0_5 = flt(raw_score * (5 / 100), 3)
+            weighted_score += flt(score_0_5 * (row.weight / 100), 3)
+        
+        if missing_appraisals:
+            frappe.msgprint(
+                f"No Company Appraisal found for: {', '.join(missing_appraisals)}. Using 0 for missing companies."
+            )
+        
+        return flt(weighted_score, 3)
 
     def get_employee_department_data(self):
         return frappe.db.get_all("Department Details", {"parent": self.employee}, ["department", "weightage"])
@@ -224,6 +281,11 @@ class AnnualAppraisal(Document):
 
     def get_appraisal_data(self):
         quarter_data = self._build_quarter_data()
+        
+        # Get employee's date of joining to filter department scores
+        date_of_joining = frappe.db.get_value("Employee", self.employee, "date_of_joining")
+        # Use first day of joining month (include partial months)
+        joining_month_start = get_first_day(date_of_joining) if date_of_joining else None
 
         DPA = frappe.qb.DocType("Department Appraisal")
         APC = frappe.qb.DocType("Appraisal Cycle")
@@ -243,6 +305,12 @@ class AnnualAppraisal(Document):
             .when(APC.start_date[quarter_data["Q4"][0] : quarter_data["Q4"][1]], "Q4")
             .else_("No Quarter").as_("quarter")
             ).where((DPA.department.isin(list(self.department_map.keys()))) & (DPA.docstatus == 1) 
-            & (APC.start_date[quarter_data["Year"][0] : quarter_data["Year"][1]])).orderby(APC.start_date)
+            & (APC.start_date[quarter_data["Year"][0] : quarter_data["Year"][1]]))
+        
+        # Filter by joining month - only include cycles from the month employee joined
+        if joining_month_start:
+            query = query.where(APC.start_date >= joining_month_start)
+        
+        query = query.orderby(APC.start_date)
 
         return query.run(as_dict = 1)
