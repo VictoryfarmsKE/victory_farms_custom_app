@@ -27,6 +27,7 @@ class AnnualAppraisal(Document):
         ap_doc.end_date = year_dates.get("year_end_date")
         ap_doc.payout_frequency = "Annually"
         bonus_calculation_amount = ap_doc.get_amount_used_for_bonus_calculation(self.employee)
+        frappe.log_error(f"Bonus Calculation Amount: {bonus_calculation_amount}")
 
         individual_score_value = self.total_individual_score
         individual_score = flt((individual_score_value * 100) / 5, 2)
