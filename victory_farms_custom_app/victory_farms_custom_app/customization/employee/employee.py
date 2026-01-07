@@ -25,14 +25,14 @@ def validate(self, method):
         group_companies = self.get("custom_group_company_details") or []
         
         if not group_companies:
-            frappe.msgprint(
+            frappe.throw(
                 _("When 'Appraisal on Group' is enabled, you must define at least one company in 'Group Company Details'.")
             )
         
         total_weight = sum(flt(row.weight) for row in group_companies)
         
         if flt(total_weight, 2) != 100.0:
-            frappe.msgprint(
+            frappe.throw(
                 _("Group company weights must sum to 100%. Current total: {0}%").format(flt(total_weight, 2))
             )
 

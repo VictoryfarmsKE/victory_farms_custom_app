@@ -11,6 +11,10 @@ from frappe.query_builder.custom import ConstantColumn
 
 
 class AnnualAppraisal(Document):
+    def before_submit(self):
+        """Ensure all scores are calculated before submit"""
+        self.get_department_data()
+    
     def on_submit(self):
         self.create_appraisal_payout()
 
@@ -44,8 +48,11 @@ class AnnualAppraisal(Document):
 
         ap_doc.append("appraisal_payout_details",{
             "employee": self.employee, 
+            "individual_score": individual_score,
             "individual_score_value": self.total_individual_score,
+            "department_score": department_score,
             "department_score_value": self.total_avg,
+            "company_score": company_score,
             "company_score_value": self.company_score,
             "individual_bonus": individual_bonus,
             "department_bonus": department_bonus,
