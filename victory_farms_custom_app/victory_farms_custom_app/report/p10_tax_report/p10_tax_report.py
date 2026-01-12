@@ -141,12 +141,6 @@ def get_columns():
 			"width": 150
 		},
 		{
-			"fieldname": "taxable_pay", 
-			"label": _("Taxable Pay"), 
-			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
 			"fieldname": "tax_payable", 
 			"label": _("Taxable Pay (Ksh) (O)"), 
 			"fieldtype": "Float", 
