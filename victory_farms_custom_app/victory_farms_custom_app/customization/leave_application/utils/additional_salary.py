@@ -1,6 +1,6 @@
 import frappe
 from frappe import _
-from frappe.utils import flt, get_last_day, date_diff
+from frappe.utils import flt, get_last_day, date_diff, getdate
 from datetime import timedelta
 from victory_farms_custom_app.victory_farms_custom_app.customization.leave_allocation.leave_allocation import get_assigned_salary_structure_assignment
 
@@ -10,9 +10,10 @@ def create_additional_salary(self):
 
 	# Check if Leave Type is "Unpaid Leave" and Employee Grade contains "H"
 	employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
-	if self.leave_type == "Unpaid Leave" and employee_grade and "H" in employee_grade:
+ 
+	if self.leave_type == "Unpaid Leave" and employee_grade and ("H" in employee_grade or "P" in employee_grade):
 		frappe.msgprint(
-			msg="Additional Salary will not be created for 'Unpaid Leave' when the employee grade contains 'H'.",
+			msg="Additional Salary will not be created for 'Unpaid Leave' when the employee grade contains 'H' or 'P'.",
 			title="Notice",
 			indicator="orange"
 		)
@@ -29,14 +30,18 @@ def create_additional_salary(self):
 
 	date_range = {}
 
-	month_last_day = get_last_day(self.from_date)
+	# Ensure from_date and to_date are date objects
+	from_date = getdate(self.from_date)
+	to_date = getdate(self.to_date)
+
+	month_last_day = get_last_day(from_date)
 	next_month_last_date = None
-	if month_last_day >= self.to_date:
-		date_range.update({month_last_day : [self.from_date, self.to_date]})
+	if month_last_day >= to_date:
+		date_range.update({month_last_day: [from_date, to_date]})
 	else:
-		next_month_start_date = month_last_day + timedelta(days = 1)
-		next_month_last_date = get_last_day(self.to_date)
-		date_range.update({month_last_day : [self.from_date, month_last_day], next_month_last_date : [next_month_start_date, self.to_date]})
+		next_month_start_date = month_last_day + timedelta(days=1)
+		next_month_last_date = get_last_day(to_date)
+		date_range.update({month_last_day: [from_date, month_last_day], next_month_last_date: [next_month_start_date, to_date]})
 
 	for row in date_range:
 		leave_days = (date_diff(date_range[row][1], date_range[row][0]) + 1 )if date_range[row][1] != date_range[row][0] else 1
