@@ -43,24 +43,45 @@ def create_additional_salary(self):
 		next_month_last_date = get_last_day(to_date)
 		date_range.update({month_last_day: [from_date, month_last_day], next_month_last_date: [next_month_start_date, to_date]})
 
-	for row in date_range:
-		leave_days = (date_diff(date_range[row][1], date_range[row][0]) + 1 )if date_range[row][1] != date_range[row][0] else 1
+	total_leave_days = getattr(self, "total_leave_days", None)
+	if total_leave_days is None:
+		total_leave_days = (date_diff(to_date, from_date) + 1) if to_date != from_date else 1
 
-		if add_doc_name := frappe.db.get_value("Additional Salary", {"docstatus": 0, "employee": self.employee, "salary_component": salary_component, "payroll_date": row}):
+
+	total_calendar_days = (date_diff(to_date, from_date) + 1) if to_date != from_date else 1
+
+	for row in date_range:
+		seg_start, seg_end = date_range[row][0], date_range[row][1]
+		seg_calendar_days = (date_diff(seg_end, seg_start) + 1) if seg_end != seg_start else 1
+
+		if len(date_range) == 1:
+			seg_leave_days = total_leave_days
+		else:
+			seg_leave_days = (total_leave_days * seg_calendar_days) / float(total_calendar_days)
+
+		amount = flt(seg_leave_days * daily_pay, self.precision)
+
+		add_doc_name = frappe.db.get_value("Additional Salary", {"docstatus": 0, "ref_doctype": "Leave Application", "ref_docname": self.name, "salary_component": salary_component, "payroll_date": row})
+		if not add_doc_name:
+			add_doc_name = frappe.db.get_value("Additional Salary", {"docstatus": 0, "employee": self.employee, "salary_component": salary_component, "payroll_date": row})
+
+		if add_doc_name:
 			ads_doc = frappe.get_doc("Additional Salary", add_doc_name)
-			ads_doc.amount += flt(leave_days * daily_pay, self.precision)
+			ads_doc.amount = amount
 		else:
 			ads_doc = frappe.new_doc("Additional Salary")
 			ads_doc.employee = self.employee
 			ads_doc.salary_component = salary_component
 			ads_doc.currency = currency
 			ads_doc.payroll_date = row
-			ads_doc.amount = flt(leave_days * daily_pay, self.precision)
+			ads_doc.amount = amount
+			ads_doc.ref_doctype = "Leave Application"
+			ads_doc.ref_docname = self.name
 		# ads_doc.ref_doctype = "Leave Application"
 		# ads_doc.ref_docname = self.name
 
 		ads_doc.save()
-	# ads_doc.submit()
+		ads_doc.submit()
 
 def create_reverse_jv(self):
 	if not frappe.db.get_value("Leave Type", self.leave_type, "custom_create_liability_entries"):
