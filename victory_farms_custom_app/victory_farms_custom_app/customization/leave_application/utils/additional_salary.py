@@ -26,7 +26,6 @@ def create_additional_salary(self):
 	
 	gross_pay, currency = frappe.db.get_value("Employee", self.employee, ["ctc", "salary_currency"])
 
-	daily_pay = gross_pay / 30
 
 	date_range = {}
 
@@ -59,7 +58,10 @@ def create_additional_salary(self):
 		else:
 			seg_leave_days = (total_leave_days * seg_calendar_days) / float(total_calendar_days)
 
-		amount = flt(seg_leave_days * daily_pay, self.precision)
+		# compute daily pay for the calendar month of this segment
+		seg_days_in_month = get_last_day(seg_start).day
+		seg_daily_pay = gross_pay / seg_days_in_month if seg_days_in_month else gross_pay / 30
+		amount = flt(seg_leave_days * seg_daily_pay, self.precision)
 
 		add_doc_name = frappe.db.get_value("Additional Salary", {"docstatus": 0, "ref_doctype": "Leave Application", "ref_docname": self.name, "salary_component": salary_component, "payroll_date": row})
 		if not add_doc_name:

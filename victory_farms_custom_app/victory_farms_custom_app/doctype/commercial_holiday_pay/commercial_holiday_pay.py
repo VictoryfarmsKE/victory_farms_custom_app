@@ -3,7 +3,8 @@
 
 import frappe
 from frappe import _
-from frappe.utils import date_diff, get_last_day
+from frappe.utils import date_diff, get_last_day, getdate
+from datetime import timedelta
 from frappe.model.document import Document
 
 class CommercialHolidayPay(Document):
@@ -47,9 +48,33 @@ def update_amounts(self):
 	if not gross_pay:
 		frappe.throw(_("Gross Pay not found"))
 
-	gross_pay_per_day = gross_pay / 30
+	# Compute commercial amount by allocating days across calendar-month segments
+	from_date = getdate(self.from_date)
+	to_date = getdate(self.to_date)
 
-	self.commercial_amount = self.number_of_days * gross_pay_per_day
+	month_last_day = get_last_day(from_date)
+	if month_last_day >= to_date:
+		seg_start = from_date
+		seg_end = to_date
+		seg_calendar_days = (date_diff(seg_end, seg_start) + 1) if seg_end != seg_start else 1
+		seg_days_in_month = get_last_day(seg_start).day
+		seg_daily = gross_pay / seg_days_in_month if seg_days_in_month else gross_pay / 30
+		total_amount = seg_calendar_days * seg_daily
+	else:
+		next_month_start = month_last_day + timedelta(days=1)
+		# first segment
+		seg1_calendar_days = (date_diff(month_last_day, from_date) + 1) if month_last_day != from_date else 1
+		seg1_days_in_month = get_last_day(from_date).day
+		seg1_daily = gross_pay / seg1_days_in_month if seg1_days_in_month else gross_pay / 30
+		seg1_amount = seg1_calendar_days * seg1_daily
+		# second segment
+		seg2_calendar_days = (date_diff(to_date, next_month_start) + 1) if to_date != next_month_start else 1
+		seg2_days_in_month = get_last_day(next_month_start).day
+		seg2_daily = gross_pay / seg2_days_in_month if seg2_days_in_month else gross_pay / 30
+		seg2_amount = seg2_calendar_days * seg2_daily
+		total_amount = seg1_amount + seg2_amount
+
+	self.commercial_amount = total_amount
 
 
 def create_additional_salary(self):
