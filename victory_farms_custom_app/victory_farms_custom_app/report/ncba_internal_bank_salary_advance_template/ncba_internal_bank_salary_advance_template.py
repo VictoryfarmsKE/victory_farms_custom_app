@@ -1,0 +1,255 @@
+# Copyright (c) 2026, Solufy and contributors
+# For license information, please see license.txt
+
+
+import frappe
+from frappe import _
+from frappe.utils import formatdate, today
+
+
+def execute(filters=None):
+    columns = get_columns()
+    data = get_data(filters)
+    
+    return columns, data, None, None
+
+
+def get_columns():
+    return [
+        {
+            "fieldname": "debit_customer_id",
+            "label": _("Debit Customer ID"),
+            "fieldtype": "Data",
+            "width": 150
+        },
+        {
+            "fieldname": "debit_account",
+            "label": _("Debit Account"),
+            "fieldtype": "Data",
+            "width": 150
+        },
+        {
+            "fieldname": "file_total",
+            "label": _("File Total"),
+            "fieldtype": "Data",
+            "width": 150
+        },
+        {
+            "fieldname": "currency",
+            "label": _("Currency"),
+            "fieldtype": "Data",
+            "width": 100
+        },
+        {
+            "fieldname": "effective_date",
+            "label": _("Effective Date"),
+            "fieldtype": "Data",
+            "width": 120
+        },
+        {
+            "fieldname": "col6",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col7",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col8",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col9",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col10",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col11",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col12",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col13",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col14",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col15",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col16",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col17",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        },
+        {
+            "fieldname": "col18",
+            "label": _(""),
+            "fieldtype": "Data",
+            "width": 50
+        }
+    ]
+
+
+def get_data(filters):
+    detail_rows = get_detail_rows()
+    # Calculate file total
+    file_total = sum(float(row.get("debit_customer_id", 0)) for row in detail_rows)
+    
+    # Build first header row
+    header_row_1 = get_header_row_1(file_total)
+    
+    # Build second header row 
+    header_row_2 = get_header_row_2()
+    
+    data = [header_row_1, header_row_2] + detail_rows
+    
+    return data
+
+
+def get_header_row_1(file_total):
+    """
+    Generate the first header row (summary information)
+    """
+    return {
+        "debit_customer_id": "541587",
+        "debit_account": "5415870015",
+        "file_total": "{:.2f}".format(file_total),
+        "currency": "KES",
+        "effective_date": formatdate(today(), "ddMMyyyy"),
+        "col6": "",
+        "col7": "",
+        "col8": "",
+        "col9": "",
+        "col10": "",
+        "col11": "",
+        "col12": "",
+        "col13": "",
+        "col14": "",
+        "col15": "",
+        "col16": "",
+        "col17": "",
+        "col18": ""
+    }
+
+
+def get_header_row_2():
+    """
+    Generate the second header row (column headers for detail rows)
+    """
+    return {
+        "debit_customer_id": "Payment Amount",
+        "debit_account": "Beneficiary Type",
+        "file_total": "Beneficiary Name",
+        "currency": "Beneficiary Account",
+        "effective_date": "Payment Type",
+        "col6": "Bank Code",
+        "col7": "Beneficiary Email",
+        "col8": "Payment Description 1",
+        "col9": "Payment Description 2",
+        "col10": "Payment Description 3",
+        "col11": "Payment Description 4",
+        "col12": "Debit Narrative",
+        "col13": "Credit Narrative",
+        "col14": "Purpose Code",
+        "col15": "Deal Reference",
+        "col16": "Beneficiary Address 1",
+        "col17": "Beneficiary Address 2",
+        "col18": "Beneficiary Address 3"
+    }
+
+
+def get_detail_rows():
+    query = """
+        SELECT 
+            emp.ctc,
+            emp.employee_name,
+            emp.bank_ac_no,
+            emp.custom_bank_code,
+            emp.custom_branch_code,
+            emp.prefered_email,
+            emp.name as employee_id
+        FROM  
+            `tabEmployee` emp
+        WHERE
+            emp.status = 'Active'
+            AND emp.salary_currency = 'KES'
+            AND emp.bank_name LIKE '%%NCBA%%'
+        GROUP BY
+            emp.name
+    """
+    
+    results = frappe.db.sql(query, as_dict=True)
+    
+    employee_payments = {}
+    for row in results:
+        emp_id = row.get("employee_id")
+        if emp_id not in employee_payments:
+            employee_payments[emp_id] = row
+        else:
+            employee_payments[emp_id]["ctc"] += row.get("ctc", 0)
+    
+    # Convert to list of formatted rows
+    detail_rows = []
+    for emp_id, data in employee_payments.items():
+        detail_rows.append({
+            "debit_customer_id": "{:.2f}".format(data.get("ctc", 0)*0.3),  # Payment Amount
+            "debit_account": "A",  # Beneficiary Type (Adhoc)
+            "file_total": data.get("employee_name", ""),  # Beneficiary Name
+            "currency": data.get("bank_ac_no", ""),  # Beneficiary Account
+            "effective_date": "INTERNAL",  # Payment Type
+            "col6": "{}{}".format(
+                data.get("custom_bank_code") or "",
+                data.get("custom_branch_code") or ""
+            ),  # Bank Code
+            "col7": data.get("prefered_email") or "0",  # Beneficiary Email
+            "col8": "0",  # Payment Description 1
+            "col9": "0",  # Payment Description 2
+            "col10": "0",  # Payment Description 3
+            "col11": "0",  # Payment Description 4
+            "col12": "0",  # Debit Narrative
+            "col13": "0",  # Credit Narrative
+            "col14": "0",  # Purpose Code
+            "col15": "",  # Deal Reference
+            "col16": "0",  # Beneficiary Address 1
+            "col17": "0",  # Beneficiary Address 2
+            "col18": "0"   # Beneficiary Address 3
+        })
+    
+    return detail_rows
