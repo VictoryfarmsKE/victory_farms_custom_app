@@ -136,7 +136,8 @@ def get_data(filters):
     
     if not from_date or not to_date:
         frappe.throw(_("Please select From Date and To Date"))
-        detail_rows = get_detail_rows(from_date, to_date)
+    
+    detail_rows = get_detail_rows(from_date, to_date)
     
     if not detail_rows:
         frappe.msgprint(_("No salary slips found for the selected date range"))
