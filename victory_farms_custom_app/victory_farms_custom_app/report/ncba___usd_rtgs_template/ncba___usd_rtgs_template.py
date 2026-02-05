@@ -213,6 +213,7 @@ def get_detail_rows(from_date, to_date):
     query = """
         SELECT 
             ss.net_pay,
+            ss.custom_net_pay_excluding_bonus,
             ss.employee_name,
             ss.bank_account_no,
             emp.custom_bank_code,
@@ -239,16 +240,23 @@ def get_detail_rows(from_date, to_date):
     employee_payments = {}
     for row in results:
         emp_id = row.get("employee_id")
+
+        custom_net = row.get("custom_net_pay_excluding_bonus")
+        net_pay = row.get("net_pay", 0)
+
+        payment_amount = net_pay if float(custom_net or 0) == 0 else float(custom_net)
+
         if emp_id not in employee_payments:
             employee_payments[emp_id] = row
+            employee_payments[emp_id]["payment_amount"] = payment_amount
         else:
-            employee_payments[emp_id]["net_pay"] += row.get("net_pay", 0)
+            employee_payments[emp_id]["payment_amount"] += payment_amount
     
     # Convert to list of formatted rows
     detail_rows = []
     for emp_id, data in employee_payments.items():
         detail_rows.append({
-            "debit_customer_id": "{:.2f}".format(data.get("net_pay", 0)),  # Payment Amount
+            "debit_customer_id": "{:.2f}".format(data.get("payment_amount", 0)),  # Payment Amount
             "debit_account": "A",  # Beneficiary Type (Adhoc)
             "file_total": data.get("employee_name", ""),  # Beneficiary Name
             "currency": data.get("bank_account_no", ""),  # Beneficiary Account
