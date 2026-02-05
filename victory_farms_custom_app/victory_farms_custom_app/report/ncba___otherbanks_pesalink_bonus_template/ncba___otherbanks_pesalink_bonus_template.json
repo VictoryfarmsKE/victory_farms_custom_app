@@ -1,0 +1,43 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [],
+ "creation": "2026-02-05 10:44:55.252875",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date",
+   "mandatory": 1,
+   "wildcard_filter": 0
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date",
+   "mandatory": 1,
+   "wildcard_filter": 0
+  }
+ ],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": null,
+ "modified": "2026-02-05 10:44:55.252875",
+ "modified_by": "Administrator",
+ "module": "Victory Farms Custom App",
+ "name": "NCBA - Otherbanks Pesalink Bonus Template",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Salary Slip",
+ "report_name": "NCBA - Otherbanks Pesalink Bonus Template",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Payroll Officer"
+  }
+ ],
+ "timeout": 0
+}
