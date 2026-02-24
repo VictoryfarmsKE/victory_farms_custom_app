@@ -26,7 +26,15 @@ def create_journal_entry(self, diff_balance):
 
 	assigned_ssa = get_assigned_salary_structure_assignment(self.employee, frappe.utils.today())
 
-	base_amount = frappe.db.get_value("Salary Structure Assignment", assigned_ssa, "base") / 30
+	if not assigned_ssa:
+		return
+
+	base_amount = frappe.db.get_value("Salary Structure Assignment", assigned_ssa, "base")
+
+	if not base_amount:
+		return
+
+	base_amount = base_amount / 30
 
 	actual_amount = diff_balance * base_amount
 
