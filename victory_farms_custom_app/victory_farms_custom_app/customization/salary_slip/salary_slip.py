@@ -291,25 +291,32 @@ def validate(self, method):
  
 	bonus_amount = 0
 	nssf_amount = 0
-	bonus_gross_paye = 0
-	if self.salary_structure != "Quarterly and Annual - Jan 2026 Onwards":
-		for row in self.earnings:
-			if row.salary_component in bonus_components:
-				bonus_amount += row.amount or 0
-		for row in self.deductions:
-				if row.salary_component == "Bonus Gross PAYE":
-					bonus_gross_paye += row.amount or 0
-			
-		self.custom_net_pay_excluding_bonus = (
-			(self.net_pay or 0)
-			- bonus_amount
-			+ bonus_gross_paye
-		)
-
-	else:
+ 
+	if self.salary_structure == "Quarterly and Annual - Jan 2026 Onwards":
 		for row in self.deductions:
 			if row.salary_component in nssf_components:
 				nssf_amount += row.amount or 0 
 			self.custom_net_pay_excluding_bonus = self.net_pay + nssf_amount
+	elif self.salary_structure == "FTE Monthly - After Mid-Month Bonus":
+		for row in self.earnings:
+			if row.salary_component in bonus_components:
+				bonus_amount += row.amount or 0
+		bonus_gross_paye = (	
+			min(bonus_amount, 24000) * 0.1
+			+ max(min(bonus_amount - 24000, 8333), 0) * 0.25
+			+ max(min(bonus_amount - 32333, 467667), 0) * 0.3
+			+ max(min(bonus_amount - 500000, 300000), 0) * 0.325
+			+ max(bonus_amount - 800000, 0) * 0.35
+		)
+		self.custom_net_pay_excluding_bonus = self.net_pay - (bonus_amount - bonus_gross_paye)
+	else:
+		for row in self.earnings:
+			if row.salary_component in bonus_components:
+				bonus_amount += row.amount or 0
+		self.custom_net_pay_excluding_bonus = (
+			(self.net_pay or 0)
+			- bonus_amount
+		)
+		
 	
    
