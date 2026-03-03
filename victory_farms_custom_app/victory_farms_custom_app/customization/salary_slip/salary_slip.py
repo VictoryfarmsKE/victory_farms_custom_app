@@ -312,7 +312,6 @@ def validate(self, method):
 				+ max(min(taxable_income - 500000, 300000), 0) * 0.325
 				+ max(taxable_income - 800000, 0) * 0.35
 			)
-			frappe.log_error(f"Bonus Amount: {bonus_amount}, Bonus Gross PAYE: {bonus_gross_paye}, Net Pay: {self.net_pay}, Net Pay Excluding Bonus: {self.custom_net_pay_excluding_bonus}")
 			self.custom_net_pay_excluding_bonus = self.net_pay - (bonus_amount - bonus_gross_paye)
 	else:
 		for row in self.earnings:
