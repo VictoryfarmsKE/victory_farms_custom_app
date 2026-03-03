@@ -301,14 +301,19 @@ def validate(self, method):
 		for row in self.earnings:
 			if row.salary_component in bonus_components:
 				bonus_amount += row.amount or 0
-		bonus_gross_paye = (	
-			min(bonus_amount, 24000) * 0.1
-			+ max(min(bonus_amount - 24000, 8333), 0) * 0.25
-			+ max(min(bonus_amount - 32333, 467667), 0) * 0.3
-			+ max(min(bonus_amount - 500000, 300000), 0) * 0.325
-			+ max(bonus_amount - 800000, 0) * 0.35
-		)
-		self.custom_net_pay_excluding_bonus = self.net_pay - (bonus_amount - bonus_gross_paye)
+			nssf = (
+				(min(bonus_amount, 9000) + max(min(bonus_amount, 108000) - 9000, 0))*0.06
+			)
+			taxable_income = bonus_amount - nssf
+			bonus_gross_paye = (	
+				min(taxable_income, 24000) * 0.1
+				+ max(min(taxable_income - 24000, 8333), 0) * 0.25
+				+ max(min(taxable_income - 32333, 467667), 0) * 0.3
+				+ max(min(taxable_income - 500000, 300000), 0) * 0.325
+				+ max(taxable_income - 800000, 0) * 0.35
+			)
+			frappe.log_error(f"Bonus Amount: {bonus_amount}, Bonus Gross PAYE: {bonus_gross_paye}, Net Pay: {self.net_pay}, Net Pay Excluding Bonus: {self.custom_net_pay_excluding_bonus}")
+			self.custom_net_pay_excluding_bonus = self.net_pay - (bonus_amount - bonus_gross_paye)
 	else:
 		for row in self.earnings:
 			if row.salary_component in bonus_components:
