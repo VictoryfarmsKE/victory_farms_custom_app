@@ -296,7 +296,7 @@ def validate(self, method):
 		for row in self.deductions:
 			if row.salary_component in nssf_components:
 				nssf_amount += row.amount or 0 
-			self.custom_net_pay_excluding_bonus = self.net_pay + nssf_amount
+			self.custom_net_pay_excluding_bonus = self.net_pay
 	elif self.salary_structure == "FTE Monthly - After Mid-Month Bonus":
 		for row in self.earnings:
 			if row.salary_component in bonus_components:
@@ -312,7 +312,7 @@ def validate(self, method):
 				+ max(min(taxable_income - 500000, 300000), 0) * 0.325
 				+ max(taxable_income - 800000, 0) * 0.35
 			)
-			self.custom_net_pay_excluding_bonus = self.net_pay - (bonus_amount - bonus_gross_paye)
+			self.custom_net_pay_excluding_bonus = self.net_pay - (taxable_income - bonus_gross_paye)
 	else:
 		for row in self.earnings:
 			if row.salary_component in bonus_components:
