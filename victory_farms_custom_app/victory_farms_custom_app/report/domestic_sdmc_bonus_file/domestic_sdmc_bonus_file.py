@@ -177,7 +177,7 @@ def get_data(filtered_appraisal_payouts):
             "debit_account": "A",  # Beneficiary Type (Adhoc)
             "file_total": item.get("employee_name", ""),  # Beneficiary Name
             "currency": emp_info.get("bank_ac_no", ""),  # Beneficiary Account
-            "effective_date": "INTERNAL",  # Payment Type
+            "effective_date": "PESALINK",  # Payment Type
             "col6": "{}{}".format(
                 emp_info.get("custom_bank_code") or "",
                 emp_info.get("custom_branch_code") or ""
@@ -295,7 +295,6 @@ def get_appraisal_payout_details(payout_ids):
         .join(Employee).on(Employee.name == AppraisalPayoutItem.employee)
         .where(AppraisalPayoutItem.parent.isin(payout_ids))
         .where(AppraisalPayoutItem.total_bonus != 0)
-        .where(Employee.bank_name.like('%NCBA%'))
         .select(
             AppraisalPayoutItem.employee,
             AppraisalPayoutItem.employee_name,

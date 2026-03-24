@@ -1,7 +1,6 @@
 # Copyright (c) 2026, Solufy and contributors
 # For license information, please see license.txt
 
-
 import frappe
 from frappe import _
 from frappe.utils import formatdate, today
@@ -128,7 +127,24 @@ def get_columns():
 
 
 def get_data(filters):
-    detail_rows = get_detail_rows()
+    """
+    Generate data rows matching CSV template format
+    """
+    if not filters:
+        filters = {}
+    
+    from_date = filters.get("from_date")
+    to_date = filters.get("to_date")
+    
+    if not from_date or not to_date:
+        frappe.throw(_("Please select From Date and To Date"))
+    
+    detail_rows = get_detail_rows(from_date, to_date)
+    
+    if not detail_rows:
+        frappe.msgprint(_("No salary slips found for the selected date range"))
+        return []
+    
     # Calculate file total
     file_total = sum(float(row.get("debit_customer_id", 0)) for row in detail_rows)
     
@@ -149,9 +165,9 @@ def get_header_row_1(file_total):
     """
     return {
         "debit_customer_id": "541587",
-        "debit_account": "5415870028",
+        "debit_account": "5415870015",
         "file_total": "{:.2f}".format(file_total),
-        "currency": "USD",
+        "currency": "KES",
         "effective_date": formatdate(today(), "ddMMyyyy"),
         "col6": "",
         "col7": "",
@@ -195,44 +211,58 @@ def get_header_row_2():
     }
 
 
-def get_detail_rows():
+def get_detail_rows(from_date, to_date):
     query = """
         SELECT 
-            emp.ctc,
-            emp.employee_name,
-            emp.bank_ac_no,
+            ss.net_pay,
+            ss.custom_net_pay_excluding_bonus,
+            ss.employee_name,
+            ss.bank_account_no,
             emp.custom_bank_code,
             emp.custom_branch_code,
             emp.prefered_email,
             emp.name as employee_id
-        FROM  
-            `tabEmployee` emp
+        FROM 
+            `tabSalary Slip` ss
+        INNER JOIN 
+            `tabEmployee` emp ON emp.name = ss.employee
         WHERE
-            emp.status = 'Active'
-            AND emp.salary_currency = 'USD'
-        GROUP BY
-            emp.name
+            ss.docstatus = 1 
+            AND emp.salary_currency = 'KES'
+            AND ss.posting_date BETWEEN %(from_date)s AND %(to_date)s
+        ORDER BY
+            ss.employee_name
     """
     
-    results = frappe.db.sql(query, as_dict=True)
+    results = frappe.db.sql(query, {
+        "from_date": from_date,
+        "to_date": to_date
+    }, as_dict=True)
     
     employee_payments = {}
     for row in results:
         emp_id = row.get("employee_id")
+
+        custom_net = row.get("custom_net_pay_excluding_bonus")
+        net_pay = row.get("net_pay", 0)
+
+        payment_amount = net_pay if float(custom_net or 0) == 0 else float(custom_net)
+
         if emp_id not in employee_payments:
             employee_payments[emp_id] = row
+            employee_payments[emp_id]["payment_amount"] = payment_amount
         else:
-            employee_payments[emp_id]["ctc"] += row.get("ctc", 0)
+            employee_payments[emp_id]["payment_amount"] += payment_amount
     
     # Convert to list of formatted rows
     detail_rows = []
     for emp_id, data in employee_payments.items():
         detail_rows.append({
-            "debit_customer_id": "{:.2f}".format(data.get("ctc", 0)*0.3),  # Payment Amount
+            "debit_customer_id": "{:.2f}".format(data.get("payment_amount", 0)),  # Payment Amount
             "debit_account": "A",  # Beneficiary Type (Adhoc)
             "file_total": data.get("employee_name", ""),  # Beneficiary Name
-            "currency": data.get("bank_ac_no", ""),  # Beneficiary Account
-            "effective_date": "RTGS",  # Payment Type
+            "currency": data.get("bank_account_no", ""),  # Beneficiary Account
+            "effective_date": "PESALINK",  # Payment Type
             "col6": "{}{}".format(
                 data.get("custom_bank_code") or "",
                 data.get("custom_branch_code") or ""
