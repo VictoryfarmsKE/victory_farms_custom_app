@@ -263,7 +263,7 @@ def validate(self, method):
 	bonus_amount = 0
 	nssf_amount = 0
 
-	if self.salary_structure == "Quarterly and Annual - Jan 2026 Onwards":
+	if self.salary_structure == "Quarterly and Annual - Jan 2026 Onwards" or self.salary_structure == "FTE Monthly - After Mid-Month Bonus Exits":
 		for row in self.deductions:
 			if row.salary_component in nssf_components:
 				nssf_amount += row.amount or 0
