@@ -3,18 +3,20 @@
 
 frappe.ui.form.on("Quarterly Average Appraisal", {
     refresh(frm) {
-        frm.add_custom_button(
-            __("Get Data"),
-            function () {
-                frm.call({
-                    doc: frm.doc,
-                    method: "get_department_data",
-                    callback: function (r) {
-                        frm.dirty();
-                    },
-                });
-            },
-        );
+        if (frm.doc && frm.doc.docstatus === 0) {
+            frm.add_custom_button(
+                __("Get Data"),
+                function () {
+                    frm.call({
+                        doc: frm.doc,
+                        method: "get_department_data",
+                        callback: function (r) {
+                            frm.dirty();
+                        },
+                    });
+                },
+            );
+        }
     },
 
     employee(frm) {
@@ -26,7 +28,6 @@ frappe.ui.form.on("Quarterly Average Appraisal", {
                     if (r) {
                         frm.set_value("bonus_potential", r.bonus_potential || 0);
                         frm.set_value("bonus_potential_department", r.custom_department_bonus_potential_ || 0);
-                        frm.set_value("bonus_potential_company", r.custom_companygroup_bonus || 0);
                         frm.set_value("department", r.department || "");
                         frm.refresh_fields();
                     }
@@ -35,7 +36,6 @@ frappe.ui.form.on("Quarterly Average Appraisal", {
         } else {
             frm.set_value("bonus_potential", 0);
             frm.set_value("bonus_potential_department", 0);
-            frm.set_value("bonus_potential_company", 0);
             frm.set_value("department", "");
             frm.refresh_fields();
         }
@@ -49,12 +49,10 @@ frappe.ui.form.on("Quarterly Average Appraisal", {
                 function(r) {
                     if (r) {
                         if (frm.doc.bonus_potential != r.bonus_potential ||
-                            frm.doc.bonus_potential_department != r.custom_department_bonus_potential_ ||
-                            frm.doc.bonus_potential_company != r.custom_companygroup_bonus) {
+                            frm.doc.bonus_potential_department != r.custom_department_bonus_potential_) {
                             
                             frm.set_value("bonus_potential", r.bonus_potential || 0);
                             frm.set_value("bonus_potential_department", r.custom_department_bonus_potential_ || 0);
-                            frm.set_value("bonus_potential_company", r.custom_companygroup_bonus || 0);
                         }
                     }
                 }
