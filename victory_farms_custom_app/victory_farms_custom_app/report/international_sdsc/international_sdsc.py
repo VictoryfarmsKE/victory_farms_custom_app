@@ -180,6 +180,7 @@ def get_detail_rows(from_date, to_date):
 		WHERE
 			ss.docstatus = 1
 			AND emp.salary_currency = 'USD'
+			AND emp.custom_transfer_type = 'International'
 			AND ss.posting_date BETWEEN %(from_date)s AND %(to_date)s
 		ORDER BY
 			emp.employee_name
