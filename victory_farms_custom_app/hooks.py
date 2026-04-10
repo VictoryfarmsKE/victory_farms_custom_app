@@ -36,7 +36,8 @@ doctype_js = {
     "Stock Entry": "victory_farms_custom_app/customization/stock_entry_detail/stock_entry_detail.js",
     "Leave Type": "victory_farms_custom_app/customization/leave_type/leave_type.js",
     "Holiday List": "victory_farms_custom_app/customization/holiday_list/holiday_list.js",
-    "Employee": "victory_farms_custom_app/customization/employee/employee.js"
+    "Employee": "victory_farms_custom_app/customization/employee/employee.js",
+    "Leave Application" : "victory_farms_custom_app/customization/leave_application/leave_application.js"
 }
 doctype_list_js = {"Employee Checkin" : "victory_farms_custom_app/customization/employee_checkin/employee_checkin_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -171,7 +172,7 @@ doc_events = {
 
 scheduler_events = {
     "cron": {
-        "0 0 28-31 * *": [
+        "0 0 20-24 * *": [
             "victory_farms_custom_app.victory_farms_custom_app.customization.leave_type.leave_type.auto_create_leave_allocation",
             "victory_farms_custom_app.victory_farms_custom_app.doctype.store_deduction.store_deduction.create_remaining_payments"
         ],

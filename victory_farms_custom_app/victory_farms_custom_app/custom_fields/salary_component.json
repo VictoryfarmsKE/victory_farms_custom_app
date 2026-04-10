@@ -45,6 +45,16 @@
    "is_system_generated": 0,
    "label": "Do not include in Journal Entry",
    "module": "Victory Farms Custom App"
+  },
+  {
+   "dt": "Salary Component",
+   "fieldname": "custom_debit_account",
+   "fieldtype": "Link",
+   "options": "Account",
+   "insert_after": "ignore_for_jv",
+   "is_system_generated": 0,
+   "label": "Debit Account",
+   "module": "Victory Farms Custom App"
   }
  ]
 }

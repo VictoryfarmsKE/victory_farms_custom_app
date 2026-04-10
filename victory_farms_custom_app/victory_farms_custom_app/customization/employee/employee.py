@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.utils import flt
 
 def after_insert(self, method):
     if not self.custom_create_individual_holiday_list:
@@ -8,17 +9,32 @@ def after_insert(self, method):
     create_holiday_list(self)
 
 def validate(self, method):
-    if not self.custom_department_details:
-        return
+    # Validate department details weightage
+    if self.custom_department_details:
+        remaining_weightage = 100
+        length = len(self.custom_department_details)
+        for row in self.custom_department_details:
+            if not row.weightage:
+                row.weightage = remaining_weightage / length
+     
+            length -= 1
+            remaining_weightage -= row.weightage
     
-    remaining_weightage = 100
-    length = len(self.custom_department_details)
-    for row in self.custom_department_details:
-        if not row.weightage:
-            row.weightage = remaining_weightage / length
- 
-        length -= 1
-        remaining_weightage -= row.weightage
+    # Validate group company weights sum to 100% when custom_appraisal_on_group is enabled
+    if self.get("custom_appraisal_on_group"):
+        group_companies = self.get("custom_group_company_details") or []
+        
+        if not group_companies:
+            frappe.throw(
+                _("When 'Appraisal on Group' is enabled, you must define at least one company in 'Group Company Details'.")
+            )
+        
+        total_weight = sum(flt(row.weight) for row in group_companies)
+        
+        if flt(total_weight, 2) != 100.0:
+            frappe.throw(
+                _("Group company weights must sum to 100%. Current total: {0}%").format(flt(total_weight, 2))
+            )
 
 @frappe.whitelist()
 def create_holiday_list(doc):
