@@ -171,13 +171,15 @@ def get_data(filtered_appraisal_payouts):
     for item in detail_items:
         emp = item.get("employee")
         emp_info = emp_bank_map.get(emp, {})
+        bank_name = (emp_info.get("bank_name") or "").lower()
+        payment_type = "INTERNAL" if "ncba" in bank_name else "PESALINK"
         
         detail_rows.append({
             "debit_customer_id": "{:.2f}".format(flt(item.get("total_bonus", 0))),  # Payment Amount
             "debit_account": "A",  # Beneficiary Type (Adhoc)
             "file_total": item.get("employee_name", ""),  # Beneficiary Name
             "currency": emp_info.get("bank_ac_no", ""),  # Beneficiary Account
-            "effective_date": "PESALINK",  # Payment Type
+            "effective_date": payment_type,  # Payment Type
             "col6": "{}{}".format(
                 emp_info.get("custom_bank_code") or "",
                 emp_info.get("custom_branch_code") or ""
@@ -312,7 +314,7 @@ def get_employee_bank_map(employee_ids):
         return {}
     rows = frappe.db.sql(
         """
-        SELECT name, employee_name, bank_ac_no, custom_bank_code, custom_branch_code, prefered_email
+        SELECT name, employee_name, bank_name, bank_ac_no, custom_bank_code, custom_branch_code, prefered_email
         FROM `tabEmployee`
         WHERE name IN %(emp_ids)s
         """,

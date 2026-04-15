@@ -220,6 +220,7 @@ def get_detail_rows(from_date, to_date):
             ss.bank_account_no,
             emp.custom_bank_code,
             emp.custom_branch_code,
+            emp.bank_name,
             emp.prefered_email,
             emp.name as employee_id
         FROM 
@@ -257,12 +258,15 @@ def get_detail_rows(from_date, to_date):
     # Convert to list of formatted rows
     detail_rows = []
     for emp_id, data in employee_payments.items():
+        bank_name = (data.get("bank_name") or "").lower()
+        payment_type = "INTERNAL" if "ncba" in bank_name else "PESALINK"
+
         detail_rows.append({
             "debit_customer_id": "{:.2f}".format(data.get("payment_amount", 0)),  # Payment Amount
             "debit_account": "A",  # Beneficiary Type (Adhoc)
             "file_total": data.get("employee_name", ""),  # Beneficiary Name
             "currency": data.get("bank_account_no", ""),  # Beneficiary Account
-            "effective_date": "PESALINK",  # Payment Type
+            "effective_date": payment_type,  # Payment Type
             "col6": "{}{}".format(
                 data.get("custom_bank_code") or "",
                 data.get("custom_branch_code") or ""
