@@ -53,6 +53,7 @@ class OvertimeHoursReport:
 
 	def generate_columns(self):
 		self.columns = [
+			{"label": _("Timesheet"), "fieldname": "timesheet", "fieldtype": "Link", "options": "Timesheet", "width": 200},
 			{"label": _("Employee"), "fieldname": "employee", "fieldtype": "Link", "options": "Employee", "width": 200},
 			{"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 200},
 			{"label": _("Department"), "fieldname": "department", "fieldtype": "Link", "options": "Department", "width": 200},
@@ -78,6 +79,7 @@ class OvertimeHoursReport:
 			f"""
 			SELECT
 				tt.employee AS employee,
+				tt.name AS timesheet,
 				ttd.from_time AS start_time,
 				ttd.to_time AS end_time,
 				ttd.activity_type AS activity_type,
@@ -114,9 +116,10 @@ class OvertimeHoursReport:
 		ot_2_0_hours = 0.0
 		unique_employees = set()
 
-		for emp, start_time, end_time, activity_type, hours in self.filtered_time_logs:
+		for emp, timesheet, start_time, end_time,  activity_type, hours in self.filtered_time_logs:
 			row = frappe._dict()
 			row["employee"] = emp
+			row["timesheet"] = timesheet
 			row["start_time"] = start_time
 			row["end_time"] = end_time
 			row["activity_type"] = activity_type
