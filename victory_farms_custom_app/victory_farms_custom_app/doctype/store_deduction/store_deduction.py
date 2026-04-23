@@ -3,14 +3,18 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import today, month_diff, add_days, getdate, add_months
+from frappe.utils import today, getdate, add_months
+
+
+def _has_store_deduction_detail(ads_doc, store_deduction_name):
+	return any(
+		(row.store_deduction == store_deduction_name)
+		for row in (ads_doc.get("custom_store_deduction_details") or [])
+	)
 
 class StoreDeduction(Document):
 	def on_submit(self):
 		salary_component = frappe.db.get_value("Salary Component", {"is_for_store_deduction": 1})
-		# payroll_date is the 25th of posting_date's month
-		payroll_date = getdate(self.posting_date).replace(day=25)
-
 		# Ensure period_of_payment has a sensible default before dividing
 		if not self.period_of_payment:
 			self.period_of_payment = 5 if self.item_cost > 1000 else 1
@@ -30,6 +34,8 @@ class StoreDeduction(Document):
 		ads_name = frappe.db.get_value("Additional Salary", {"docstatus": 0, "payroll_date": first_payroll, "salary_component": salary_component, "employee": self.employee})
 		if ads_name:
 			ads_doc = frappe.get_doc("Additional Salary", ads_name)
+			if _has_store_deduction_detail(ads_doc, self.name):
+				return
 			ads_doc.amount = (ads_doc.amount or 0) + per_period_cost
 		else:
 			ads_doc = frappe.new_doc("Additional Salary")
@@ -83,6 +89,8 @@ def create_remaining_payments():
 
 		if ads_name:= frappe.db.get_value("Additional Salary", {"docstatus": 0, "payroll_date": payroll_date, "salary_component": salary_component, "employee": sd_doc.employee}):
 			ads_doc = frappe.get_doc("Additional Salary", ads_name)
+			if _has_store_deduction_detail(ads_doc, row):
+				continue
 			ads_doc.amount = (ads_doc.amount or 0) + (per_period if not emp_data.relieving_date else per_period * sd_doc.remaining_payments)
 
 		else:
