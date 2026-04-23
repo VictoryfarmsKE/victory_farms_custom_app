@@ -30,6 +30,12 @@ class OvertimeHoursReport:
 		if not self.filters.get("docstatus"):
 			frappe.throw(_("Please select Document Status"))
 
+		ds_map = {"Draft": 0, "Submitted": 1, "Cancelled": 2}
+		if self.filters.docstatus not in ds_map:
+			frappe.throw(_("Invalid Document Status. Choose Draft, Submitted or Cancelled."))
+
+		self.docstatus = ds_map[self.filters.docstatus]
+
 	def validate_dates(self):
 		self.day_span = (self.to_date - self.from_date).days
 
@@ -49,17 +55,16 @@ class OvertimeHoursReport:
 		self.columns = [
 			{"label": _("Employee"), "fieldname": "employee", "fieldtype": "Link", "options": "Employee", "width": 200},
 			{"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 200},
-			{"label": _("Department"), "fieldname": "department", "fieldtype": "Link", "options": "Department", "width": 120},
-			{"label": _("Start Time"), "fieldname": "start_time", "fieldtype": "Datetime", "width": 160},
-			{"label": _("End Time"), "fieldname": "end_time", "fieldtype": "Datetime", "width": 160},
-			{"label": _("Activity Type"), "fieldname": "activity_type", "fieldtype": "Data", "width": 150},
-			{"label": _("OT Rate"), "fieldname": "ot_rate", "fieldtype": "Data", "width": 80},
+			{"label": _("Department"), "fieldname": "department", "fieldtype": "Link", "options": "Department", "width": 200},
+			{"label": _("Start Time"), "fieldname": "start_time", "fieldtype": "Datetime", "width": 200},
+			{"label": _("End Time"), "fieldname": "end_time", "fieldtype": "Datetime", "width": 200},
+			{"label": _("Activity Type"), "fieldname": "activity_type", "fieldtype": "Data", "width": 200},
+			# {"label": _("OT Rate"), "fieldname": "ot_rate", "fieldtype": "Data", "width": 80}
 			{"label": _("Hours"), "fieldname": "hours", "fieldtype": "Float", "width": 100},
 		]
 
 	def generate_filtered_time_logs(self):
 		additional_filters = ""
-
 		if self.filters.get("employee"):
 			additional_filters += f" AND tt.employee = {self.filters.get('employee')!r}"
 		if self.filters.get("company"):
@@ -117,8 +122,6 @@ class OvertimeHoursReport:
 			row["activity_type"] = activity_type
 			row["ot_rate"] = self._classify_ot_rate(activity_type)
 			row["hours"] = flt(hours, 2)
-
-			# attach employee info
 			row["employee_name"] = frappe.db.get_value("Employee", emp, "employee_name")
 			row["department"] = frappe.db.get_value("Employee", emp, "department")
 
@@ -160,7 +163,7 @@ class OvertimeHoursReport:
 		]
 
 	def generate_chart_data(self):
-		# Aggregate OT 1.5x and OT 2.0x hours per employee for a stacked bar chart
+		# Aggregate OT hours per employee 
 		emp_ot = {}
 		for r in self.data:
 			emp = r.get("employee_name") or r.get("employee") or "Unknown"
@@ -169,7 +172,7 @@ class OvertimeHoursReport:
 			if rate in ("1.5x", "2.0x"):
 				emp_ot[emp][rate] += flt(r.get("hours"), 2)
 
-		# Limit to 30 employees with the highest OT hours
+		# Limit to 30 employees with the hieghst total OT hours
 		sorted_emps = sorted(emp_ot.keys(), key=lambda e: emp_ot[e]["1.5x"] + emp_ot[e]["2.0x"], reverse=True)[:30]
 
 		self.chart = {
