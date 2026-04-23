@@ -164,6 +164,7 @@ def get_detail_rows(from_date, to_date):
 			ss.custom_net_pay_excluding_bonus,
 			emp.name as employee_id,
 			emp.employee_name,
+			emp.custom_account_name,
 			COALESCE(emp.bank_ac_no, ss.bank_account_no) as bank_account_no,
 			COALESCE(NULLIF(emp.iban, ''), '') as swift_code,
 			COALESCE(NULLIF(emp.prefered_email, ''), NULLIF(emp.company_email, ''), '0') as beneficiary_email_id,
@@ -207,6 +208,7 @@ def get_detail_rows(from_date, to_date):
 			employee_payments[emp_id] = {
 				"posting_date": getdate(row.get("posting_date")),
 				"employee_name": row.get("employee_name") or "",
+				"custom_account_name": row.get("custom_account_name") or "",
 				"bank_account_no": row.get("bank_account_no") or "",
 				"swift_code": row.get("swift_code") or "",
 				"beneficiary_email_id": row.get("beneficiary_email_id") or "0",
@@ -231,7 +233,7 @@ def get_detail_rows(from_date, to_date):
 				"transfer_currency": "USD",
 				"effective_date": data.get("posting_date").strftime("%d%m%Y"),
 				"beneficiary_type": "A",
-				"beneficiary_name": data.get("employee_name", ""),
+				"beneficiary_name": data.get("custom_account_name", ""),
 				"beneficiary_account": data.get("bank_account_no", ""),
 				"network_type": "S",
 				"swift_code": data.get("swift_code", ""),
@@ -247,5 +249,4 @@ def get_detail_rows(from_date, to_date):
 				"purpose_of_payment_code": "",
 			}
 		)
-
 	return detail_rows

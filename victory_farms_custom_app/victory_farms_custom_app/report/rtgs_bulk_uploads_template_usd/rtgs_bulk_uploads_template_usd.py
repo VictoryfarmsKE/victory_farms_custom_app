@@ -131,6 +131,7 @@ def get_detail_rows(from_date, to_date):
             emp.custom_bank_code,
             COALESCE(emp.bank_ac_no, ss.bank_account_no) as bank_account_no,
             emp.employee_name,
+            emp.custom_account_name,
             emp.name as employee_id
         FROM 
             `tabSalary Slip` ss
@@ -166,6 +167,7 @@ def get_detail_rows(from_date, to_date):
             employee_payments[aggregation_key] = {
                 "posting_date": posting_date,
                 "employee_name": row.get("employee_name") or "",
+                "custom_account_name": row.get("custom_account_name") or "",
                 "bank_account_no": row.get("bank_account_no") or "",
                 "custom_bank_code": row.get("custom_bank_code") or "",
                 "payment_amount": payment_amount,
@@ -181,7 +183,7 @@ def get_detail_rows(from_date, to_date):
             "bank_code": data.get("custom_bank_code", ""),
             "blank_1": "",
             "beneficiary_account": data.get("bank_account_no", ""),
-            "beneficiary_name": data.get("employee_name", ""),
+            "beneficiary_name": data.get("custom_account_name", ""),
             "static_value": "BANK",
             "blank_2": "",
             "transfer_currency": "USD",
