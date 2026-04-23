@@ -81,18 +81,48 @@ def create_remaining_payments():
 		else:
 			per_period = sd_doc.item_cost
 
-		# payroll_date is the 25th of current month unless relieving_date
+		# Determine payroll_date for the NEXT period after those already created
 		if emp_data.relieving_date:
 			payroll_date = emp_data.relieving_date
 		else:
-			payroll_date = getdate(todays_date).replace(day=25)
+			latest_ads_list = frappe.get_all(
+				"Additional Salary",
+				filters={
+					"docstatus": 0,
+					"salary_component": salary_component,
+					"employee": sd_doc.employee
+				},
+				fields=["name", "payroll_date"],
+				order_by="payroll_date desc",
+				limit=10
+			)
+			
+			latest_pd = None
+			for ads_rec in latest_ads_list:
+				# Check if this ADS has this SD in its details
+				has_sd = frappe.db.get_value(
+					"SD Details",
+					{"parent": ads_rec.name, "store_deduction": row},
+					"name"
+				)
+				if has_sd:
+					latest_pd = ads_rec.payroll_date
+					break
+			
+			if latest_pd:
+				# Next payroll_date is latest + 1 month
+				payroll_date = getdate(add_months(latest_pd, 1)).replace(day=25)
+			else:
+				# No ADS created yet for this SD; use 25th of current month
+				payroll_date = getdate(todays_date).replace(day=25)
 
 		if ads_name:= frappe.db.get_value("Additional Salary", {"docstatus": 0, "payroll_date": payroll_date, "salary_component": salary_component, "employee": sd_doc.employee}):
 			ads_doc = frappe.get_doc("Additional Salary", ads_name)
 			if _has_store_deduction_detail(ads_doc, row):
+				# This SD is already in this ADS; skip (already processed)
 				continue
+			# Add this SD's amount to the existing ADS
 			ads_doc.amount = (ads_doc.amount or 0) + (per_period if not emp_data.relieving_date else per_period * sd_doc.remaining_payments)
-
 		else:
 			ads_doc = frappe.new_doc("Additional Salary")
 			ads_doc.salary_component = salary_component
