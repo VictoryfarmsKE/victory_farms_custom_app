@@ -138,8 +138,7 @@ def get_detail_rows(from_date, to_date):
             `tabEmployee` emp ON emp.name = ss.employee
         WHERE
             ss.docstatus = 1 
-            AND emp.salary_currency = 'USD'
-            AND emp.custom_transfer_type = 'Local'
+            AND emp.salary_currency = 'KES'
             AND ss.posting_date BETWEEN %(from_date)s AND %(to_date)s
         ORDER BY
             ss.posting_date,
@@ -173,9 +172,11 @@ def get_detail_rows(from_date, to_date):
         else:
             employee_payments[aggregation_key]["payment_amount"] += payment_amount
     
-    # Convert to list of formatted rows
+    # Convert to list of formatted rows — only include payments exceeding 1,000,000 KES
     detail_rows = []
     for _, data in employee_payments.items():
+        if data.get("payment_amount", 0) <= 1_000_000:
+            continue
         detail_rows.append({
             "effective_date": data.get("posting_date").strftime("%Y%m%d"),
             "bank_code": data.get("custom_bank_code", ""),
