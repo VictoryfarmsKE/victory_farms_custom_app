@@ -62,6 +62,7 @@ class OvertimeHoursReport:
 			{"label": _("Activity Type"), "fieldname": "activity_type", "fieldtype": "Data", "width": 200},
 			# {"label": _("OT Rate"), "fieldname": "ot_rate", "fieldtype": "Data", "width": 80}
 			{"label": _("Hours"), "fieldname": "hours", "fieldtype": "Float", "width": 100},
+			{"label": _("Notes"), "fieldname": "notes", "fieldtype": "Data", "width": 200},
 		]
 
 	def generate_filtered_time_logs(self):
@@ -80,6 +81,7 @@ class OvertimeHoursReport:
 			SELECT
 				tt.employee AS employee,
 				tt.name AS timesheet,
+				tt.note AS notes,
 				ttd.from_time AS start_time,
 				ttd.to_time AS end_time,
 				ttd.activity_type AS activity_type,
@@ -116,7 +118,7 @@ class OvertimeHoursReport:
 		ot_2_0_hours = 0.0
 		unique_employees = set()
 
-		for emp, timesheet, start_time, end_time,  activity_type, hours in self.filtered_time_logs:
+		for emp, timesheet, notes, start_time, end_time, activity_type, hours in self.filtered_time_logs:
 			row = frappe._dict()
 			row["employee"] = emp
 			row["timesheet"] = timesheet
@@ -125,6 +127,7 @@ class OvertimeHoursReport:
 			row["activity_type"] = activity_type
 			row["ot_rate"] = self._classify_ot_rate(activity_type)
 			row["hours"] = flt(hours, 2)
+			row["notes"] = notes
 			row["employee_name"] = frappe.db.get_value("Employee", emp, "employee_name")
 			row["department"] = frappe.db.get_value("Employee", emp, "department")
 
