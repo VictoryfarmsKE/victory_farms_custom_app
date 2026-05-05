@@ -23,208 +23,150 @@ def get_columns():
 		},
 		{   
 			"fieldname": "employee_name", 
-			"label": _("Employee Name"),
+			"label": _("Name of Employee"),
 			"fieldtype": "Data", 
 			"read_only": 1,
 			"width": 150
 		},
 		{   
 			"fieldname": "residential_status", 
-			"label": _("Residential Status"),
+			"label": _("Resident Status"),
 			"fieldtype": "Data", 
 			"read_only": 1,
 			"width": 100
 		},
 		{   
 			"fieldname": "type_of_employee", 
-			"label": _("Type Of Employee"),
+			"label": _("Type Of Employment"),
+			"fieldtype": "Data", 
+			"read_only": 1,
+			"width": 100
+		},
+		{   
+			"fieldname": "custom_disablity", 
+			"label": _("Persons with Disability (PWD)"),
+			"fieldtype": "Data", 
+			"read_only": 1,
+			"width": 100
+		},
+		{   
+			"fieldname": "custom_tax_exemption_certificate", 
+			"label": _("Exemption Certificate Number"),
 			"fieldtype": "Data", 
 			"read_only": 1,
 			"width": 100
 		},
 		{   
 			"fieldname": "basic_salary", 
-			"label": _("Basic Salary"), 
-			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
-			"fieldname": "housing_allowance",
-			"label": _("Housing Allowance"), 
-			"fieldtype": "Float", 
-			"width": 180
-		},
-		{
-			"fieldname": "transport_allowance",
-			"label": _("Transport Allowance"), 
-			"fieldtype": "Float", 
-			"width": 150
-		 },
-		{
-			"fieldname": "leave_pay", 
-			"label": _("Leave Pay"), 
-			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
-			"fieldname": "over_time_allowance", 
-			"label": _("Over Time Allowance"), 
-			"fieldtype": "Float", 
-			"width": 200
-		},
-		{
-			"fieldname": "directors_fees", 
-			"label": _("Directors Fees"), 
-			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
-			"fieldname": "lump_sum_pay_if_any", 
-			"label": _("Lump Sum Pay if any"), 
-			"fieldtype": "Float",
-			"width": 250
-		},
-		{
-			"fieldname": "other_allowance", 
-			"label": _("Other Allowance"), 
-			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
-			"fieldname": "total_cash_pay", 
-			"label": _("Total Cash Pay"), 
+			"label": _("Total Cash Pay (A)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "value_of_car_benefit", 
-			"label": _("Value of Car Benefit"), 
+			"label": _("Value of Car Benefit (B)"), 
 			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
-			"fieldname": "other_non_cash_benefit", 
-			"label": _("Other Non cash benefit"), 
-			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
-			"fieldname": "total_non_cash_benefits", 
-			"label": _("Total Non Cash Benefits"), 
-			"fieldtype": "Float", 
-			"width": 150
+			"width": 180
 		},
 		{
 			"fieldname": "value_of_meals", 
-			"label": _("Value of meals"), 
+			"label": _("Value of Meals (C)"), 
+			"fieldtype": "Float", 
+			"width": 180
+		},
+  		{
+			"fieldname": "total_non_cash_benefits", 
+			"label": _("Non Cash Benefits (D)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
-		{
+    	{
 			"fieldname": "type_of_housing", 
 			"label": _("Type of Housing"), 
 			"fieldtype": "Data", 
 			"width": 150
 		},
 		{
-			"fieldname": "rent_of_house", 
-			"label": _("Rent of House"),
-			"fieldtype": "Float", 
-			"width": 150,
-		},
-		{
-			"fieldname": "computed_rent_of_house", 
-			"label": _("Computed Rent of House"),
+			"fieldname": "housing_benefit", 
+			"label": _("Housing Benefit (F)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
-			"fieldname": "rent_recovered_from_employee", 
-			"label": _("Rent Recovered from Employee"),
+			"fieldname": "other_benefits",
+			"label": _("Other Benefits (G)"), 
 			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
-			"fieldname": "net_value_of_housing", 
-			"label": _("Net Value of Housing"),
-			"fieldtype": "Float", 
-			"width": 150
+			"width": 180
 		},
 		{
 			"fieldname": "total_gross_pay", 
-			"label": _("Total Gross Pay"),
+			"label": _("Total Gross Pay (KSH) H = (A+B+C+D+F+G)"),
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "social_health_insurance_fund", 
-			"label": _("Social Health Insurance Fund"), 
+			"label": _("Social Health Insurance Funds (SHIF) (I)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "actual_contribution(nssf)", 
-			"label": _("Actual Contribution (NSSF)"), 
+			"label": _("NSSF Contribution (J)"), 
+			"fieldtype": "Float", 
+			"width": 150
+		},
+{
+			"fieldname": "other_pension_contributions", 
+			"label": _("Other Pension Contributions (K)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "post_retirement_medical_fund", 
-			"label": _("Post Retirement medical Fund"), 
+			"label": _("Post Retirement Medical Fund (L)"), 
 			"fieldtype": "Float", 
 			"width": 280
 		},
 		{
 			"fieldname": "mortgage_interest", 
-			"label": _("Mortgage Interest"), 
+			"label": _("Mortgage Interest (M)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "affordable_housing_levy", 
-			"label": _("Affordable Housing Levy"), 
-			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
-			"fieldname": "amount_of_benefit", 
-			"label": _("Amount of Benefit"), 
-			"fieldtype": "Float", 
-			"width": 150
-		},
-		{
-			"fieldname": "taxable_pay", 
-			"label": _("Taxable Pay"), 
+			"label": _("Affordable Housing Levy (N)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "tax_payable", 
-			"label": _("Tax Payable"), 
+			"label": _("Taxable Pay (Ksh) (O)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "monthly_relief", 
-			"label": _("Monthly Relief"), 
+			"label": _("Monthly Personal Relief (Ksh) (P)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "amount_of_insurance_relief", 
-			"label": _("Amount of Insurance Relief"), 
+			"label": _("Amount of Insurance Relief (Ksh)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "paye_allowance", 
-			"label": _("PAYE"), 
+			"label": _("PAYE Tax (Ksh) (R)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
 		{
 			"fieldname": "self_assessed_paye_tax", 
-			"label": _("Self Assessed PAYE Tax"), 
+			"label": _("Self Assessed PAYE Tax (Ksh) (S)"), 
 			"fieldtype": "Float", 
 			"width": 150
 		},
@@ -261,6 +203,8 @@ def get_p10_report_data(filters):
 			employee.tax_id,
 			salary_slip.employee_name,
 			employee.residential_status,
+			employee.custom_disablity,
+			employee.custom_tax_exemption_certificate,
 			employee.type_of_employee,
 			employee.type_of_housing,
 			salary_detail.salary_component,
@@ -287,6 +231,8 @@ def get_p10_report_data(filters):
 					"employee_name": employee_name,
 					"tax_id": employee_pin,
 					"residential_status": row.get("residential_status"),
+					"custom_disablity": row.get("custom_disablity"),
+					"custom_tax_exemption_certificate": row.get("custom_tax_exemption_certificate"),
 					"type_of_employee": row.get("type_of_employee"),
 					"type_of_housing": row.get("type_of_housing"),
 					"components": {}
@@ -352,6 +298,9 @@ def get_p10_report_data(filters):
 			act_key = key.lower().replace(" ", "_")
 			if not row.get(act_key):
 				row[act_key] = 0
+
+		# compute other_benefits as housing_allowance + transport_allowance
+		row["other_benefits"] = row.get("housing_allowance", 0) + row.get("transport_allowance", 0)
 
 		report_data.append(row)
 	return report_data

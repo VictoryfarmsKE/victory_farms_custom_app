@@ -47,7 +47,9 @@ def update_amounts(self):
 	if not gross_pay:
 		frappe.throw(_("Gross Pay not found"))
 
-	gross_pay_per_day = gross_pay / 30
+	# Use actual calendar days in the month (based on posting_date)
+	days_in_month = get_last_day(self.posting_date).day
+	gross_pay_per_day = gross_pay / days_in_month
 
 	self.commercial_amount = self.number_of_days * gross_pay_per_day
 

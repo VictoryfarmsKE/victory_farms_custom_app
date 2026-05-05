@@ -243,6 +243,56 @@ def update_from_to_date(self):
 		self.end_date = employee_details.relieving_date
 
 def validate(self, method):
+	bonus_components = [
+		"Bonus Department",
+		"Bonus Individual",
+		"Bonus Company",
+		"Bonus Company (Annual)",
+		"Bonus Department (Annual)",
+		"Bonus Individual (Annual)",
+		"Bonus Company (Quarterly)",
+		"Bonus Department (Quarterly)",
+		"Bonus Individual (Quarterly)",
+		"Bonus"
+	]
+	nssf_components = [
+		"Employee NSSF T1",
+		"Employee NSSF T2"
+	]
+
+	bonus_amount = 0
+	nssf_amount = 0
+
+	if self.salary_structure == "Quarterly and Annual - Jan 2026 Onwards" or self.salary_structure == "FTE Monthly - After Mid-Month Bonus Exits":
+		for row in self.deductions:
+			if row.salary_component in nssf_components:
+				nssf_amount += row.amount or 0
+			self.custom_net_pay_excluding_bonus = self.net_pay
+	elif self.salary_structure == "FTE Monthly - After Mid-Month Bonus":
+		for row in self.earnings:
+			if row.salary_component in bonus_components:
+				bonus_amount += row.amount or 0
+			nssf = (
+				(min(bonus_amount, 9000) + max(min(bonus_amount, 108000) - 9000, 0))*0.06
+			)
+			taxable_income = bonus_amount - nssf
+			bonus_gross_paye = (
+				min(taxable_income, 24000) * 0.1
+				+ max(min(taxable_income - 24000, 8333), 0) * 0.25
+				+ max(min(taxable_income - 32333, 467667), 0) * 0.3
+				+ max(min(taxable_income - 500000, 300000), 0) * 0.325
+				+ max(taxable_income - 800000, 0) * 0.35
+			)
+			self.custom_net_pay_excluding_bonus = self.net_pay - (taxable_income - bonus_gross_paye)
+	else:
+		for row in self.earnings:
+			if row.salary_component in bonus_components:
+				bonus_amount += row.amount or 0
+		self.custom_net_pay_excluding_bonus = (
+			(self.net_pay or 0)
+			- bonus_amount
+		)
+
 	if self.gross_pay < 0:
 		self.custom_overdrawn_salary = 1
 	else:
@@ -268,3 +318,4 @@ def udpate_foreign_currency(self):
 	self.custom_foreign_total_deduction = fmt_money(flt(self.total_deduction / exchange_rate, 2), 2, foreign_currency)
 	self.custom_foreign_net_pay = fmt_money(flt(self.net_pay / exchange_rate, 2), 2, foreign_currency)
 	self.custom_foreign_rounded_total = fmt_money(flt(self.rounded_total / exchange_rate, 0), 2, foreign_currency)
+ 

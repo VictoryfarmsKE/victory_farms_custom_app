@@ -1,0 +1,31 @@
+{
+ "add_total_row": 1,
+ "add_translate_data": 0,
+ "columns": [],
+ "creation": "2026-04-22 15:49:13.708601",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": null,
+ "modified": "2026-04-22 21:18:36.458922",
+ "modified_by": "Administrator",
+ "module": "Victory Farms Custom App",
+ "name": "Overtime Hours Based On Timesheet",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Timesheet",
+ "report_name": "Overtime Hours Based On Timesheet",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "HR User"
+  },
+  {
+   "role": "HR Manager"
+  }
+ ],
+ "timeout": 0
+}
