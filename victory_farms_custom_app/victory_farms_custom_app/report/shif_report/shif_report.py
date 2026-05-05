@@ -122,8 +122,10 @@ def get_data(filters):
     ).date()
     end_date = frappe.utils.get_last_day(start_date)
 
-    query = query.where(salary_slip.start_date >= start_date)
-    query = query.where(salary_slip.end_date <= end_date)
+    # query = query.where(salary_slip.start_date >= start_date)
+    # query = query.where(salary_slip.end_date <= end_date)
+    
+    query = query.where(salary_slip.end_date.between(start_date, end_date))
 
     data = query.run(as_dict=True)
 
