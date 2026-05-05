@@ -1,0 +1,9 @@
+# Copyright (c) 2026, Solufy and contributors
+# For license information, please see license.txt
+
+# import frappe
+from frappe.model.document import Document
+
+
+class ConsignmentPODetails(Document):
+	pass
