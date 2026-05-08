@@ -166,7 +166,7 @@ def get_detail_rows(from_date, to_date):
 			emp.employee_name,
 			emp.custom_account_name,
 			COALESCE(emp.bank_ac_no, ss.bank_account_no) as bank_account_no,
-			COALESCE(NULLIF(emp.iban, ''), '') as swift_code,
+			COALESCE(NULLIF(emp.micr_code, ''), '') as swift_code,
 			COALESCE(NULLIF(emp.prefered_email, ''), NULLIF(emp.company_email, ''), '0') as beneficiary_email_id,
 			COALESCE(NULLIF(addr.address_line1, ''), '') as beneficiary_address_1,
 			COALESCE(NULLIF(addr.address_line2, ''), '') as beneficiary_address_2,

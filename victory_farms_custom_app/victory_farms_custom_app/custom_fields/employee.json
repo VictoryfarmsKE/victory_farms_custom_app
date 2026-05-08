@@ -449,7 +449,7 @@
    "fieldtype": "Data",
    "insert_after": "ifsc_code",
    "is_system_generated": 1,
-   "label": "MICR Code",
+   "label": "Swift Code",
    "module": "Victory Farms Custom App"
   },
   {
