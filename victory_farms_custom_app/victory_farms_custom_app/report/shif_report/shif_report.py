@@ -41,6 +41,12 @@ def get_columns():
             "width": 150,
         },
         {
+            "label": _("Validation ID"),
+            "fieldname": "custom_validation_id",
+            "fieldtype": "Data",
+            "width": 150,
+        },
+        {
             "label": _("National ID"),
             "fieldname": "national_id",
             "fieldtype": "Data",
