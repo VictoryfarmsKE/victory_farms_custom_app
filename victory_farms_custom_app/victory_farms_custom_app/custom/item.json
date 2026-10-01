@@ -110,7 +110,7 @@
    "property": "options",
    "property_type": "Text",
    "row_name": null,
-   "value": "STO-ITEM-.YYYY.-"
+   "value": "STO-ITEM-.YYYY.-|n FEED-.####"
   },
   {
    "_assign": null,
