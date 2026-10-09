@@ -95,7 +95,7 @@
    "_liked_by": null,
    "_user_tags": null,
    "creation": "2023-12-18 15:36:42.810703",
-   "default_value": null,
+   "default_value": "STO-ITEM-.YYYY.-",
    "doc_type": "Item",
    "docstatus": 0,
    "doctype_or_field": "DocField",
@@ -110,7 +110,7 @@
    "property": "options",
    "property_type": "Text",
    "row_name": null,
-  "value": "STO-ITEM-.YYYY.-\nFEED-.####"
+    "value": "STO-ITEM-.YYYY.-\nFEED-.####"
   },
   {
    "_assign": null,
