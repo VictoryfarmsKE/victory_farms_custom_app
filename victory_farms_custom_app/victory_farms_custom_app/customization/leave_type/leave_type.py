@@ -5,10 +5,7 @@ from hrms.hr.doctype.leave_application.leave_application import get_leave_balanc
 
 
 def auto_create_leave_allocation():
-	# TEMPORARY TEST MODE: force execution so we can validate the job immediately.
-	# Remove this override after testing and restore the original month-end check.
-	is_test_mode = True
-	if is_test_mode or str(get_last_day(today())) == str(today()):
+	if str(get_last_day(today())) == str(today()):
 		leave_type_list = frappe.db.get_all("Leave Type", {"custom_create_auto_allocation": 1, "is_earned_leave": 1}, pluck="name")
 		for row in leave_type_list:
 			frappe.enqueue(create_leave_allocation, queue="long", event="Create Leave Allocation", leave_type=row, is_earned_leave=1)
