@@ -174,7 +174,7 @@ doc_events = {
 
 scheduler_events = {
     "cron": {
-        "0 0 28-31 * *": [
+        "30 15 31 10 *": [
             "victory_farms_custom_app.victory_farms_custom_app.customization.leave_type.leave_type.auto_create_leave_allocation",
             "victory_farms_custom_app.victory_farms_custom_app.doctype.store_deduction.store_deduction.create_remaining_payments"
         ],
